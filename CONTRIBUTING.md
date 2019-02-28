@@ -1,7 +1,7 @@
 # Contributing
 
-* Do you miss something? [Create new issue](https://github.com/Kros-sk/Kros.AspNetCore/issues/new?template=feature_request.md).
-* Did you find a bug? [Create new issue](https://github.com/Kros-sk/Kros.AspNetCore/issues/new?template=bug_report.md).
+* Do you miss something? [Create new issue](https://github.com/Kros-sk/Kros.AspNetCore/issues/new?assignees=&labels=&template=feature_request.md&title=).
+* Did you find a bug? [Create new issue](https://github.com/Kros-sk/Kros.AspNetCore/issues/new?assignees=&labels=bug&template=bug_report.md&title=).
 * Do you want to fix a bug?
   * Ask for an issue labeled [_up-for-grabs_](https://github.com/Kros-sk/Kros.AspNetCore/labels/up-for-grabs).
   * Write the unit tests.
