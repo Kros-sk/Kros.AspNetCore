@@ -68,7 +68,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             {
                 callCount++;
                 return new Foo() { Value = 2 };
-            };
+            }
 
             var foo = await cache.GetAndSetAsync<Foo>("foo", func, options);
             foo.Value.Should().Be(2);
