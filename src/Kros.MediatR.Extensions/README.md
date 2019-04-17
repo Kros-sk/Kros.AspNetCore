@@ -3,7 +3,7 @@
 **Kros.MediatR.Extensions** je knižnica, ktorá rozširuje knižnicu [MediatR](https://github.com/jbogard/MediatR).
 
 ### NullCheckPostProcessor
-Registrovaním `service.AddMediatRNullCheckPostProcessor()` pridáte do MediatR pipeline-y post processor, ktorý kontroluje výsledok requestu a ak je `null` tak vyvolá `NotFoundException`.
+Registrovaním `services.AddMediatRNullCheckPostProcessor()` pridáte do MediatR pipeline-y post processor, ktorý kontroluje výsledok requestu a ak je `null` tak vyvolá `NotFoundException`.
 
 ### ControllerBaseExtensions
 Rozširuje `ControllerBase` o veci, ktoré zjednodušujú prácu s MediatR v controllery.
