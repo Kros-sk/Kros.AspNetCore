@@ -3,7 +3,7 @@
 namespace Kros.AspNetCore.Exceptions
 {
     /// <summary>
-    ///  The exception that is thrown when user requesting resource for which has not permission.
+    ///  The exception which is thrown when user does not have permission for requested resource.
     /// </summary>
     public class ResourceIsForbiddenException : Exception
     {
