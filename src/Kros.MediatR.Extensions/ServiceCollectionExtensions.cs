@@ -33,9 +33,9 @@ namespace Kros.MediatR.Extensions
             Type MakeGenericType(Type type, int i)
                 => type.MakeGenericType(requests[i], responses[i]);
 
-            IEnumerable<Type> pipelineBehaviours = GetPipelineBehaviours(requestType, pipeLineType);
+            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType);
 
-            foreach (var behavior in pipelineBehaviours)
+            foreach (var behavior in pipelineBehaviors)
             {
                 for (int i = 0; i < requests.Count; i++)
                 {
@@ -60,9 +60,9 @@ namespace Kros.MediatR.Extensions
             var pipeLineType = typeof(IPipelineBehavior<,>);
             var requests = GetTypes(requestType);
             var unitType = typeof(Unit);
-            IEnumerable<Type> pipelineBehaviours = GetPipelineBehaviours(requestType, pipeLineType);
+            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType);
 
-            foreach (var behavior in pipelineBehaviours)
+            foreach (var behavior in pipelineBehaviors)
             {
                 foreach (var request in requests)
                 {
@@ -75,7 +75,7 @@ namespace Kros.MediatR.Extensions
             return services;
         }
 
-        private static IEnumerable<Type> GetPipelineBehaviours(Type requestType, Type pipeLineType)
+        private static IEnumerable<Type> GetPipelineBehaviors(Type requestType, Type pipeLineType)
             => Assembly.GetAssembly(requestType).GetTypes()
             .Where(t
                 => t.GetInterface(pipeLineType.Name) != null
