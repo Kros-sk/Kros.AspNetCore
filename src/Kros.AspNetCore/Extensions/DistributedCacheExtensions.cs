@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.Caching.Distributed
         {
             var result = await distributedCache.GetStringAsync(key, token);
 
-            return String.IsNullOrWhiteSpace(result) ? default(T) : JsonConvert.DeserializeObject<T>(result);
+            return string.IsNullOrWhiteSpace(result) ? default(T) : JsonConvert.DeserializeObject<T>(result);
         }
 
         /// <summary>
