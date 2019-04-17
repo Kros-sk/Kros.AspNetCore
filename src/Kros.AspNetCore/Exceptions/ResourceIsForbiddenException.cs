@@ -8,7 +8,7 @@ namespace Kros.AspNetCore.Exceptions
     public class ResourceIsForbiddenException : Exception
     {
         /// <summary>
-        /// Ctor.
+        /// Initializes a new instance of <see cref="ResourceIsForbiddenException"/> class.
         /// </summary>
         public ResourceIsForbiddenException()
             : this(Properties.Resources.UserDoNotHavePermissionToAccessRequestedResource)
@@ -16,7 +16,7 @@ namespace Kros.AspNetCore.Exceptions
         }
 
         /// <summary>
-        /// Ctor.
+        /// Initializes a new instance of <see cref="ResourceIsForbiddenException"/> class.
         /// </summary>
         /// <param name="message">Message.</param>
         public ResourceIsForbiddenException(string message)

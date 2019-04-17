@@ -19,7 +19,7 @@ public async Task<GetToDoQuery.ToDo> GetToDo(int id)
 
 ## Registrovanie pipeline behaviors na základe rozhraní
 
-Umožňuje registrovať pipeline behaviours pre všetky requesty, ktoré implementujú požadované rozhrania.
+Umožňuje registrovať pipeline behaviors pre všetky requesty, ktoré implementujú požadované rozhrania.
 
 Napríklad:
 
