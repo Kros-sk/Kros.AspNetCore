@@ -47,7 +47,7 @@ namespace Microsoft.Extensions.Caching.Distributed
 
         /// <summary>
         /// Gets value from specified cache with the specified <paramref name="key"/>
-        /// and if it don't exist use <paramref name="valueFactory"/> for to get it and cache it.
+        /// and if it doesn't exist use <paramref name="valueFactory"/> to get it and cache it.
         /// </summary>
         /// <typeparam name="T">Type of value.</typeparam>
         /// <param name="distributedCache">The cache in which to store the data.</param>
