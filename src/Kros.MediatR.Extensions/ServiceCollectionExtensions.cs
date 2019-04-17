@@ -23,52 +23,37 @@ namespace Kros.MediatR.Extensions
         /// <param name="services">Service container.</param>
         /// <exception cref="InvalidOperationException">When number of implementation
         /// <typeparamref name="TRequest"/> and <typeparamref name="TResponse"/> are different.</exception>
-        public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest, TResponse>(this IServiceCollection services)
-        {
-            var requestType = typeof(TRequest);
-            var responseType = typeof(TResponse);
-            var pipeLineType = typeof(IPipelineBehavior<,>);
-            (var requests, var responses) = GetTypes(requestType, responseType);
-
-            Type MakeGenericType(Type type, int i)
-                => type.MakeGenericType(requests[i], responses[i]);
-
-            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType);
-
-            foreach (var behavior in pipelineBehaviors)
-            {
-                for (int i = 0; i < requests.Count; i++)
-                {
-                    services.AddTransient(MakeGenericType(pipeLineType, i), MakeGenericType(behavior, i));
-                }
-            }
-
-            return services;
-        }
-
-        /// <summary>
-        /// Scan for MediatR pipeline behaviors
-        /// which request implement <typeparamref name="TRequest"/>.
-        /// </summary>
-        /// <typeparam name="TRequest">Request type.</typeparam>
-        /// <param name="services">Service container.</param>
-        /// <exception cref="InvalidOperationException">When number of implementation
-        /// <typeparamref name="TRequest"/> and <typeparamref name="TResponse"/> are different.</exception>
         public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(this IServiceCollection services)
         {
             var requestType = typeof(TRequest);
-            var pipeLineType = typeof(IPipelineBehavior<,>);
             var requests = GetTypes(requestType);
-            var unitType = typeof(Unit);
+            var requestInterfaceName = typeof(IRequest<>).Name;
+            var pipeLineType = typeof(IPipelineBehavior<,>);
+
             IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType);
 
             foreach (var behavior in pipelineBehaviors)
             {
+                var behaviorGenericArgumentsCount = behavior.GetGenericArguments().Length;
+
                 foreach (var request in requests)
                 {
+                    var interfaceType = request.GetInterface(requestInterfaceName);
+                    var responseType = interfaceType.GetGenericArguments()[0];
+                    Type genericBehaviorType = null;
+
+                    if (behaviorGenericArgumentsCount == 1)
+                    {
+                        genericBehaviorType = behavior.MakeGenericType(request);
+                    }
+                    else
+                    {
+                        genericBehaviorType = behavior.MakeGenericType(request, responseType);
+                    }
+
                     services.AddTransient(
-                        pipeLineType.MakeGenericType(request, unitType),
-                        behavior.MakeGenericType(request));
+                        pipeLineType.MakeGenericType(request, responseType),
+                        genericBehaviorType);
                 }
             }
 
@@ -80,20 +65,6 @@ namespace Kros.MediatR.Extensions
             .Where(t
                 => t.GetInterface(pipeLineType.Name) != null
                 && t.GetGenericArguments()[0].GetInterface(requestType.Name) != null);
-
-        private static (IList<Type>, IList<Type>) GetTypes(Type requestType, Type responseType)
-        {
-            var requests = GetTypes(requestType);
-            var responses = GetTypes(responseType);
-
-            if (requests.Count != responses.Count)
-            {
-                throw new InvalidOperationException(
-                    string.Format(Properties.Resources.IncorrectNumberOfImplementation, requestType.Name, responseType.Name));
-            }
-
-            return (requests, responses);
-        }
 
         private static IList<Type> GetTypes(Type type)
             => Assembly.GetAssembly(type)

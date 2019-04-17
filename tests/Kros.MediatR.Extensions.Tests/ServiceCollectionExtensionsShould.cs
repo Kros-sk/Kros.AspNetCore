@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
-using System;
 using MediatR.Pipeline;
 using Kros.MediatR.PostProcessors;
 
@@ -137,7 +136,7 @@ namespace Kros.MediatR.Extensions.Tests
         [Fact]
         public void RegisterPipelineBehaviorsForRequestType()
         {
-            Services.AddPipelineBehaviorsForRequest<IFooRequest, IFooResponse>();
+            Services.AddPipelineBehaviorsForRequest<IFooRequest>();
 
             var behavior = Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
 
@@ -147,21 +146,13 @@ namespace Kros.MediatR.Extensions.Tests
         [Fact]
         public void RegisterPipelineBehaviorsForRequestTypeWhenMoreRequestsImplementInterface()
         {
-            Services.AddPipelineBehaviorsForRequest<IBarRequest, IBarResponse>();
+            Services.AddPipelineBehaviorsForRequest<IBarRequest>();
 
             var behavior = Provider.GetRequiredService<IPipelineBehavior<BarRequest, BarRequest.BarResponse>>();
             behavior.Should().BeAssignableTo<BarPipelineBehavior<BarRequest, BarRequest.BarResponse>>();
 
             var behaviorBar1 = Provider.GetRequiredService<IPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>();
             behaviorBar1.Should().BeAssignableTo<BarPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>();
-        }
-
-        [Fact]
-        public void ThrowExceptionWhenNumberOfImplementationsAreDifferent()
-        {
-            Action action = () => Services.AddPipelineBehaviorsForRequest<ITestRequest, ITestResponse>();
-
-            action.Should().Throw<InvalidOperationException>();
         }
 
         [Fact]
