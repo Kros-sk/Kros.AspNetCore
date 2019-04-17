@@ -1,4 +1,4 @@
-﻿using Kros.MediatR.PostProcessor;
+﻿using Kros.MediatR.PostProcessors;
 using MediatR;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
@@ -106,6 +106,6 @@ namespace Kros.MediatR.Extensions
         /// </summary>
         /// <param name="services">Service container.</param>
         public static IServiceCollection AddMediatRNullCheckPostProcessor(this IServiceCollection services)
-            => services.AddTransient(typeof(IRequestPostProcessor<,>), typeof(NullCheckPostProcessor<,>));
+            => services.AddSingleton(typeof(IRequestPostProcessor<,>), typeof(NullCheckPostProcessor<,>));
     }
 }

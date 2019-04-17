@@ -6,7 +6,7 @@ using Xunit;
 using FluentAssertions;
 using System;
 using MediatR.Pipeline;
-using Kros.MediatR.PostProcessor;
+using Kros.MediatR.PostProcessors;
 
 namespace Kros.MediatR.Extensions.Tests
 {

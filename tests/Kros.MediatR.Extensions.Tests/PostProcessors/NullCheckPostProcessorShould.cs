@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
 using Kros.AspNetCore.Exceptions;
-using Kros.MediatR.PostProcessor;
+using Kros.MediatR.PostProcessors;
 using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Kros.MediatR.Extensions.Tests.PostProcessor
+namespace Kros.MediatR.Extensions.Tests.PostProcessors
 {
     public class NullCheckPostProcessorShould
     {

@@ -1,7 +1,6 @@
 ﻿using Kros.AspNetCore.Exceptions;
 using Kros.AspNetCore.Extensions;
 using Kros.Utils;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -51,10 +50,6 @@ namespace Kros.AspNetCore.Middlewares
             {
                 SetResponseType(context, ex, HttpStatusCode.RequestTimeout);
             }
-            catch (Exception)
-            {
-                throw;
-            }
         }
 
         private void SetResponseType(HttpContext context, Exception ex, HttpStatusCode statusCode)
@@ -64,18 +59,5 @@ namespace Kros.AspNetCore.Middlewares
             context.Response.ClearExceptCorsHeaders();
             context.Response.StatusCode = (int)statusCode;
         }
-    }
-
-    /// <summary>
-    /// Extension for adding error handling middleware to application.
-    /// </summary>
-    public static class ErrorHandlingMiddlewareExtension
-    {
-        /// <summary>
-        /// Extension for adding error handling middleware to application.
-        /// </summary>
-        /// <param name="app">Application builder.</param>
-        public static void UseErrorHandling(this IApplicationBuilder app)
-            => app.UseMiddleware<ErrorHandlingMiddleware>();
     }
 }

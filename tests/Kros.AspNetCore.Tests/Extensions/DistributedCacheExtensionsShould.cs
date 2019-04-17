@@ -51,11 +51,11 @@ namespace Kros.AspNetCore.Tests.Extensions
             var foo = await cache.GetAsync<Foo>("foo");
             foo.Should().BeNull();
 
-            var @int = await cache.GetAsync<int?>("int");
-            @int.Should().BeNull();
+            var intValue = await cache.GetAsync<int?>("int");
+            intValue.Should().BeNull();
 
-            var @string = await cache.GetAsync<string>("string");
-            @string.Should().BeNull();
+            var stringValue = await cache.GetAsync<string>("string");
+            stringValue.Should().BeNull();
         }
 
         [Fact]

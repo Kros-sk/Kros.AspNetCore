@@ -2,7 +2,7 @@
 using MediatR.Pipeline;
 using System.Threading.Tasks;
 
-namespace Kros.MediatR.PostProcessor
+namespace Kros.MediatR.PostProcessors
 {
     /// <summary>
     /// MediatR post processor which check if response is

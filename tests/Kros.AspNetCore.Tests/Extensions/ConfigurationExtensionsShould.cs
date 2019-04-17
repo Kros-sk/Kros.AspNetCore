@@ -20,7 +20,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         public void GetOptionsByType()
         {
             var configuration = GetConfiguration();
-            var options = configuration.GetOptions<TestOptions>();
+            var options = configuration.GetSection<TestOptions>();
 
             options.Value.Should().Be(1);
         }

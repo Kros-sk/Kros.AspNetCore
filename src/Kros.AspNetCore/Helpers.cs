@@ -7,9 +7,10 @@
     {
         /// <summary>
         /// Get section name by <typeparamref name="TOptions"/> type.
+        /// Section name is class name without Options suffix.
         /// </summary>
         /// <typeparam name="TOptions">Option type.</typeparam>
-        /// <returns>Section name for <typeparamref name="TOptions"/> type.</returns>
+        /// <returns>Class name without Options suffix.</returns>
         public static string GetSectionName<TOptions>() where TOptions : class
         {
             const string uselessSuffix = "Options";
