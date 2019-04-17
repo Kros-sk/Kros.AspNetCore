@@ -6,7 +6,6 @@ namespace Kros.AspNetCore.Tests.Extensions
 {
     public class ConfigurationExtensionsShould
     {
-
         #region Test class
 
         class TestOptions

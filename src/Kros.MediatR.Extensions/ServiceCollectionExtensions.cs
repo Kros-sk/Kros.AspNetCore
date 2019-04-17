@@ -26,10 +26,10 @@ namespace Kros.MediatR.Extensions
         public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(this IServiceCollection services)
         {
             var requestType = typeof(TRequest);
-            var requests = GetTypes(requestType);
-            var requestInterfaceName = typeof(IRequest<>).Name;
             var pipeLineType = typeof(IPipelineBehavior<,>);
+            var requestInterfaceName = typeof(IRequest<>).Name;
 
+            var requests = GetTypes(requestType);
             IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType);
 
             foreach (var behavior in pipelineBehaviors)

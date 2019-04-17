@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <summary>
         /// Send command for create resource.
         /// </summary>
-        /// <typeparam name="TResponse">Response type</typeparam>
+        /// <typeparam name="TResponse">Type of command response. This response is used as id for response to the client.</typeparam>
         /// <param name="controller">Controller.</param>
         /// <param name="command">Create command.</param>
         /// <param name="actionName">Action name to specify URI at which the content has been created.</param>
