@@ -64,7 +64,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             IDistributedCache cache = new MemoryDistributedCache();
             DistributedCacheEntryOptions options = new DistributedCacheEntryOptions();
             var callCount = 0;
-            Func<Foo> func = () =>
+            Foo func()
             {
                 callCount++;
                 return new Foo() { Value = 2 };
