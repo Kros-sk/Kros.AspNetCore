@@ -1,5 +1,4 @@
-﻿
-using FluentAssertions;
+﻿using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +17,6 @@ namespace Kros.MediatR.Extensions.Tests
 
         public class TestController : ControllerBase
         {
-
         }
 
         public class Request : IRequest<Request.Response>
