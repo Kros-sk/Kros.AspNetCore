@@ -80,7 +80,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
         internal class MemoryDistributedCache : IDistributedCache
         {
-            private Dictionary<string, byte[]> _cache = new Dictionary<string, byte[]>();
+            private readonly Dictionary<string, byte[]> _cache = new Dictionary<string, byte[]>();
 
             public byte[] Get(string key)
                 => _cache.TryGetValue(key, out var value) ? value : null;
