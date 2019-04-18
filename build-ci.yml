@@ -1,0 +1,33 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+pool: Default
+
+variables:
+  - group: Nuget
+  - name: buildConfiguration
+    value: 'Release'
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Nuget restore'
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build'
+    inputs:
+      command: build
+      projects: '**/*.csproj'
+      arguments: '--configuration $(BuildConfiguration) --no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Tests'
+    inputs:
+      command: test
+      projects: '**/*[Tt]ests*.csproj'
+      arguments: '--configuration $(BuildConfiguration)'
