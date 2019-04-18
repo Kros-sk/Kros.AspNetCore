@@ -11,21 +11,19 @@ variables:
   - group: Nuget
   - name: buildConfiguration
     value: 'Release'
-  - name: projectName
-    value: 'Kros.AspNetCore'
 
 steps:
   - task: DotNetCoreCLI@2
     displayName: 'Nuget restore'
     inputs:
       command: 'restore'
-      projects: '**/$(projectName).csproj'
+      projects: '**/*.csproj'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build'
     inputs:
       command: build
-      projects: '**/$(projectName).csproj'
+      projects: '**/*.csproj'
       arguments: '--configuration $(BuildConfiguration) --no-restore'
 
   - task: DotNetCoreCLI@2
