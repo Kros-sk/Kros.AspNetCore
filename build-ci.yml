@@ -4,8 +4,7 @@ trigger:
     include:
       - master
 
-pool:
-  name: Hosted Windows 2019 with VS2019
+pool: Default
 
 variables:
   - group: Nuget
