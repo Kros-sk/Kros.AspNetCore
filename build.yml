@@ -40,9 +40,9 @@ steps:
       projects: '**/*[Tt]ests*.csproj'
 
   - task: DotNetCoreCLI@2
-    displayName: 'Publish'
+    displayName: 'Pack'
     inputs:
-      command: publish
+      command: pack
       projects: '**/$(projectName).csproj'
 
   - task: CopyFiles@2
