@@ -21,7 +21,7 @@ variables:
   - name: 'project.Current'
     value: ''
   - name: 'project.TestProjectsCount'
-    value:  0    
+    value:  0
 
 steps:
   - powershell: echo '##vso[task.setvariable variable=project.Current]$(project.AspNetCore)'
@@ -31,7 +31,7 @@ steps:
   - powershell: echo '##vso[task.setvariable variable=project.Current]$(project.MediatR)'
     displayName: 'Set project: $(project.MediatR)'
     condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/mediatr-v')
-    
+
   - script: |
       echo No project was specified.
       echo Build must be triggered with correct tag and based on the tag name, the project is selected.
@@ -40,8 +40,8 @@ steps:
       echo   - mediatr-v* - Kros.MediatR.Extensions
       exit 1
     displayName: 'Check project name'
-    condition: eq(variables['project.Current'], '')    
-    
+    condition: eq(variables['project.Current'], '')
+
   - task: DotNetCoreCLI@2
     displayName: 'Nuget restore'
     inputs:
@@ -63,7 +63,7 @@ steps:
       Write-Host Test projects found: $count
       Write-Output ("##vso[task.setvariable variable=project.TestProjectsCount;]$count")
     displayName: Find Test Projects
-    
+
   - task: DotNetCoreCLI@2
     displayName: 'Tests'
     condition: gt(variables['project.TestProjectsCount'], 0)
