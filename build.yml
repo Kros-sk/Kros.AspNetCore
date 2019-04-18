@@ -1,0 +1,57 @@
+trigger:
+  tags:
+    include:
+    - v*
+
+pool:
+  name: Hosted Windows 2019 with VS2019
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: DevShared/Templates
+
+variables:
+  - group: Nuget
+  - name: buildConfiguration
+    value: 'Release'
+  - name: projectName
+    value: 'Kros.AspNetCore'
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Nuget restore'
+    inputs:
+      command: 'restore'
+      projects: '**/$(projectName).csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build'
+    inputs:
+      command: build
+      projects: '**/$(projectName).csproj'
+      arguments: '--configuration $(BuildConfiguration) --no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Tests'
+    inputs:
+      command: test
+      projects: '**/*[Tt]ests*.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish'
+    inputs:
+      command: publish
+      projects: '**/$(projectName).csproj'
+
+  - task: CopyFiles@2
+    displayName: 'Copy package files to staging directory'
+    inputs:
+      Contents: '**/$(projectName)*.nupkg'
+      TargetFolder: '$(build.artifactStagingDirectory)'
+      FlattenFolders: true
+
+  - template: steps/nuget-push.yml@templates
+    parameters:
+      feed: '$(nuget.feed)'
