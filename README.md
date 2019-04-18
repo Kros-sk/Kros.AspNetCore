@@ -1,6 +1,10 @@
 # Kros.AspNetCore
 
+[Kros.AspNetCore](https://github.com/Kros-sk/Kros.AspNetCore/blob/master/src/Kros.AspNetCore)
 
+# Kros.MediatR.Extensions
+
+[Kros.MediatR.Extensions](https://github.com/Kros-sk/Kros.AspNetCore/blob/master/src/Kros.MediatR.Extensions)
 
 ## Contributing Guide
 
