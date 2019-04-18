@@ -24,7 +24,7 @@ steps:
     inputs:
       command: build
       projects: '**/*.csproj'
-      arguments: '--configuration $(BuildConfiguration)'
+      arguments: '--configuration $(BuildConfiguration) --no-restore'
 
   - task: DotNetCoreCLI@2
     displayName: 'Tests'
