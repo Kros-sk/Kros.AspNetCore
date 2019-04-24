@@ -328,3 +328,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder
 .mfractor/
+Kros.AspNetCore.xml
+Kros.MediatR.Extensions.xml

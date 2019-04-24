@@ -2,12 +2,28 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.0.1</Version>
+    <Authors>KROS a.s.</Authors>
+    <Description>General utilities and helpers for building ASP.NET Core WEB API</Description>
+    <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.MediatR.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.MediatR.Extensions</RepositoryUrl>
+    <PackageIconUrl>https://en.gravatar.com/userimage/137934964/524e95fbd8c2e8779e02819ab6902bef.png</PackageIconUrl>
+    <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
+    <PackageTags>MediatR;CQRS;ASP.NET Core;Extensions;Helpers;</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
-  <ItemGroup>    
-    <PackageReference Include="MediatR" Version="6.0.0" />    
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>$(OutDir)Kros.MediatR.Extensions.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-    
   </ItemGroup>
 
   <ItemGroup>
@@ -27,5 +43,5 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>  
+  </ItemGroup>
 </Project>
