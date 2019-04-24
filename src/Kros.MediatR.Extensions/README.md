@@ -24,5 +24,5 @@ Umožňuje registrovať pipeline behaviors pre všetky requesty, ktoré implemen
 Napríklad:
 
 ```CSharp
-services.AddPipelineBehaviorsForRequest<IUserResourceQuery, IUserResourceQueryResult>()
+services.AddPipelineBehaviorsForRequest<IUserResourceQuery>()
 ```
