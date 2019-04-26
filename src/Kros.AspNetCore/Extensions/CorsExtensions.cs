@@ -8,17 +8,17 @@ namespace Kros.AspNetCore.Extensions
     /// </summary>
     public static class CorsExtensions
     {
-        private const string AllowAllOriginsPolicy = "AllowAllOrigins";
+        private const string AllowAnyOrigins = "AllowAllOrigins";
 
         /// <summary>
         /// Adds allow all origins Cors policy.
         /// </summary>
         /// <param name="services">IoC container.</param>
-        public static IServiceCollection AddAllowAllOriginsCorsPolicy(this IServiceCollection services)
+        public static IServiceCollection AddAllowAnyOriginCors(this IServiceCollection services)
             => services.AddCors(options =>
             {
                 options.AddPolicy(
-                    AllowAllOriginsPolicy,
+                    AllowAnyOrigins,
                     builder => builder
                         .AllowAnyOrigin()
                         .AllowAnyMethod()
@@ -52,7 +52,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="app">Application.</param>
         public static IApplicationBuilder UseAllowAllOriginsCors(this IApplicationBuilder app)
-            => app.UseCors(AllowAllOriginsPolicy);
+            => app.UseCors(AllowAnyOrigins);
 
         /// <summary>
         /// Register usage of custom cors policy.
