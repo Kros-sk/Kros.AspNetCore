@@ -8,7 +8,7 @@ namespace Kros.AspNetCore.Extensions
     /// </summary>
     public static class CorsExtensions
     {
-        private const string AllowAnyOrigins = "AllowAllOrigins";
+        private const string AllowAnyOrigins = "AllowAnyOrigins";
 
         /// <summary>
         /// Adds allow all origins Cors policy.
