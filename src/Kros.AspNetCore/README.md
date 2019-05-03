@@ -45,4 +45,4 @@ V adresári `Extensions` sa nachádzajú rôzne rozšírenia štandardných trie
 
 ## BaseStartup
 
-Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` režime sú pre `CORS ` povolené všetky domény.
+Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` režime sú pre `CORS` povolené všetky domény.
