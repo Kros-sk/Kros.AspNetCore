@@ -41,7 +41,7 @@ V adresári `Extensions` sa nachádzajú rôzne rozšírenia štandardných trie
   
 - ### CorsExtensions
   
-  Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto doménž je potrebné vymenovať v `appsettings.json` v sekcii `AllowesHosts`.
+  Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto domény je potrebné vymenovať v `appsettings.json` v sekcii `AllowesHosts`.
 
 ## BaseStartup
 
