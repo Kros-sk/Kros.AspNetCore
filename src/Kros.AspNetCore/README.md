@@ -37,4 +37,12 @@ V adresári `Extensions` sa nachádzajú rôzne rozšírenia štandardných trie
 
 - ### ServiceCollectionExtensions
 
-  Obsahuje jednoduchšie konfigurovanie options do DI kontajnera. A odľahčené registrovanie Mvc pre web api - `services.AddWebApi()`.
+  Obsahuje jednoduchšie konfigurovanie options do DI kontajnera. A odľahčené registrovanie Mvc pre web api - `services.AddWebApi()`
+  
+- ### CorsExtensions
+  
+  Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto doménž je potrebné vymenovať v `appsettings.json` v sekcii `AllowesHosts`.
+
+## BaseStartup
+
+Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` režime sú pre `CORS ` povolené všetky domény.
