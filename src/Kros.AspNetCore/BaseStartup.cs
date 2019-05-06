@@ -52,15 +52,8 @@ namespace Kros.AspNetCore
             }
             else
             {
-                try
-                {
-                    var allowedOrigins = Configuration.GetSection(CorsOptions.CorsSectionName).Get<string[]>();
-                    services.AddCustomOriginsCorsPolicy(allowedOrigins, CorsOptions.CorsPolicyName);
-                }
-                catch
-                {
-                    throw;
-                }
+                var allowedOrigins = Configuration.GetSection(CorsOptions.CorsSectionName).Get<string[]>();
+                services.AddCustomOriginsCorsPolicy(allowedOrigins, CorsOptions.CorsPolicyName);
             }
         }
 
