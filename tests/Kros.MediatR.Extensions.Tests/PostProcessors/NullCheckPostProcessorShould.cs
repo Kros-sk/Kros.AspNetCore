@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Kros.AspNetCore.Exceptions;
 using Kros.MediatR.PostProcessors;
+using MediatR;
 using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Kros.MediatR.Extensions.Tests.PostProcessors
@@ -12,7 +12,7 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         [Fact]
         public void ThrowExceptionWhenResponseIsNull()
         {
-            var postProcessor = new NullCheckPostProcessor<string, string>();
+            var postProcessor = new NullCheckPostProcessor<string, string>(NullCheckPostProcessorOptions.Default);
 
             Action action = () => postProcessor.Process("", null);
 
@@ -22,11 +22,26 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         [Fact]
         public void DoNotThrowExceptionWhenResponseIsNotNull()
         {
-            var postProcessor = new NullCheckPostProcessor<string, string>();
+            var postProcessor = new NullCheckPostProcessor<string, string>(NullCheckPostProcessorOptions.Default);
 
             Action action = () => postProcessor.Process("request", "response");
 
             action.Should().NotThrow<NotFoundException>();
         }
+
+        [Fact]
+        public void DoNotCheckResponseIfNullCheckIgnoreIsSet()
+        {
+            var options = new NullCheckPostProcessorOptions();
+            options.IgnoreRequest<Request>();
+
+            var postProcessor = new NullCheckPostProcessor<Request, string>(options);
+
+            Action action = () => postProcessor.Process(new Request(), null);
+
+            action.Should().NotThrow<NotFoundException>();
+        }
+
+        public class Request : IRequest<string> { }
     }
 }

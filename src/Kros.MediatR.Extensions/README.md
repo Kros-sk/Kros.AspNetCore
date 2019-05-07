@@ -4,7 +4,18 @@
 
 ## NullCheckPostProcessor
 
-Registrovaním `services.AddMediatRNullCheckPostProcessor()` pridáte do MediatR pipeline-y post processor, ktorý kontroluje výsledok requestu a ak je `null` tak vyvolá `NotFoundException`.
+Registrovaním `services.AddMediatRNullCheckPostProcessor()` pridáte do MediatR pipeline-y post processor,
+ktorý kontroluje výsledky všetkých requestov a ak je `null` tak vyvolá `NotFoundException`.
+
+Ak potrebujete niektoré requesty vynechať z kontrolovania, môžete tak spraviť nasledovne:
+
+```CSharp
+services.AddMediatRNullCheckPostProcessor((o) =>
+{
+   o.IgnoreRequest<CreateDefaultUserCommand>();
+   o.IgnoreRequest<AnotherCommand>();
+});
+```
 
 ## ControllerBaseExtensions
 

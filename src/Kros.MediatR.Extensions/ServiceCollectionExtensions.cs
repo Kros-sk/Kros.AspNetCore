@@ -16,13 +16,12 @@ namespace Kros.MediatR.Extensions
     {
         /// <summary>
         /// Scan for MediatR pipeline behaviors
-        /// which request implement <typeparamref name="TRequest"/> and response implement <typeparamref name="TResponse"/>.
+        /// which request implement <typeparamref name="TRequest"/>.
         /// </summary>
         /// <typeparam name="TRequest">Request type.</typeparam>
-        /// <typeparam name="TResponse">Response type.</typeparam>
         /// <param name="services">Service container.</param>
         /// <exception cref="InvalidOperationException">When number of implementation
-        /// <typeparamref name="TRequest"/> and <typeparamref name="TResponse"/> are different.</exception>
+        /// <typeparamref name="TRequest"/> and response are different.</exception>
         public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(this IServiceCollection services)
         {
             var requestType = typeof(TRequest);
@@ -77,6 +76,26 @@ namespace Kros.MediatR.Extensions
         /// </summary>
         /// <param name="services">Service container.</param>
         public static IServiceCollection AddMediatRNullCheckPostProcessor(this IServiceCollection services)
-            => services.AddSingleton(typeof(IRequestPostProcessor<,>), typeof(NullCheckPostProcessor<,>));
+            => services.AddSingleton(NullCheckPostProcessorOptions.Default)
+            .AddSingleton(typeof(IRequestPostProcessor<,>), typeof(NullCheckPostProcessor<,>));
+
+        /// <summary>
+        /// Add <see cref="NullCheckPostProcessor{TRequest, TResponse}"/> for MediatR.
+        /// </summary>
+        /// <param name="services">Service container.</param>
+        /// <param name="optionAction">Configure which requests will be ignore.</param>
+        public static IServiceCollection AddMediatRNullCheckPostProcessor(
+            this IServiceCollection services,
+            Action<NullCheckPostProcessorOptions> optionAction)
+        {
+            var options = new NullCheckPostProcessorOptions();
+
+            optionAction(options);
+
+            services.AddSingleton(options);
+            services.AddSingleton(typeof(IRequestPostProcessor<,>), typeof(NullCheckPostProcessor<,>));
+
+            return services;
+        }
     }
 }
