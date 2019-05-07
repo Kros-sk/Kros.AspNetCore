@@ -69,6 +69,7 @@ namespace Kros.MediatR.Extensions.Tests
         {
             var service = new ServiceCollection();
             service.AddMediatR();
+            service.AddMediatRNullCheckPostProcessor();
 
             var actionContext = new ActionContext
             {

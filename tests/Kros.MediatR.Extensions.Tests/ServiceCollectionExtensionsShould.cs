@@ -6,6 +6,8 @@ using Xunit;
 using FluentAssertions;
 using MediatR.Pipeline;
 using Kros.MediatR.PostProcessors;
+using Kros.AspNetCore.Exceptions;
+using System;
 
 namespace Kros.MediatR.Extensions.Tests
 {
@@ -163,6 +165,17 @@ namespace Kros.MediatR.Extensions.Tests
             var behavior = Provider.GetRequiredService<IRequestPostProcessor<BarRequest, BarRequest.BarResponse>>();
 
             behavior.Should().BeAssignableTo<NullCheckPostProcessor<BarRequest, BarRequest.BarResponse>>();
+        }
+
+        [Fact]
+        public void RegisterNullCheckPostProcessWithIgnoringType()
+        {
+            Services.AddMediatRNullCheckPostProcessor((o)=> o.IgnoreRequest<string>());
+            var behavior = Provider.GetRequiredService<IRequestPostProcessor<string, string>>();
+
+            Action action = () => behavior.Process("", null);
+
+            action.Should().NotThrow<NotFoundException>();
         }
 
         [Fact]
