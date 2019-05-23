@@ -173,7 +173,7 @@ namespace Kros.MediatR.Extensions.Tests
             Services.AddMediatRNullCheckPostProcessor((o)=> o.IgnoreRequest<string>());
             var behavior = Provider.GetRequiredService<IRequestPostProcessor<string, string>>();
 
-            Action action = () => behavior.Process("", null);
+            Action action = () => behavior.Process("", null, CancellationToken.None);
 
             action.Should().NotThrow<NotFoundException>();
         }

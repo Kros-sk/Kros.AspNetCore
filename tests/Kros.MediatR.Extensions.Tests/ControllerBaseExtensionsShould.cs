@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -68,7 +69,7 @@ namespace Kros.MediatR.Extensions.Tests
         private static TestController CreateController()
         {
             var service = new ServiceCollection();
-            service.AddMediatR();
+            service.AddMediatR(Assembly.GetExecutingAssembly());
             service.AddMediatRNullCheckPostProcessor();
 
             var actionContext = new ActionContext

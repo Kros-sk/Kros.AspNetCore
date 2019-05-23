@@ -3,6 +3,7 @@ using Kros.AspNetCore.Exceptions;
 using Kros.MediatR.PostProcessors;
 using MediatR;
 using System;
+using System.Threading;
 using Xunit;
 
 namespace Kros.MediatR.Extensions.Tests.PostProcessors
@@ -14,7 +15,7 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         {
             var postProcessor = new NullCheckPostProcessor<string, string>(NullCheckPostProcessorOptions.Default);
 
-            Action action = () => postProcessor.Process("", null);
+            Action action = () => postProcessor.Process("", null, CancellationToken.None);
 
             action.Should().Throw<NotFoundException>();
         }
@@ -24,7 +25,7 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         {
             var postProcessor = new NullCheckPostProcessor<string, string>(NullCheckPostProcessorOptions.Default);
 
-            Action action = () => postProcessor.Process("request", "response");
+            Action action = () => postProcessor.Process("request", "response", CancellationToken.None);
 
             action.Should().NotThrow<NotFoundException>();
         }
@@ -37,7 +38,7 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
 
             var postProcessor = new NullCheckPostProcessor<Request, string>(options);
 
-            Action action = () => postProcessor.Process(new Request(), null);
+            Action action = () => postProcessor.Process(new Request(), null, CancellationToken.None);
 
             action.Should().NotThrow<NotFoundException>();
         }
