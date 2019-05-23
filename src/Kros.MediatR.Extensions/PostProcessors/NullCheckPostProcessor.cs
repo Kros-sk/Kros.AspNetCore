@@ -28,7 +28,7 @@ namespace Kros.MediatR.PostProcessors
         /// <inheritdoc />
         public Task Process(TRequest request, TResponse response)
         {
-            if (_options.CanCheckResponse(request) && response is null)
+            if (_options.CanCheckResponse(request) && response == null)
             {
                 throw new NotFoundException();
             }
