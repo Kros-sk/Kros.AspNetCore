@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds the minimum essential MVC services to the DI container for web API services.
-        /// (MVC Core, JSON Formatters, CORS, API Explorer)
+        /// (MVC Core, JSON Formatters, CORS, API Explorer, Authorization)
         /// Additional services must be added separately using the <see cref="IMvcCoreBuilder"/> returned from this method.
         /// As compatibility version for MVC is used <see cref="DefaultCompatibilityVersion"/>.
         /// </summary>
@@ -54,7 +54,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Adds the minimum essential MVC services to the DI container for web API services.
-        /// (MVC Core, JSON Formatters, CORS, API Explorer)
+        /// (MVC Core, JSON Formatters, CORS, API Explorer, Authorization)
         /// Additional services must be added separately using the <see cref="IMvcCoreBuilder"/> returned from this method.
         /// </summary>
         /// <param name="services">MVC Core builder.</param>
@@ -66,7 +66,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder.AddFormatterMappings()
                 .AddJsonFormatters()
                 .AddCors()
-                .AddApiExplorer();
+                .AddApiExplorer()
+                .AddAuthorization();
         }
     }
 }
