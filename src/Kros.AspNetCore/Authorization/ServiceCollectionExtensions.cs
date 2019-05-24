@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 
 namespace Kros.AspNetCore.Authorization
@@ -24,10 +26,12 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="services">Collection of app services.</param>
         /// <param name="scheme">Scheme name for authentication.</param>
         /// <param name="configuration">Configuration from which the options are loaded.</param>
+        /// <param name="configureOptions">Configuration.</param>
         public static IServiceCollection AddApiJwtAuthentication(
             this IServiceCollection services,
             string scheme,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            Action<JwtBearerOptions> configureOptions = null)
         {
             var options = configuration.GetSection<ApiJwtAuthorizationOptions>();
 
@@ -43,6 +47,8 @@ namespace Kros.AspNetCore.Authorization
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
+
+                    configureOptions?.Invoke(x);
                 });
 
             return services;

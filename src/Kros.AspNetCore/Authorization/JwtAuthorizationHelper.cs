@@ -28,14 +28,14 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="userClaims">User claims.</param>
         /// <param name="secretKey">Key used for signing.</param>
         /// <returns>Jwt token.</returns>
-        public static string CreateJwtTokenFromClaims(IEnumerable<Claim> userClaims, string secretKey)
+        public static string CreateJwtTokenFromClaims(IEnumerable<Claim> userClaims, string secretKey, DateTime? expires = null)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(userClaims),
-                Expires = DateTime.UtcNow.AddMinutes(5),
+                Expires = expires,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
