@@ -77,6 +77,7 @@ namespace Kros.AspNetCore.Authorization
         /// </summary>
         /// <param name="services">Collection of app services.</param>
         /// <param name="scheme">Scheme name for authentication.</param>
+        /// <param name="configuration">App configurations.</param>
         /// <returns></returns>
         public static IServiceCollection AddAuthJwtAuthentication(
             this IServiceCollection services,

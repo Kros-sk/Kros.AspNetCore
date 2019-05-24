@@ -11,7 +11,7 @@ namespace Kros.AspNetCore.Authorization
         /// <summary>
         /// Return user id from user claims.
         /// </summary>
-        /// <param name="userClaims">All user claims.</param>
+        /// <param name="claimsPrincipal">Claims principal which contains all user claims.</param>
         /// <returns>User id.</returns>
         public static int GetUserId(this ClaimsPrincipal claimsPrincipal)
         {
@@ -26,7 +26,7 @@ namespace Kros.AspNetCore.Authorization
         /// <summary>
         /// Return email from user claims.
         /// </summary>
-        /// <param name="userClaims">All user claims.</param>
+        /// <param name="claimsPrincipal">Claims principal which contains all user claims.</param>
         /// <returns>User email.</returns>
         public static int GetUserEmail(this ClaimsPrincipal claimsPrincipal)
         {
@@ -41,7 +41,7 @@ namespace Kros.AspNetCore.Authorization
         /// <summary>
         /// Return specific value from user claims.
         /// </summary>
-        /// <param name="userClaims">All user claims.</param>
+        /// <param name="claimsPrincipal">Claims principal which contains all user claims.</param>
         /// <param name="userClaimType">Claim type.</param>
         /// <returns>Claim value.</returns>
         private static string GetValueFromUserClaims(ClaimsPrincipal claimsPrincipal, string userClaimType)
