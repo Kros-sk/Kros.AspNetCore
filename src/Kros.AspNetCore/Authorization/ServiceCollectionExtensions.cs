@@ -14,20 +14,16 @@ namespace Kros.AspNetCore.Authorization
         /// Configure gateway authorization.
         /// </summary>
         /// <param name="services">Collection of app services.</param>
-        /// <returns></returns>
         public static IServiceCollection AddGatewayJwtAuthorization(this IServiceCollection services)
-        {
-            services.AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName);
-            return services;
-        }
+            => services.AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
+            .Services;
 
         /// <summary>
-        /// Configure api authentication.
+        /// Configure downstream api authentication.
         /// </summary>
         /// <param name="services">Collection of app services.</param>
         /// <param name="scheme">Scheme name for authentication.</param>
         /// <param name="configuration">Configuration from which the options are loaded.</param>
-        /// <returns></returns>
         public static IServiceCollection AddApiJwtAuthentication(
             this IServiceCollection services,
             string scheme,
@@ -50,42 +46,6 @@ namespace Kros.AspNetCore.Authorization
                 });
 
             return services;
-        }
-
-        /// <summary>
-        /// Configure api authorization.
-        /// </summary>
-        /// <param name="services">Collection of app services.</param>
-        /// <param name="scheme">Scheme name for authentication.</param>
-        /// <returns></returns>
-        public static IServiceCollection AddApiJwtAuthorization(
-            this IServiceCollection services,
-            string scheme)
-        {
-            return services.AddAuthorization(options =>
-            {
-                options.AddPolicy(JwtAuthorizationHelper.AuthPolicyName, policyAdmin =>
-                {
-                    policyAdmin.AuthenticationSchemes.Add(scheme);
-                    policyAdmin.RequireClaim(UserClaimTypes.IsAdmin, bool.TrueString);
-                });
-            });
-        }
-
-        /// <summary>
-        /// Configure authentication for authorization service.
-        /// </summary>
-        /// <param name="services">Collection of app services.</param>
-        /// <param name="scheme">Scheme name for authentication.</param>
-        /// <param name="configuration">App configurations.</param>
-        /// <returns></returns>
-        public static IServiceCollection AddAuthJwtAuthentication(
-            this IServiceCollection services,
-            string scheme,
-            IConfiguration configuration)
-        {
-            AddApiJwtAuthentication(services, scheme, configuration);
-            return AddApiJwtAuthorization(services, scheme);
         }
     }
 }

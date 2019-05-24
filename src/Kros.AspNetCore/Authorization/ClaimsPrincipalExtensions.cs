@@ -28,15 +28,8 @@ namespace Kros.AspNetCore.Authorization
         /// </summary>
         /// <param name="claimsPrincipal">Claims principal which contains all user claims.</param>
         /// <returns>User email.</returns>
-        public static int GetUserEmail(this ClaimsPrincipal claimsPrincipal)
-        {
-            if (int.TryParse(GetValueFromUserClaims(claimsPrincipal, UserClaimTypes.Email), out int result))
-            {
-                return result;
-            }
-
-            return 0;
-        }
+        public static string GetUserEmail(this ClaimsPrincipal claimsPrincipal)
+            => GetValueFromUserClaims(claimsPrincipal, UserClaimTypes.Email);
 
         /// <summary>
         /// Return specific value from user claims.
@@ -45,8 +38,6 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="userClaimType">Claim type.</param>
         /// <returns>Claim value.</returns>
         private static string GetValueFromUserClaims(ClaimsPrincipal claimsPrincipal, string userClaimType)
-        {
-            return claimsPrincipal.Claims.FirstOrDefault(x => x.Type == userClaimType)?.Value ?? string.Empty;
-        }
+            => claimsPrincipal.Claims.FirstOrDefault(x => x.Type == userClaimType)?.Value ?? string.Empty;
     }
 }

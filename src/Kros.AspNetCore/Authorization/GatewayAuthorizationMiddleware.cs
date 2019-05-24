@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -54,9 +55,10 @@ namespace Kros.AspNetCore.Authorization
 
         private async Task<string> GetUserAuthorizationJwtAsync(HttpContext httpContext, IHttpClientFactory httpClientFactory)
         {
-            using (var client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
+            if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues value))
             {
-                if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues value)) {
+                using (var client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
+                {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
 
                     var response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl);
@@ -64,6 +66,10 @@ namespace Kros.AspNetCore.Authorization
                     if (response.IsSuccessStatusCode)
                     {
                         return await response.Content.ReadAsStringAsync();
+                    }
+                    else
+                    {
+                        throw new UnauthorizedAccessException();
                     }
                 }
             }

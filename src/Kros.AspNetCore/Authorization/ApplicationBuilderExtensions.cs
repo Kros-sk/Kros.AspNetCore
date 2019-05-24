@@ -12,23 +12,33 @@ namespace Kros.AspNetCore.Authorization
         /// <summary>
         /// Add gateway authentication middleware to request pipeline.
         /// </summary>
-        /// <param name="app">IApplicationBuilder where middleware is added.</param>
-        /// <param name="configuration">Configuration from which the options are loaded.</param>
-        /// <returns></returns>
+        /// <param name="app"><see cref="IApplicationBuilder"/> where middleware is added.</param>
+        /// <param name="configuration">Configuration from which the options are loaded.
+        /// Configuration must contains GatewayJwtAuthorization section.</param>
         public static IApplicationBuilder UseGatewayJwtAuthorization(
             this IApplicationBuilder app,
             IConfiguration configuration)
-            => app.UseMiddleware<GatewayAuthorizationMiddleware>(configuration.GetSection<GatewayJwtAuthorizationOptions>());
+        {
+            var option = configuration.GetSection<GatewayJwtAuthorizationOptions>();
+
+            if (option == null)
+            {
+                throw new InvalidOperationException(
+                    String.Format(Properties.Resources.GatewayJwtAuthorizationMissingSection,
+                    Helpers.GetSectionName<GatewayJwtAuthorizationOptions>()));
+            }
+
+            return app.UseMiddleware<GatewayAuthorizationMiddleware>(option);
+        }
 
         /// <summary>
         /// Add gateway authentication middleware to request pipeline.
         /// </summary>
-        /// <param name="app">IApplicationBuilder where middleware is added.</param>
-        /// <param name="configureOptions">Func returning <see cref="GatewayJwtAuthorizationOptions"/></param>
-        /// <returns></returns>
+        /// <param name="app"><see cref="IApplicationBuilder"/> where middleware is added.</param>
+        /// <param name="configureOptions">Function for obtaining <see cref="GatewayJwtAuthorizationOptions"/>.</param>
         public static IApplicationBuilder UseGatewayJwtAuthorization(
             this IApplicationBuilder app,
             Func<GatewayJwtAuthorizationOptions> configureOptions)
-            => app.UseMiddleware<GatewayAuthorizationMiddleware>(configureOptions.Invoke());
+            => app.UseMiddleware<GatewayAuthorizationMiddleware>(configureOptions());
     }
 }

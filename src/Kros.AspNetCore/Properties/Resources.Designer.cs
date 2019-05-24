@@ -61,6 +61,15 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; configuration section is missing or empty..
+        /// </summary>
+        internal static string GatewayJwtAuthorizationMissingSection {
+            get {
+                return ResourceManager.GetString("GatewayJwtAuthorizationMissingSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Resource was not found..
         /// </summary>
         internal static string NotFound {

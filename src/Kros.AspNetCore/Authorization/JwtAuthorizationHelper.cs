@@ -13,11 +13,6 @@ namespace Kros.AspNetCore.Authorization
     public static class JwtAuthorizationHelper
     {
         /// <summary>
-        /// Authentication admin policy name.
-        /// </summary>
-        public const string AuthPolicyName = "admin";
-
-        /// <summary>
         /// Jwt authentication scheme name.
         /// </summary>
         public const string JwtSchemeName = "JwtAuthorization";
@@ -45,6 +40,7 @@ namespace Kros.AspNetCore.Authorization
                     new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+
             return tokenHandler.WriteToken(securityToken);
         }
     }
