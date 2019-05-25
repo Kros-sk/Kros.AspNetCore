@@ -38,7 +38,6 @@ namespace Kros.AspNetCore.Tests.Authorization
             var jwt2 = JwtAuthorizationHelper
                 .CreateJwtTokenFromClaims(claims2, "top_secreat_password", new DateTime(2200, 1, 1));
 
-
             jwt1.Should().NotBe(jwt2);
         }
 
