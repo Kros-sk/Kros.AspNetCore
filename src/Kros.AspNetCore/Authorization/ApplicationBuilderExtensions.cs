@@ -15,6 +15,9 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="app"><see cref="IApplicationBuilder"/> where middleware is added.</param>
         /// <param name="configuration">Configuration from which the options are loaded.
         /// Configuration must contains GatewayJwtAuthorization section.</param>
+        /// <exception cref="InvalidOperationException">
+        /// When `GatewayJwtAuthorization` section is missing in configuration.
+        /// </exception>
         public static IApplicationBuilder UseGatewayJwtAuthorization(
             this IApplicationBuilder app,
             IConfiguration configuration)

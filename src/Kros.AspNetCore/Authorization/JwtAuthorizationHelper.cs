@@ -27,6 +27,7 @@ namespace Kros.AspNetCore.Authorization
         /// </summary>
         /// <param name="userClaims">User claims.</param>
         /// <param name="secretKey">Key used for signing.</param>
+        /// <param name="expires">Sets the value of the 'expiration' claim.</param>
         /// <returns>Jwt token.</returns>
         public static string CreateJwtTokenFromClaims(IEnumerable<Claim> userClaims, string secretKey, DateTime? expires = null)
         {
