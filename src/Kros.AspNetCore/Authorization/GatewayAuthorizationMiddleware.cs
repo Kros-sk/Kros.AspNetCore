@@ -69,7 +69,7 @@ namespace Kros.AspNetCore.Authorization
                     }
                     else
                     {
-                        throw new UnauthorizedAccessException();
+                        throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
                     }
                 }
             }

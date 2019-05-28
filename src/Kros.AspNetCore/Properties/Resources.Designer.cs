@@ -61,6 +61,15 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authorization service forbidden this request..
+        /// </summary>
+        internal static string AuthorizationServiceForbiddenRequest {
+            get {
+                return ResourceManager.GetString("AuthorizationServiceForbiddenRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; configuration section is missing or empty..
         /// </summary>
         internal static string GatewayJwtAuthorizationMissingSection {
