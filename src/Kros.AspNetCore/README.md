@@ -46,3 +46,14 @@ V adresári `Extensions` sa nachádzajú rôzne rozšírenia štandardných trie
 ## BaseStartup
 
 Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` režime sú pre `CORS` povolené všetky domény.
+
+## Authorization
+
+[PR #19](https://github.com/Kros-sk/Kros.AspNetCore/pull/19) adds the ability to authorize internal (downstream) services behind the api gateway.
+
+The Api gateway will use `GatewayAuthorizationMiddleware` middleware to contact the authorization service to forward the `Authorization Header` from the original request. Your authorization service will validate this token and create new credential token to be routed to internal services.
+
+To add middleware, you must first register the related services `services.AddGatewayJwtAuthorization()`
+and then register `app.UseGatewayJwtAuthorization()` to the pipeline.
+
+You can use `JwtAuthorizationHelper` to generate a Jwt token.
