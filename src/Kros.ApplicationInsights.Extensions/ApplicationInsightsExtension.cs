@@ -1,9 +1,8 @@
-﻿using Kros.ApplicationInsights.Extensions.Options;
-using Microsoft.ApplicationInsights.Extensibility;
+﻿using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Options;
 
-namespace Kros.ApplicationInsights.Extensions
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static partial class ApplicationInsightsExtension
     {

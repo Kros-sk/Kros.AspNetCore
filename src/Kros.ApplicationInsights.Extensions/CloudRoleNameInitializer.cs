@@ -2,7 +2,7 @@
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace Kros.ApplicationInsights.Extensions
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Configuration of service name representation in Application Insights.

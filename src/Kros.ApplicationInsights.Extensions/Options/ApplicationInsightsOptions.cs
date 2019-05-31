@@ -1,4 +1,4 @@
-﻿namespace Kros.ApplicationInsights.Extensions.Options
+﻿namespace Microsoft.Extensions.DependencyInjection.Options
 {
     /// <summary>
     /// Settings for Application insights.
