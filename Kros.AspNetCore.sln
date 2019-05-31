@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.AspNetCore.Tests", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.MediatR.Extensions.Tests", "tests\Kros.MediatR.Extensions.Tests\Kros.MediatR.Extensions.Tests.csproj", "{808D81B7-477D-4576-83AA-A405C63ABCA5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.ApplicationInsights.Extensions", "src\Kros.ApplicationInsights.Extensions\Kros.ApplicationInsights.Extensions.csproj", "{879989F6-7103-4F06-A865-E862EBC31468}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{808D81B7-477D-4576-83AA-A405C63ABCA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{808D81B7-477D-4576-83AA-A405C63ABCA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{808D81B7-477D-4576-83AA-A405C63ABCA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{879989F6-7103-4F06-A865-E862EBC31468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{879989F6-7103-4F06-A865-E862EBC31468}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{879989F6-7103-4F06-A865-E862EBC31468}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{879989F6-7103-4F06-A865-E862EBC31468}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{D5FD0C86-7301-4A17-B923-86F532C84798} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
 		{7D3EF3F7-5A32-47E2-8688-65FE68CB24B5} = {F2FE0B51-B10D-491C-AC69-1C9D08D4514E}
 		{808D81B7-477D-4576-83AA-A405C63ABCA5} = {F2FE0B51-B10D-491C-AC69-1C9D08D4514E}
+		{879989F6-7103-4F06-A865-E862EBC31468} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF06D895-E4AC-4374-95F5-89F47567F9F6}

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>KROS a.s.</Authors>
+    <Description>General utilities and helpers for building ASP.NET Core WEB API</Description>
+    <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.ApplicationInsigths.Extensions</PackageProjectUrl>
+    <PackageIconUrl>https://en.gravatar.com/userimage/137934964/524e95fbd8c2e8779e02819ab6902bef.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.AspNetCore</RepositoryUrl>
+    <PackageTags>ASP.NET Core;Utils;Utility;Helpers;Extensions;</PackageTags>
+    <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kros.Utils" Version="1.9.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>
