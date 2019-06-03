@@ -117,12 +117,16 @@ namespace Kros.Swagger.Extensions
 
             string clientId = GetOAuthClientId(swaggerDocumentationSettings);
 
-            app.UseSwagger(c => c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
+            app.UseSwagger(c =>
             {
-                swaggerDoc.BasePath = "/";
+                c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
+                {
+                    swaggerDoc.BasePath = "/";
+                });
 
                 setupAction?.Invoke(c);
-            }))
+            })
+
             .UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("../swagger/v1/swagger.json", swaggerDocumentationSettings.Title);
