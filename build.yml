@@ -1,6 +1,6 @@
 trigger:
   tags:
-    include: [ 'aspnetcore-v*', 'mediatr-v*', 'appinsights-v*' ]
+    include: [ 'aspnetcore-v*', 'mediatr-v*', 'appinsights-v*', 'swagger-v*' ]
 
 pool: Default
 
@@ -20,6 +20,8 @@ variables:
     value: 'Kros.MediatR.Extensions'
   - name: project.AppInsights
     value: 'Kros.ApplicationInsights.Extensions'
+  - name: project.Swagger
+    value: 'Kros.Swagger.Extensions'
   - name: 'project.Current'
     value: ''
   - name: 'project.TestProjectsCount'
@@ -38,6 +40,10 @@ steps:
     displayName: 'Set project: $(project.AppInsights)'
     condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/appinsights-v')
 
+  - powershell: echo '##vso[task.setvariable variable=project.Current]$(project.Swagger)'
+    displayName: 'Set project: $(project.Swagger)'
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/swagger-v')
+
   - script: |
       echo No project was specified.
       echo Build must be triggered with correct tag and based on the tag name, the project is selected.
@@ -45,6 +51,7 @@ steps:
       echo   - aspnetcore-v* - Kros.AspNetCore
       echo   - mediatr-v* - Kros.MediatR.Extensions
       echo   - appinsights-v* - Kros.ApplicationInsights.Extensions
+      echo   - swagger-v* - Kros.Swagger.Extensions
       exit 1
     displayName: 'Check project name'
     condition: eq(variables['project.Current'], '')
