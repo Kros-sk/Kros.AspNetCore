@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -89,79 +88,6 @@ namespace Kros.Swagger.Extensions
             }
 
             return app;
-        }
-    }
-
-    /// <summary>
-    /// Adds enum value descriptions to Swagger.
-    /// </summary>
-    public class EnumDocumentFilter : IDocumentFilter
-    {
-        /// <inheritdoc />
-        public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
-        {
-            foreach (KeyValuePair<string, Schema> schemaDictionaryItem in swaggerDoc.Definitions)
-            {
-                Schema schema = schemaDictionaryItem.Value;
-
-                foreach (KeyValuePair<string, Schema> propertyDictionaryItem in schema.Properties)
-                {
-                    Schema property = propertyDictionaryItem.Value;
-                    IList<object> propertyEnums = property.Enum;
-
-                    if (propertyEnums != null && propertyEnums.Count > 0)
-                    {
-                        property.Description += DescribeEnum(propertyEnums);
-                    }
-                }
-            }
-
-            if (swaggerDoc.Paths.Count > 0)
-            {
-                foreach (PathItem pathItem in swaggerDoc.Paths.Values)
-                {
-                    DescribeEnumParameters(pathItem.Parameters);
-
-                    var possibleParameterisedOperations = new List<Operation> { pathItem.Get, pathItem.Post, pathItem.Put };
-                    possibleParameterisedOperations
-                        .FindAll(x => x != null)
-                        .ForEach(x => DescribeEnumParameters(x.Parameters));
-                }
-            }
-        }
-
-        private static void DescribeEnumParameters(IList<IParameter> parameters)
-        {
-            if (parameters == null)
-            {
-                return;
-            }
-
-            foreach (IParameter param in parameters)
-            {
-                if (param.Extensions.ContainsKey("enum") && (param.Extensions["enum"] is IList<object> paramEnums) &&
-                    (paramEnums.Count > 0))
-                {
-                    param.Description += DescribeEnum(paramEnums);
-                }
-            }
-        }
-
-        private static string DescribeEnum(IEnumerable<object> enums)
-        {
-            var enumDescriptions = new List<string>();
-            Type type = null;
-            foreach (object enumOption in enums)
-            {
-                if (type == null)
-                {
-                    type = enumOption.GetType();
-                }
-                enumDescriptions.
-                    Add($"{Convert.ChangeType(enumOption, type.GetEnumUnderlyingType())} = {Enum.GetName(type, enumOption)}");
-            }
-
-            return $"{Environment.NewLine}{string.Join(Environment.NewLine, enumDescriptions)}";
         }
     }
 }
