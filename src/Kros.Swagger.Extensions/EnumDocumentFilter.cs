@@ -13,13 +13,10 @@ namespace Kros.Swagger.Extensions
         /// <inheritdoc />
         public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
         {
-            foreach (KeyValuePair<string, Schema> schemaDictionaryItem in swaggerDoc.Definitions)
+            foreach (Schema schema in swaggerDoc.Definitions.Values)
             {
-                Schema schema = schemaDictionaryItem.Value;
-
-                foreach (KeyValuePair<string, Schema> propertyDictionaryItem in schema.Properties)
+                foreach (Schema property in schema.Properties.Values)
                 {
-                    Schema property = propertyDictionaryItem.Value;
                     IList<object> propertyEnums = property.Enum;
 
                     if (propertyEnums != null && propertyEnums.Count > 0)
