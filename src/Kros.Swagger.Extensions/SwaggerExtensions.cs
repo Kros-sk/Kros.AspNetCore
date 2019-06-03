@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,8 +25,17 @@ namespace Kros.Swagger.Extensions
         /// </summary>
         /// <param name="services">IoC container.</param>
         /// <param name="configuration">Application configuration.</param>
-        public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services, IConfiguration configuration)
+        /// <param name="setupAction">Action for configuring swagger generating options.</param>
+        public static IServiceCollection AddSwaggerDocumentation(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            Action<SwaggerGenOptions> setupAction = null)
         {
+            services.ConfigureSwaggerGen(options =>
+            {
+                options.CustomSchemaIds(x => x.FullName); // https://wegotcode.com/microsoft/swagger-fix-for-dotnetcore/
+            });
+
             string assemblyName = AppDomain.CurrentDomain.FriendlyName;
             Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
@@ -33,27 +44,40 @@ namespace Kros.Swagger.Extensions
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
-                    c.IncludeXmlComments(GetXmlDocumentationFilePath(assemblyName));
-                    c.DocumentFilter<EnumDocumentFilter>();
-                    if (swaggerDocumentationSettings.Extensions.TryGetValue("TokenUrl", out object t) && t is string tokenUrl)
+
+                    string documentationFilePath = GetXmlDocumentationFilePath(assemblyName);
+                    if (File.Exists(documentationFilePath))
                     {
-                        c.AddSecurityDefinition("Bearer", new OAuth2Scheme
-                        {
-                            Type = "oauth2",
-                            Flow = "password",
-                            TokenUrl = tokenUrl
-                        });
-                        c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                        {
-                        {
-                            "Bearer", new string[] { }
-                        }
-                        });
+                        c.IncludeXmlComments(documentationFilePath);
                     }
+
+                    c.DocumentFilter<EnumDocumentFilter>();
+                    AddSwaggerSecurity(c, swaggerDocumentationSettings);
+
+                    setupAction?.Invoke(c);
                 });
             }
 
             return services;
+        }
+
+        private static void AddSwaggerSecurity(SwaggerGenOptions swaggerOptions, Info swaggerDocumentationSettings)
+        {
+            if (swaggerDocumentationSettings.Extensions.TryGetValue("TokenUrl", out object t) && t is string tokenUrl)
+            {
+                swaggerOptions.AddSecurityDefinition("Bearer", new OAuth2Scheme
+                {
+                    Type = "oauth2",
+                    Flow = "password",
+                    TokenUrl = tokenUrl
+                });
+                swaggerOptions.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    {
+                        "Bearer", new string[] { }
+                    }
+                });
+            }
         }
 
         private static Info GetSwaggerDocumentationSettings(IConfiguration configuration)
@@ -70,7 +94,14 @@ namespace Kros.Swagger.Extensions
         /// Adds Swagger documentation generator middleware.
         /// </summary>
         /// <param name="app">Application.</param>
-        public static IApplicationBuilder UseSwaggerDocumentation(this IApplicationBuilder app, IConfiguration configuration)
+        /// <param name="configuration">Application configuration.</param>
+        /// <param name="setupAction">Action for configuring swagger options.</param>
+        /// <param name="setupUiAction">Action for configuring swagger UI options.</param>
+        public static IApplicationBuilder UseSwaggerDocumentation(
+            this IApplicationBuilder app,
+            IConfiguration configuration,
+            Action<SwaggerOptions> setupAction = null,
+            Action<SwaggerUIOptions> setupUiAction = null)
         {
             Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
@@ -81,12 +112,16 @@ namespace Kros.Swagger.Extensions
                 app.UseSwagger(c => c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
                 {
                     swaggerDoc.BasePath = "/";
+
+                    setupAction?.Invoke(c);
                 }))
                 .UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("../swagger/v1/swagger.json", "Titan API V1");
+                    c.SwaggerEndpoint("../swagger/v1/swagger.json", swaggerDocumentationSettings.Title);
                     c.OAuthClientId(clientId);
                     c.OAuthClientSecret(string.Empty);
+
+                    setupUiAction?.Invoke(c);
                 });
             }
 
@@ -95,7 +130,7 @@ namespace Kros.Swagger.Extensions
 
         private static string GetOAuthClientId(Info swaggerDocumentationSettings)
         {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out object clientId))
+            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out object c) && c is string clientId)
             {
                 return clientId.ToString();
             }
