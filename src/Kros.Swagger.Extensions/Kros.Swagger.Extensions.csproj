@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Company>KROS a.s.</Company>
+    <Authors>KROS a.s.</Authors>
+    <Description>Extensions to facilitate work with Swagger documentation.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.Swagger.Extensions</PackageProjectUrl>
+    <PackageIconUrl>https://en.gravatar.com/userimage/137934964/524e95fbd8c2e8779e02819ab6902bef.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.AspNetCore</RepositoryUrl>
+    <PackageTags>ASP.NET core;Swagger;Extensions;</PackageTags>
+    <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
