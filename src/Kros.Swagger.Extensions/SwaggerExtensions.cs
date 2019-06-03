@@ -31,32 +31,36 @@ namespace Kros.Swagger.Extensions
             IConfiguration configuration,
             Action<SwaggerGenOptions> setupAction = null)
         {
+            Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
+
+            if (swaggerDocumentationSettings == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
+            }
+
             services.ConfigureSwaggerGen(options =>
             {
                 options.CustomSchemaIds(x => x.FullName); // https://wegotcode.com/microsoft/swagger-fix-for-dotnetcore/
             });
 
             string assemblyName = AppDomain.CurrentDomain.FriendlyName;
-            Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
-            if (swaggerDocumentationSettings != null)
+            services.AddSwaggerGen(c =>
             {
-                services.AddSwaggerGen(c =>
+                c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
+
+                string documentationFilePath = GetXmlDocumentationFilePath(assemblyName);
+                if (File.Exists(documentationFilePath))
                 {
-                    c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
+                    c.IncludeXmlComments(documentationFilePath);
+                }
 
-                    string documentationFilePath = GetXmlDocumentationFilePath(assemblyName);
-                    if (File.Exists(documentationFilePath))
-                    {
-                        c.IncludeXmlComments(documentationFilePath);
-                    }
+                c.DocumentFilter<EnumDocumentFilter>();
+                AddSwaggerSecurity(c, swaggerDocumentationSettings);
 
-                    c.DocumentFilter<EnumDocumentFilter>();
-                    AddSwaggerSecurity(c, swaggerDocumentationSettings);
-
-                    setupAction?.Invoke(c);
-                });
-            }
+                setupAction?.Invoke(c);
+            });
 
             return services;
         }
@@ -105,25 +109,28 @@ namespace Kros.Swagger.Extensions
         {
             Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
-            if (swaggerDocumentationSettings != null)
+            if (swaggerDocumentationSettings == null)
             {
-                string clientId = GetOAuthClientId(swaggerDocumentationSettings);
-
-                app.UseSwagger(c => c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
-                {
-                    swaggerDoc.BasePath = "/";
-
-                    setupAction?.Invoke(c);
-                }))
-                .UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("../swagger/v1/swagger.json", swaggerDocumentationSettings.Title);
-                    c.OAuthClientId(clientId);
-                    c.OAuthClientSecret(string.Empty);
-
-                    setupUiAction?.Invoke(c);
-                });
+                throw new InvalidOperationException(
+                    string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
             }
+
+            string clientId = GetOAuthClientId(swaggerDocumentationSettings);
+
+            app.UseSwagger(c => c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
+            {
+                swaggerDoc.BasePath = "/";
+
+                setupAction?.Invoke(c);
+            }))
+            .UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("../swagger/v1/swagger.json", swaggerDocumentationSettings.Title);
+                c.OAuthClientId(clientId);
+                c.OAuthClientSecret(string.Empty);
+
+                setupUiAction?.Invoke(c);
+            });
 
             return app;
         }
