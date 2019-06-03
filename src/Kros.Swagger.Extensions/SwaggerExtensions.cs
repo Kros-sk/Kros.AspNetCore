@@ -15,6 +15,7 @@ namespace Kros.Swagger.Extensions
     {
 #pragma warning disable IDE1006 // Naming Styles
         private const string SwaggerDocumentationSectionName = "SwaggerDocumentation";
+        private const string DefaultOAuthClientId = "kros_postman";
 #pragma warning restore IDE1006 // Naming Styles
 
         /// <summary>
@@ -75,6 +76,8 @@ namespace Kros.Swagger.Extensions
 
             if (swaggerDocumentationSettings != null)
             {
+                string clientId = GetOAuthClientId(swaggerDocumentationSettings);
+
                 app.UseSwagger(c => c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
                 {
                     swaggerDoc.BasePath = "/";
@@ -82,12 +85,22 @@ namespace Kros.Swagger.Extensions
                 .UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("../swagger/v1/swagger.json", "Titan API V1");
-                    c.OAuthClientId("kros_titan_postman");
+                    c.OAuthClientId(clientId);
                     c.OAuthClientSecret(string.Empty);
                 });
             }
 
             return app;
+        }
+
+        private static string GetOAuthClientId(Info swaggerDocumentationSettings)
+        {
+            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out object clientId))
+            {
+                return clientId.ToString();
+            }
+
+            return DefaultOAuthClientId;
         }
     }
 }

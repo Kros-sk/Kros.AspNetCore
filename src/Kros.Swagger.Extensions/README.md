@@ -41,7 +41,8 @@ Príklad konfigurácie:
     "Url": "www.kros.sk"
   },
   "Extensions": {
-    "TokenUrl": "https://login.site.com/token"
+    "TokenUrl": "https://login.site.com/token",
+    "OAuthClientId": "kros_postman"
   }
 }
 ```
