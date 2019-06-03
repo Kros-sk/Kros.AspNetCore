@@ -33,7 +33,7 @@ namespace Kros.Swagger.Extensions
         {
             Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
-            if (swaggerDocumentationSettings == null)
+            if (swaggerDocumentationSettings is null)
             {
                 throw new InvalidOperationException(
                     string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
@@ -109,7 +109,7 @@ namespace Kros.Swagger.Extensions
         {
             Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
-            if (swaggerDocumentationSettings == null)
+            if (swaggerDocumentationSettings is null)
             {
                 throw new InvalidOperationException(
                     string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
