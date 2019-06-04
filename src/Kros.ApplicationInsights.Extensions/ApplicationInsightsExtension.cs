@@ -6,9 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static partial class ApplicationInsightsExtension
     {
-#pragma warning disable IDE1006 // Naming Styles
         private const string ApplicationInsightsSectionName = "ApplicationInsights";
-#pragma warning restore IDE1006 // Naming Styles
 
         /// <summary>
         /// Registers application telemetry into DI container.
