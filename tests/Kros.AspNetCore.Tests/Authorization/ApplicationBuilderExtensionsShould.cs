@@ -58,12 +58,5 @@ namespace Kros.AspNetCore.Tests.Authorization
             new ConfigurationBuilder()
                 .AddInMemoryCollection(values)
                 .Build();
-
-        private IApplicationBuilder GetApplicationBuilder(IConfiguration configuration)
-        {
-            IServiceProvider serviceProvider = new ServiceCollection().BuildServiceProvider();
-
-            return new ApplicationBuilder(serviceProvider);
-        }
     }
 }

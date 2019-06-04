@@ -29,7 +29,7 @@ namespace Kros.MediatR.PostProcessors
         /// <inheritdoc />
         public Task Process(TRequest request, TResponse response, CancellationToken cancellationToken)
         {
-            if (_options.CanCheckResponse(request) && response == null)
+            if (_options.CanCheckResponseFor<TRequest>() && response == null)
             {
                 throw new NotFoundException();
             }

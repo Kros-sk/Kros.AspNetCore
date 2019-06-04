@@ -61,7 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="compatibilityVersion">Compatibility version for MVC.</param>
         public static IMvcCoreBuilder AddWebApi(this IServiceCollection services, CompatibilityVersion compatibilityVersion)
         {
-            var builder = services.AddMvcCore().SetCompatibilityVersion(compatibilityVersion);
+            IMvcCoreBuilder builder = services.AddMvcCore().SetCompatibilityVersion(compatibilityVersion);
 
             return builder.AddFormatterMappings()
                 .AddJsonFormatters()

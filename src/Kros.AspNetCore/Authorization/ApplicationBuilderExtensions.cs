@@ -22,12 +22,12 @@ namespace Kros.AspNetCore.Authorization
             this IApplicationBuilder app,
             IConfiguration configuration)
         {
-            var option = configuration.GetSection<GatewayJwtAuthorizationOptions>();
+            GatewayJwtAuthorizationOptions option = configuration.GetSection<GatewayJwtAuthorizationOptions>();
 
-            if (option == null)
+            if (option is null)
             {
                 throw new InvalidOperationException(
-                    String.Format(Properties.Resources.GatewayJwtAuthorizationMissingSection,
+                    string.Format(Properties.Resources.GatewayJwtAuthorizationMissingSection,
                     Helpers.GetSectionName<GatewayJwtAuthorizationOptions>()));
             }
 
