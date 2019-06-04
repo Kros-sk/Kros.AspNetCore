@@ -11,7 +11,7 @@
         public string JwtSecret { get; set; }
 
         /// <summary>
-        /// Https is required. Default value is <c>true</c>.
+        /// Https is required. Default value is <see langword="true"/>.
         /// </summary>
         public bool RequireHttpsMetadata { get; set; } = true;
     }
