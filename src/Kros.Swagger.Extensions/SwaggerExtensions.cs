@@ -15,10 +15,8 @@ namespace Kros.Swagger.Extensions
     /// </summary>
     public static class SwaggerExtensions
     {
-#pragma warning disable IDE1006 // Naming Styles
         private const string SwaggerDocumentationSectionName = "SwaggerDocumentation";
         private const string DefaultOAuthClientId = "kros_postman";
-#pragma warning restore IDE1006 // Naming Styles
 
         /// <summary>
         /// Registers Swagger documentation generator to IoC container.
