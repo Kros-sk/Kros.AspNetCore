@@ -50,6 +50,10 @@ namespace Kros.AspNetCore.Middlewares
             {
                 SetResponseType(context, ex, HttpStatusCode.RequestTimeout);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                SetResponseType(context, ex, HttpStatusCode.Unauthorized);
+            }
         }
 
         private void SetResponseType(HttpContext context, Exception ex, HttpStatusCode statusCode)
