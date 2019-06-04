@@ -24,21 +24,21 @@ namespace Kros.MediatR.Extensions
         /// <typeparamref name="TRequest"/> and response are different.</exception>
         public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(this IServiceCollection services)
         {
-            var requestType = typeof(TRequest);
-            var pipeLineType = typeof(IPipelineBehavior<,>);
-            var requestInterfaceName = typeof(IRequest<>).Name;
+            Type requestType = typeof(TRequest);
+            Type pipeLineType = typeof(IPipelineBehavior<,>);
+            string requestInterfaceName = typeof(IRequest<>).Name;
 
-            var requests = GetTypes(requestType);
+            IList<Type> requests = GetTypes(requestType);
             IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType);
 
-            foreach (var behavior in pipelineBehaviors)
+            foreach (Type behavior in pipelineBehaviors)
             {
-                var behaviorGenericArgumentsCount = behavior.GetGenericArguments().Length;
+                int behaviorGenericArgumentsCount = behavior.GetGenericArguments().Length;
 
-                foreach (var request in requests)
+                foreach (Type request in requests)
                 {
-                    var interfaceType = request.GetInterface(requestInterfaceName);
-                    var responseType = interfaceType.GetGenericArguments()[0];
+                    Type interfaceType = request.GetInterface(requestInterfaceName);
+                    Type responseType = interfaceType.GetGenericArguments()[0];
                     Type genericBehaviorType = null;
 
                     if (behaviorGenericArgumentsCount == 1)

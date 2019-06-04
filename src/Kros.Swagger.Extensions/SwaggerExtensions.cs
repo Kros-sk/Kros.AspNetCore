@@ -92,7 +92,7 @@ namespace Kros.Swagger.Extensions
         }
 
         private static string GetXmlDocumentationFilePath(string assemblyName)
-            => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".XML");
+            => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".xml");
 
         /// <summary>
         /// Adds Swagger documentation generator middleware.
@@ -143,7 +143,7 @@ namespace Kros.Swagger.Extensions
         {
             if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out object c) && c is string clientId)
             {
-                return clientId.ToString();
+                return clientId;
             }
 
             return DefaultOAuthClientId;

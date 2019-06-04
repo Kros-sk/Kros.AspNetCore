@@ -15,7 +15,7 @@
         public static string GetSectionName<TOptions>() where TOptions : class
         {
             const string uselessSuffix = "Options";
-            var sectionName = typeof(TOptions).Name;
+            string sectionName = typeof(TOptions).Name;
 
             if (sectionName.EndsWith(uselessSuffix))
             {

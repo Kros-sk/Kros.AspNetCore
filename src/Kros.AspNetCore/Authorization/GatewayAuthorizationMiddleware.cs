@@ -43,7 +43,7 @@ namespace Kros.AspNetCore.Authorization
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory)
         {
-            var userJwt = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory);
+            string userJwt = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory);
 
             if (!string.IsNullOrEmpty(userJwt))
             {
@@ -57,11 +57,11 @@ namespace Kros.AspNetCore.Authorization
         {
             if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues value))
             {
-                using (var client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
+                using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
                 {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
 
-                    var response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl);
+                    HttpResponseMessage response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl);
 
                     if (response.IsSuccessStatusCode)
                     {

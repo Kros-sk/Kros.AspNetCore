@@ -8,7 +8,7 @@ namespace Kros.MediatR.PostProcessors
     /// </summary>
     public class NullCheckPostProcessorOptions
     {
-        private HashSet<Type> _ignoredRequests = new HashSet<Type>();
+        private readonly HashSet<Type> _ignoredRequests = new HashSet<Type>();
 
         /// <summary>
         /// Default instance.
@@ -28,11 +28,11 @@ namespace Kros.MediatR.PostProcessors
         }
 
         /// <summary>
-        /// Determine if should check response of <paramref name="request"/> for <see langword="null"/>.
+        /// Determine if should check response for request type <typeparamref name="TRequest"/>.
         /// </summary>
         /// <typeparam name="TRequest">Request type.</typeparam>
-        /// <param name="request">Request.</param>
-        /// <returns><see langword="true"/> if can check response. Otherwise <see langword="false"/>.</returns>
-        public bool CanCheckResponse<TRequest>(TRequest request) => !_ignoredRequests.Contains(request.GetType());
+        /// <returns><see langword="true"/> if can check response for request type <typeparamref name="TRequest"/>.
+        /// Otherwise <see langword="false"/>.</returns>
+        internal bool CanCheckResponseFor<TRequest>() => !_ignoredRequests.Contains(typeof(TRequest));
     }
 }
