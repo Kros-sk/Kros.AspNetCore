@@ -32,7 +32,7 @@ namespace Kros.AspNetCore.Authorization
         public static string CreateJwtTokenFromClaims(IEnumerable<Claim> userClaims, string secretKey, DateTime? expires = null)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(secretKey);
+            byte[] key = Encoding.ASCII.GetBytes(secretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(userClaims),
@@ -40,7 +40,7 @@ namespace Kros.AspNetCore.Authorization
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            SecurityToken securityToken = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(securityToken);
         }

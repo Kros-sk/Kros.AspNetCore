@@ -42,7 +42,7 @@ namespace Kros.Swagger.Extensions
 
         private static void DescribeEnumParameters(IList<IParameter> parameters)
         {
-            if (parameters == null)
+            if (parameters is null)
             {
                 return;
             }

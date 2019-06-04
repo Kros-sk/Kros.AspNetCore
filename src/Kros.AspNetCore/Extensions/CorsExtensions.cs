@@ -8,7 +8,9 @@ namespace Kros.AspNetCore.Extensions
     /// </summary>
     public static class CorsExtensions
     {
+#pragma warning disable IDE1006 // Naming Styles
         private const string AllowAnyOrigins = "AllowAnyOrigins";
+#pragma warning restore IDE1006 // Naming Styles
 
         /// <summary>
         /// Adds allow all origins Cors policy.

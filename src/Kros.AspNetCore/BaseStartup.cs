@@ -19,8 +19,8 @@ namespace Kros.AspNetCore
         /// <param name="env">Information about the web hosting environment.</param>
         public BaseStartup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
+            var builder = new ConfigurationBuilder();
+            builder.SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddJsonFile($"appsettings.local.json", optional: true)
@@ -52,7 +52,7 @@ namespace Kros.AspNetCore
             }
             else
             {
-                var allowedOrigins = Configuration.GetSection(CorsOptions.CorsSectionName).Get<string[]>();
+                string[] allowedOrigins = Configuration.GetSection(CorsOptions.CorsSectionName).Get<string[]>();
                 services.AddCustomOriginsCorsPolicy(allowedOrigins, CorsOptions.CorsPolicyName);
             }
         }

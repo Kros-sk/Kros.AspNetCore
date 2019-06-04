@@ -33,7 +33,7 @@ namespace Kros.AspNetCore.Authorization
             IConfiguration configuration,
             Action<JwtBearerOptions> configureOptions = null)
         {
-            var options = configuration.GetSection<ApiJwtAuthorizationOptions>();
+            ApiJwtAuthorizationOptions options = configuration.GetSection<ApiJwtAuthorizationOptions>();
 
             services.AddAuthentication(scheme)
                 .AddJwtBearer(scheme, x =>
