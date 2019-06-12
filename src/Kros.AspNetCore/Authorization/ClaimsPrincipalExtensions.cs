@@ -29,7 +29,7 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="claimsPrincipal">Claims principal which contains all user claims.</param>
         /// <returns>User email.</returns>
         public static string GetUserEmail(this ClaimsPrincipal claimsPrincipal)
-            => GetValueFromUserClaims(claimsPrincipal, UserClaimTypes.Email);
+            => GetValueFromUserClaims(claimsPrincipal, ClaimTypes.Email);
 
         /// <summary>
         /// Return specific value from user claims.

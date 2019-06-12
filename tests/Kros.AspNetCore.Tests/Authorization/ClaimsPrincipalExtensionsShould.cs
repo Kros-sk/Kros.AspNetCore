@@ -47,7 +47,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             => new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
                  new Claim(UserClaimTypes.UserId, "22"),
-                 new Claim(UserClaimTypes.Email, "bob@gmail.com")
+                 new Claim(ClaimTypes.Email, "bob@gmail.com")
             }));
     }
 }
