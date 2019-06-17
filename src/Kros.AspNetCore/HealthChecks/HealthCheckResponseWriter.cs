@@ -12,7 +12,7 @@ namespace Kros.AspNetCore.HealthChecks
     /// </summary>
     public static class HealthCheckResponseWriter
     {
-        private const string DEFAULT_CONTENT_TYPE = "application/json";
+        private const string DefaultContentType = "application/json";
 
         /// <summary>
         /// Add health report as json to HttpContext response.
@@ -34,7 +34,7 @@ namespace Kros.AspNetCore.HealthChecks
 
                 settings.Converters.Add(new StringEnumConverter());
 
-                httpContext.Response.ContentType = DEFAULT_CONTENT_TYPE;
+                httpContext.Response.ContentType = DefaultContentType;
 
                 var uiReport = UIHealthCheckReport
                     .CreateFrom(report);

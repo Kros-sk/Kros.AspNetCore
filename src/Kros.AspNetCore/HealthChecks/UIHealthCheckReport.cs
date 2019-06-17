@@ -60,7 +60,7 @@ namespace Kros.AspNetCore.HealthChecks
 
                 if (item.Value.Exception != null)
                 {
-                    var message = item.Value.Exception?
+                    var message = item.Value.Exception
                         .Message
                         .ToString();
 
