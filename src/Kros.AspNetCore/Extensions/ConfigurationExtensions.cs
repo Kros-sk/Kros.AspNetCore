@@ -1,4 +1,6 @@
 ﻿using Kros.AspNetCore;
+using Kros.AspNetCore.Options;
+using System;
 
 namespace Microsoft.Extensions.Configuration
 {
@@ -26,5 +28,22 @@ namespace Microsoft.Extensions.Configuration
         /// <returns>Section.</returns>
         public static T GetSection<T>(this IConfiguration configuration, string sectioName) where T : class
             => configuration.GetSection(sectioName).Get<T>();
+
+        /// <summary>
+        /// Gets allowed origins setting from appSettings.json.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        public static string[] GetAllowedOrigins(this IConfiguration configuration)
+        {
+            IConfigurationSection corsSection = configuration.GetSection(CorsOptions.CorsSectionName);
+            string[] origins = corsSection.Get<string[]>();
+
+            if (origins is null)
+            {
+                return new string[] { corsSection.Get<string>() };
+            }
+
+            return origins;
+        }
     }
 }

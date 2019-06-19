@@ -18,10 +18,19 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void GetOptionsByType()
         {
-            var configuration = GetConfiguration();
-            var options = configuration.GetSection<TestOptions>();
+            IConfiguration configuration = GetConfiguration();
+            TestOptions options = configuration.GetSection<TestOptions>();
 
             options.Value.Should().Be(1);
+        }
+
+        [Fact]
+        public void GetAllowedOrigins()
+        {
+            IConfiguration configuration = GetConfiguration();
+            string[] allowedOrigins = configuration.GetAllowedOrigins();
+
+            allowedOrigins.Should().BeEquivalentTo("*");
         }
 
         private static IConfiguration GetConfiguration()
