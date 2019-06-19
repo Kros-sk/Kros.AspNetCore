@@ -35,11 +35,12 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="configuration">The configuration.</param>
         public static string[] GetAllowedOrigins(this IConfiguration configuration)
         {
-            string[] origins = configuration.GetSection(CorsOptions.CorsSectionName).Get<string[]>();
+            IConfigurationSection corsSection = configuration.GetSection(CorsOptions.CorsSectionName);
+            string[] origins = corsSection.Get<string[]>();
 
             if (origins is null)
             {
-                return new string[] { configuration.GetSection(CorsOptions.CorsSectionName).Get<string>() };
+                return new string[] { corsSection.Get<string>() };
             }
 
             return origins;
