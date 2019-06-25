@@ -54,6 +54,12 @@ namespace Kros.AspNetCore.Middlewares
             {
                 SetResponseType(context, ex, HttpStatusCode.Unauthorized);
             }
+            catch when (context.Response.StatusCode >= StatusCodes.Status200OK
+                && context.Response.StatusCode < StatusCodes.Status300MultipleChoices)
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                throw;
+            }
         }
 
         private void SetResponseType(HttpContext context, Exception ex, HttpStatusCode statusCode)
