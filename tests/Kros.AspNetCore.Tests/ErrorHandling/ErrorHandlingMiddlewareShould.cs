@@ -17,8 +17,12 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
         [MemberData(nameof(RethrowExceptionAndReturnCorectStatusCodeForExceptionData))]
         public void RethrowExceptionAndReturnCorectStatusCodeForException(int requestStatusCode, int responseStatusCode)
         {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(new Exception("Exception"), requestStatusCode);
             var context = new DefaultHttpContext();
+            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            {
+                innerHttpContext.Response.StatusCode = requestStatusCode;
+                throw new Exception("Exception");
+            }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
 
             Func<Task> action = async () => await middleware.Invoke(context);
 
@@ -38,8 +42,11 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
         [MemberData(nameof(ReturnCorectStatusCodeForExceptionData))]
         public async void ReturnCorectStatusCodeForException(Exception exception, int statusCode)
         {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(exception);
             var context = new DefaultHttpContext();
+            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            {
+                throw exception;
+            }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
 
             await middleware.Invoke(context);
 
@@ -52,23 +59,6 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             yield return new object[] { new NotFoundException(), StatusCodes.Status404NotFound };
             yield return new object[] { new TimeoutException(), StatusCodes.Status408RequestTimeout };
             yield return new object[] { new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized };
-        }
-
-        private static ErrorHandlingMiddleware CreateMiddleware(Exception exception, int responseStatusCode)
-        {
-            return new ErrorHandlingMiddleware((innerHttpContext) =>
-            {
-                innerHttpContext.Response.StatusCode = responseStatusCode;
-                throw exception;
-            }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
-        }
-
-        private static ErrorHandlingMiddleware CreateMiddleware(Exception exception)
-        {
-            return new ErrorHandlingMiddleware((innerHttpContext) =>
-            {
-                throw exception;
-            }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
         }
     }
 }
