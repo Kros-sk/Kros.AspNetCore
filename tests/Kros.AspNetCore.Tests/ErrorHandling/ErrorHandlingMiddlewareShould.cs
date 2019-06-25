@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -12,72 +13,45 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
 {
     public class ErrorHandlingMiddlewareShould
     {
-        [Fact]
-        public void Return500StatusCodeAndThrowException()
+        [Theory]
+        [MemberData(nameof(RethrowExceptionAndReturnCorectStatusCodeForExceptionData))]
+        public void RethrowExceptionAndReturnCorectStatusCodeForException(int requestStatusCode, int responseStatusCode)
         {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(new Exception("Exception"), StatusCodes.Status200OK);
+            ErrorHandlingMiddleware middleware = CreateMiddleware(new Exception("Exception"), requestStatusCode);
             var context = new DefaultHttpContext();
 
             Func<Task> action = async () => await middleware.Invoke(context);
 
             action.Should().Throw<Exception>().WithMessage("Exception");
-            context.Response.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+            context.Response.StatusCode.Should().Be(responseStatusCode);
         }
 
-        [Fact]
-        public void DontChangeStatusCodeAndThrowException()
+        public static IEnumerable<object[]> RethrowExceptionAndReturnCorectStatusCodeForExceptionData()
         {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(new Exception("Exception"), StatusCodes.Status400BadRequest);
-            var context = new DefaultHttpContext();
-
-            Func<Task> action = async () => await middleware.Invoke(context);
-
-            action.Should().Throw<Exception>().WithMessage("Exception");
-            context.Response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            yield return new object[] { StatusCodes.Status200OK, StatusCodes.Status500InternalServerError };
+            yield return new object[] { StatusCodes.Status201Created, StatusCodes.Status500InternalServerError };
+            yield return new object[] { StatusCodes.Status204NoContent, StatusCodes.Status500InternalServerError };
+            yield return new object[] { StatusCodes.Status400BadRequest, StatusCodes.Status400BadRequest };
         }
 
-        [Fact]
-        public async void CatchResourceIsForbiddenException()
+        [Theory]
+        [MemberData(nameof(ReturnCorectStatusCodeForExceptionData))]
+        public async void ReturnCorectStatusCodeForException(Exception exception, int statusCode)
         {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(new ResourceIsForbiddenException());
+            ErrorHandlingMiddleware middleware = CreateMiddleware(exception);
             var context = new DefaultHttpContext();
 
             await middleware.Invoke(context);
 
-            context.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+            context.Response.StatusCode.Should().Be(statusCode);
         }
 
-        [Fact]
-        public async void CatchNotFoundException()
+        public static IEnumerable<object[]> ReturnCorectStatusCodeForExceptionData()
         {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(new NotFoundException());
-            var context = new DefaultHttpContext();
-
-            await middleware.Invoke(context);
-
-            context.Response.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-        }
-
-        [Fact]
-        public async void CatchTimeoutException()
-        {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(new TimeoutException());
-            var context = new DefaultHttpContext();
-
-            await middleware.Invoke(context);
-
-            context.Response.StatusCode.Should().Be(StatusCodes.Status408RequestTimeout);
-        }
-
-        [Fact]
-        public async void CatchUnauthorizedAccessException()
-        {
-            ErrorHandlingMiddleware middleware = CreateMiddleware(new UnauthorizedAccessException());
-            var context = new DefaultHttpContext();
-
-            await middleware.Invoke(context);
-
-            context.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+            yield return new object[] { new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden };
+            yield return new object[] { new NotFoundException(), StatusCodes.Status404NotFound };
+            yield return new object[] { new TimeoutException(), StatusCodes.Status408RequestTimeout };
+            yield return new object[] { new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized };
         }
 
         private static ErrorHandlingMiddleware CreateMiddleware(Exception exception, int responseStatusCode)
