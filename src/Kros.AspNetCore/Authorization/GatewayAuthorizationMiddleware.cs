@@ -61,7 +61,7 @@ namespace Kros.AspNetCore.Authorization
                 {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
 
-                    HttpResponseMessage response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl);
+                    HttpResponseMessage response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value);
 
                     if (response.IsSuccessStatusCode)
                     {
