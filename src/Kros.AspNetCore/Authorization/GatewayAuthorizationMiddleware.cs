@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.Authorization
@@ -62,7 +60,7 @@ namespace Kros.AspNetCore.Authorization
                 using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
                 {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
-                    
+
                     HttpResponseMessage response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value);
 
                     if (response.IsSuccessStatusCode)
