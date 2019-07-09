@@ -1,10 +1,10 @@
 ﻿using Kros.AspNetCore.Exceptions;
 using Kros.AspNetCore.Extensions;
+using Kros.AspNetCore.Properties;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.Middlewares
@@ -38,36 +38,45 @@ namespace Kros.AspNetCore.Middlewares
             {
                 await _next.Invoke(context);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                SetResponseType(context, ex, StatusCodes.Status401Unauthorized);
+            }
             catch (ResourceIsForbiddenException ex)
             {
-                SetResponseType(context, ex, HttpStatusCode.Forbidden);
+                SetResponseType(context, ex, StatusCodes.Status403Forbidden);
             }
             catch (NotFoundException ex)
             {
-                SetResponseType(context, ex, HttpStatusCode.NotFound);
+                SetResponseType(context, ex, StatusCodes.Status404NotFound);
             }
             catch (TimeoutException ex)
             {
-                SetResponseType(context, ex, HttpStatusCode.RequestTimeout);
+                SetResponseType(context, ex, StatusCodes.Status408RequestTimeout);
             }
-            catch (UnauthorizedAccessException ex)
-            {
-                SetResponseType(context, ex, HttpStatusCode.Unauthorized);
-            }
-            catch when (context.Response.StatusCode >= StatusCodes.Status200OK
-                && context.Response.StatusCode < StatusCodes.Status300MultipleChoices)
+            catch (Exception ex) when (!context.Response.HasStarted && IsSuccessStatusCode(context.Response.StatusCode))
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                LogStatusCodeChange(ex, StatusCodes.Status500InternalServerError);
                 throw;
             }
         }
 
-        private void SetResponseType(HttpContext context, Exception ex, HttpStatusCode statusCode)
+        private void SetResponseType(HttpContext context, Exception ex, int statusCode)
         {
+            if (!context.Response.HasStarted)
+            {
+                context.Response.ClearExceptCorsHeaders();
+                context.Response.StatusCode = statusCode;
+                LogStatusCodeChange(ex, statusCode);
+            }
             _logger.LogError(ex, ex.Message);
-
-            context.Response.ClearExceptCorsHeaders();
-            context.Response.StatusCode = (int)statusCode;
         }
+
+        private void LogStatusCodeChange(Exception ex, int statusCode)
+            => _logger.LogDebug(Resources.ErrorHandlingMiddleware_StatusCodeChange, ex.GetType().FullName, statusCode);
+
+        private static bool IsSuccessStatusCode(int statusCode)
+            => (statusCode >= StatusCodes.Status200OK) && (statusCode < StatusCodes.Status300MultipleChoices);
     }
 }
