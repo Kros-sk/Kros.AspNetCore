@@ -120,9 +120,14 @@
   <data name="AuthorizationServiceForbiddenRequest" xml:space="preserve">
     <value>Authorization service forbidden this request.</value>
   </data>
+  <data name="ErrorHandlingMiddleware_StatusCodeChange" xml:space="preserve">
+    <value>Exception {0} was thrown during request pipeline. Status code of the response was changed to {1}.</value>
+    <comment>0 - Full type name of exception.
+1 - New status code for response (number).</comment>
+  </data>
   <data name="GatewayJwtAuthorizationMissingSection" xml:space="preserve">
     <value>'{0}' configuration section is missing or empty.</value>
-    <comment>{0} - Name of the section.</comment>
+    <comment>0 - Name of the section.</comment>
   </data>
   <data name="NotFound" xml:space="preserve">
     <value>Resource was not found.</value>

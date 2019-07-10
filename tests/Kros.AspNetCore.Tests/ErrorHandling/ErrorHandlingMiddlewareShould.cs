@@ -13,9 +13,20 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
 {
     public class ErrorHandlingMiddlewareShould
     {
+        private static readonly (Exception ex, int statusCode)[] _knownExceptions = new (Exception, int)[]
+        {
+            (new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized),
+            (new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden),
+            (new NotFoundException(), StatusCodes.Status404NotFound),
+            (new TimeoutException(), StatusCodes.Status408RequestTimeout)
+        };
+
         [Theory]
-        [MemberData(nameof(RethrowExceptionAndReturnCorectStatusCodeForExceptionData))]
-        public void RethrowExceptionAndReturnCorectStatusCodeForException(int requestStatusCode, int responseStatusCode)
+        [InlineData(StatusCodes.Status200OK, StatusCodes.Status500InternalServerError)]
+        [InlineData(StatusCodes.Status201Created, StatusCodes.Status500InternalServerError)]
+        [InlineData(StatusCodes.Status204NoContent, StatusCodes.Status500InternalServerError)]
+        [InlineData(StatusCodes.Status401Unauthorized, StatusCodes.Status401Unauthorized)]
+        public void ChangeSuccessStatusCodeTo500AndRethrowException(int requestStatusCode, int responseStatusCode)
         {
             var context = new DefaultHttpContext();
             var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
@@ -30,19 +41,38 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             context.Response.StatusCode.Should().Be(responseStatusCode);
         }
 
-        public static IEnumerable<object[]> RethrowExceptionAndReturnCorectStatusCodeForExceptionData()
+        [Theory]
+        [InlineData(StatusCodes.Status200OK)]
+        [InlineData(StatusCodes.Status201Created)]
+        [InlineData(StatusCodes.Status204NoContent)]
+        [InlineData(StatusCodes.Status401Unauthorized)]
+        public void NotChangeSuccessStatusCodeIfResponseHasStartedAndRethrowException(int responseStatusCode)
         {
-            yield return new object[] { StatusCodes.Status200OK, StatusCodes.Status500InternalServerError };
-            yield return new object[] { StatusCodes.Status201Created, StatusCodes.Status500InternalServerError };
-            yield return new object[] { StatusCodes.Status204NoContent, StatusCodes.Status500InternalServerError };
-            yield return new object[] { StatusCodes.Status400BadRequest, StatusCodes.Status400BadRequest };
+            HttpResponse response = Substitute.For<HttpResponse>();
+            response.HasStarted.Returns(true);
+            response.StatusCode = responseStatusCode;
+
+            HttpContext context = Substitute.For<HttpContext>();
+            context.Response.Returns(response);
+
+            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            {
+                throw new Exception();
+            }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
+
+            Func<Task> action = async () => await middleware.Invoke(context);
+            action.Should().Throw<Exception>();
+
+            context.Response.StatusCode.Should().Be(responseStatusCode);
         }
 
         [Theory]
         [MemberData(nameof(ReturnCorectStatusCodeForExceptionData))]
-        public async void ReturnCorectStatusCodeForException(Exception exception, int statusCode)
+        public async Task ReturnCorectStatusCodeForException(Exception exception, int expectedStatusCode)
         {
             var context = new DefaultHttpContext();
+            context.Response.StatusCode = StatusCodes.Status100Continue;
+
             var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
             {
                 throw exception;
@@ -50,15 +80,44 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
 
             await middleware.Invoke(context);
 
-            context.Response.StatusCode.Should().Be(statusCode);
+            context.Response.StatusCode.Should().Be(expectedStatusCode);
         }
 
         public static IEnumerable<object[]> ReturnCorectStatusCodeForExceptionData()
         {
-            yield return new object[] { new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden };
-            yield return new object[] { new NotFoundException(), StatusCodes.Status404NotFound };
-            yield return new object[] { new TimeoutException(), StatusCodes.Status408RequestTimeout };
-            yield return new object[] { new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized };
+            foreach ((Exception ex, int statusCode) in _knownExceptions)
+            {
+                yield return new object[] { ex, statusCode };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(NotChangeStatusCodeIfResponseHasStartedData))]
+        public async Task NotChangeStatusCodeIfResponseHasStarted(Exception exception)
+        {
+            HttpResponse response = Substitute.For<HttpResponse>();
+            response.HasStarted.Returns(true);
+            response.StatusCode = StatusCodes.Status100Continue;
+
+            HttpContext context = Substitute.For<HttpContext>();
+            context.Response.Returns(response);
+
+            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            {
+                throw exception;
+            }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
+
+            await middleware.Invoke(context);
+
+            context.Response.StatusCode.Should().Be(StatusCodes.Status100Continue);
+        }
+
+        public static IEnumerable<object[]> NotChangeStatusCodeIfResponseHasStartedData()
+        {
+            foreach ((Exception ex, int _) in _knownExceptions)
+            {
+                yield return new object[] { ex };
+            }
         }
     }
 }
