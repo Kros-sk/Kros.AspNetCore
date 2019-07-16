@@ -6,9 +6,9 @@ namespace Kros.AspNetCore
     /// <summary>
     /// A base class for all api controllers.
     /// </summary>
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    [Route("/api/[controller]")]
     public abstract class ApiBaseController : ControllerBase
     {
     }
