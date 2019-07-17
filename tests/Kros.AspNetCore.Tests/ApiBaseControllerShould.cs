@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Kros.AspNetCore.Tests
 {
-    public class TestApiBaseControllerShould
+    public class ApiBaseControllerShould
     {
         #region Test classes
 
