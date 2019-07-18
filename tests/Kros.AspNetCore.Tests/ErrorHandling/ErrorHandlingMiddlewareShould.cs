@@ -15,6 +15,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
     {
         private static readonly (Exception ex, int statusCode)[] _knownExceptions = new (Exception, int)[]
         {
+            (new BadRequestException(), StatusCodes.Status400BadRequest),
             (new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized),
             (new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden),
             (new NotFoundException(), StatusCodes.Status404NotFound),

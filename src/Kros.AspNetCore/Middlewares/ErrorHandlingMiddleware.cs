@@ -38,6 +38,10 @@ namespace Kros.AspNetCore.Middlewares
             {
                 await _next.Invoke(context);
             }
+            catch (BadRequestException ex)
+            {
+                SetResponseType(context, ex, StatusCodes.Status400BadRequest);
+            }
             catch (UnauthorizedAccessException ex)
             {
                 SetResponseType(context, ex, StatusCodes.Status401Unauthorized);
