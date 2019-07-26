@@ -35,7 +35,6 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         public void GetColumnsNamesForComplexTypeWithFlattening()
         {
             var jsonPatch = new JsonPatchDocument<Document>();
-
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
             var columns = jsonPatch.GetColumnsNames(new JsonPatchMapperConfig<Document>());
@@ -50,7 +49,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                 .NewConfig()
                 .Map(src =>
                 {
-                    const string address = ".Address.";
+                    const string address = "/Address/";
 
                     var index = src.IndexOf(address);
                     if (index > -1)
@@ -76,7 +75,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             var config = new JsonPatchMapperConfig<Document>()
                 .Map(src =>
                 {
-                    if (src.Contains(".Address."))
+                    if (src.Contains("/Address/"))
                     {
                         return null;
                     }
@@ -99,7 +98,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             var config = new JsonPatchMapperConfig<Document>()
                 .Map(src =>
                 {
-                    const string address = ".Address.";
+                    const string address = "/Address/";
 
                     var index = src.IndexOf(address);
                     if (index > -1)

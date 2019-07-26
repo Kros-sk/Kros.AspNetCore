@@ -83,14 +83,14 @@ For example: path `/Supplier/Name` is maped to `SupplierName`.
 
 ### Custom mapping
 
-When you need define custom mapping, you can use `JsonPatchDocumentMappingConfig<TModel>` for configuration.
+When you need define custom mapping, you can use `JsonPatchDocumentMapperConfig<TModel>` for configuration.
 
 ```CSharp
 JsonPatchMapperConfig<Document>
   .NewConfig()
   .Map(src =>
   {
-      const string address = ".Address.";
+      const string address = "/Address/";
 
       var index = src.IndexOf(address);
       if (index > -1)
@@ -103,6 +103,10 @@ JsonPatchMapperConfig<Document>
 ```
 
 ```CSharp
+var jsonPatch = new JsonPatchDocument<Document>();
+jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
+jsonPatch.Replace(p => p.Supplier.Address.PostCode, "0101010");
+
 var columns = jsonPatch.GetColumnsNames();
 columns.Should()
   .BeEquivalentTo("SupplierCountry", "SupplierPostCode");
@@ -115,7 +119,7 @@ JsonPatchMapperConfig<Document>
   .NewConfig()
   .Map(src =>
   {
-      if (src.Contains(".Address."))
+      if (src.Contains("/Address/"))
       {
           return null;
       }
