@@ -48,19 +48,12 @@ namespace Kros.AspNetCore.JsonPatch
 
         private string GetColumnNameInternal(string path)
         {
-            string property = path.TrimStart('/');
-
             if (_pathMapping != null)
             {
-                string mappedProperty = _pathMapping(property);
-                if (mappedProperty.IsNullOrEmpty()
-                    || !property.Equals(mappedProperty, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return mappedProperty;
-                }
+                path = _pathMapping(path);
             }
 
-            return property.Replace("/", string.Empty);
+            return path?.Replace("/", string.Empty);
         }
     }
 }
