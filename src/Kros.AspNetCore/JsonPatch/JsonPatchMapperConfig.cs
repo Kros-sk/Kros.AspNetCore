@@ -30,7 +30,7 @@ namespace Kros.AspNetCore.JsonPatch
         }
 
         /// <summary>
-        /// Defines mapping rule from JSON PATCH operation path to column name.
+        /// Defines mapping rule for JSON patch operation path to column name.
         /// </summary>
         /// <param name="pathMapping">Mapping rule function.</param>
         /// <returns>Configuration instance for next fluent configuration.</returns>

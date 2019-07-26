@@ -8,7 +8,7 @@
         /// <summary>
         /// Get database column name.
         /// </summary>
-        /// <param name="path">JSON PATCH path.</param>
+        /// <param name="path">JSON patch path.</param>
         /// <returns>Database column.</returns>
         string GetColumnName(string path);
     }
