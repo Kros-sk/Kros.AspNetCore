@@ -1,6 +1,7 @@
 ﻿using Kros.Extensions;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Kros.AspNetCore.JsonPatch
 {
@@ -53,7 +54,13 @@ namespace Kros.AspNetCore.JsonPatch
                 path = _pathMapping(path);
             }
 
-            return path?.Replace("/", string.Empty);
+            return path != null
+                ? string.Join(
+                    string.Empty,
+                    path.Split('/')
+                        .Where(p => !p.IsNullOrWhiteSpace())
+                        .Select(p => $"{char.ToUpper(p.First())}{p.Substring(1)}"))
+                : null;
         }
     }
 }
