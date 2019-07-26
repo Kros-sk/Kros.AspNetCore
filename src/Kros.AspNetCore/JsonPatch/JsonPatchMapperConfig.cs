@@ -34,10 +34,12 @@ namespace Kros.AspNetCore.JsonPatch
         /// </summary>
         /// <param name="pathMapping">Mapping rule function.</param>
         /// <returns>Configuration instance for next fluent configuration.</returns>
+        /// <remarks>
+        /// When you don't want a map path, then return <see langword="null"/> from <paramref name="pathMapping"/>.
+        /// </remarks>
         public JsonPatchMapperConfig<TSource> Map(Func<string, string> pathMapping)
         {
             _pathMapping = pathMapping;
-
             return this;
         }
 

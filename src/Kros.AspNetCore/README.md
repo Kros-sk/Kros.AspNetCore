@@ -2,6 +2,16 @@
 
 **Kros.AspNetCore** je univerzálna knižnica obsahujúca nástroje na zjednodušenie práce na Asp.Net Core web api projektoch.
 
+- [Kros.AspNetCore](#KrosAspNetCore)
+  - [Exceptions](#Exceptions)
+  - [Middlewares](#Middlewares)
+  - [Extensions](#Extensions)
+  - [BaseStartup](#BaseStartup)
+  - [Authorization](#Authorization)
+  - [JsonPatchDocumentExtensions](#JsonPatchDocumentExtensions)
+    - [Flattening pattern](#Flattening-pattern)
+    - [Custom mapping](#Custom-mapping)
+
 ## Exceptions
 
 Menný priestor `Kros.AspNetCore.Exceptions` obsahuje výnimky, ktoré reprezetentujú Http chybové stavy.
@@ -38,9 +48,9 @@ V adresári `Extensions` sa nachádzajú rôzne rozšírenia štandardných trie
 - ### ServiceCollectionExtensions
 
   Obsahuje jednoduchšie konfigurovanie options do DI kontajnera. A odľahčené registrovanie Mvc pre web api - `services.AddWebApi()`
-  
+
 - ### CorsExtensions
-  
+
   Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto domény je potrebné vymenovať v `appsettings.json` v sekcii `AllowedHosts`.
 
 ## BaseStartup
@@ -57,3 +67,59 @@ To add middleware, you must first register the related services `services.AddGat
 and then register `app.UseGatewayJwtAuthorization()` to the pipeline.
 
 You can use `JwtAuthorizationHelper` to generate a Jwt token.
+
+## JsonPatchDocumentExtensions
+
+This package contains extension for mapping JSON patch operations paths from `JsonPatchDocument<TModel>` class to database columns names.
+
+```CSharp
+IEnumerable<Foo> columns = jsonPatch.GetColumnsNames();
+```
+
+### Flattening pattern
+
+This extension use flattening pattern for mapping operation path to column name.
+For example: path `/Supplier/Name` is maped to `SupplierName`.
+
+### Custom mapping
+
+When you need define custom mapping, you can use `JsonPatchDocumentMappingConfig<TModel>` for configuration.
+
+```CSharp
+JsonPatchMapperConfig<Document>
+  .NewConfig()
+  .Map(src =>
+  {
+      const string address = ".Address.";
+
+      var index = src.IndexOf(address);
+      if (index > -1)
+      {
+          return src.Remove(index, address.Length);
+      }
+
+      return src;
+  });
+```
+
+```CSharp
+var columns = jsonPatch.GetColumnsNames();
+columns.Should()
+  .BeEquivalentTo("SupplierCountry", "SupplierPostCode");
+```
+
+If you don't want map a path, then return `null` from mapping function.
+
+```CSharp
+JsonPatchMapperConfig<Document>
+  .NewConfig()
+  .Map(src =>
+  {
+      if (src.Contains(".Address."))
+      {
+          return null;
+      }
+
+      return src;
+  });
+```
