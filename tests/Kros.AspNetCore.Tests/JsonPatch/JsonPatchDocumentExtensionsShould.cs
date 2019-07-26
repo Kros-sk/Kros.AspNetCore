@@ -121,7 +121,6 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void MapPathToColumnsNamesAsPascalCase()
         {
-
             var jsonPatch = new JsonPatchDocument();
             jsonPatch.Replace("/supplier/address/country", "Slovakia");
 
