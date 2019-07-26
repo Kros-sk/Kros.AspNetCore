@@ -62,7 +62,6 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                 });
 
             var jsonPatch = new JsonPatchDocument<Document>();
-
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
