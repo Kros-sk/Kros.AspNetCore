@@ -83,7 +83,7 @@ For example: path `/Supplier/Name` is maped to `SupplierName`.
 
 ### Custom mapping
 
-When you need define custom mapping, you can use `JsonPatchDocumentMappingConfig<TModel>` for configuration.
+When you need define custom mapping, you can use `JsonPatchDocumentMapperConfig<TModel>` for configuration.
 
 ```CSharp
 JsonPatchMapperConfig<Document>
