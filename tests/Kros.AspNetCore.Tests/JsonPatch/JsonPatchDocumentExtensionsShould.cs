@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Kros.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using Xunit;
 
@@ -115,6 +116,20 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             var columns = jsonPatch.GetColumnsNames(config);
             columns.Should()
                 .BeEquivalentTo("SupplierCountry");
+        }
+
+        [Fact]
+        public void MapPathToColumnsNamesAsPascalCase()
+        {
+            var jsonPatch = new JsonPatchDocument();
+            jsonPatch.Replace("/supplier/address/country", "Slovakia");
+
+            var serialized = JsonConvert.SerializeObject(jsonPatch);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
+
+            var columns = deserialized.GetColumnsNames(new JsonPatchMapperConfig<Document>());
+            columns.Should()
+                .BeEquivalentTo("SupplierAddressCountry");
         }
 
         #region Nested classes
