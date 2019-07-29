@@ -59,6 +59,8 @@ steps:
     displayName: 'Check project name'
     condition: eq(variables['project.Current'], '')
 
+  - template: steps/delete-nupkgs.yml@templates
+
   - task: DotNetCoreCLI@2
     displayName: 'Nuget restore'
     inputs:
