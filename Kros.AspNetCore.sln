@@ -21,6 +21,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.Swagger.Extensions", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kros.MassTransit.AzureServiceBus", "src\Kros.MassTransit.AzureServiceBus\Kros.MassTransit.AzureServiceBus.csproj", "{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{821CE0B1-32F3-42A6-9169-B7EDAFA86FB2}"
+	ProjectSection(SolutionItems) = preProject
+		build-ci.yml = build-ci.yml
+		build.yml = build.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
