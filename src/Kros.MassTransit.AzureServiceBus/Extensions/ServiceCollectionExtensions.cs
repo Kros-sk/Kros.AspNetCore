@@ -70,6 +70,5 @@ namespace Microsoft.Extensions.DependencyInjection
                     .AddClasses(c => c.AssignableTo(typeof(IConsumer))));
             }
         }
-
     }
 }
