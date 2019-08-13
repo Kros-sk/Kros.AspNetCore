@@ -78,7 +78,8 @@ namespace Kros.AspNetCore.Authorization
             return string.Empty;
         }
 
-        private async Task<string> GetUserAuthorizationJwtAsync(HttpContext httpContext,
+        private async Task<string> GetUserAuthorizationJwtAsync(
+            HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
             IMemoryCache memoryCache,
             StringValues value,
