@@ -17,7 +17,9 @@ namespace Kros.AspNetCore.Authorization
         /// </summary>
         /// <param name="services">Collection of app services.</param>
         public static IServiceCollection AddGatewayJwtAuthorization(this IServiceCollection services)
-            => services.AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
+            => services
+            .AddMemoryCache()
+            .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
             .Services;
 
         /// <summary>

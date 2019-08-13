@@ -1,4 +1,6 @@
-﻿namespace Kros.AspNetCore.Authorization
+﻿using System;
+
+namespace Kros.AspNetCore.Authorization
 {
     /// <summary>
     /// JWT authorization options for api gateway.
@@ -9,5 +11,13 @@
         /// Authorization service url.
         /// </summary>
         public string AuthorizationUrl { get; set; }
+
+        /// <summary>
+        /// Cache sliding expiration offset.
+        /// </summary>
+        /// <remarks>
+        /// Default is <see cref="TimeSpan.Zero"/>.
+        /// </remarks>
+        public TimeSpan CacheSlidingExpirationOffset { get; set; } = TimeSpan.Zero;
     }
 }
