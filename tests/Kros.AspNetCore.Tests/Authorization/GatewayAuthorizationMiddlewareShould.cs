@@ -119,7 +119,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             {
                 AuthorizationUrl = "http://authorizationservice.com",
                 CacheSlidingExpirationOffset = offset
-            }); ;
+            });
 
             return (httpClientFactory, middleware);
         }
