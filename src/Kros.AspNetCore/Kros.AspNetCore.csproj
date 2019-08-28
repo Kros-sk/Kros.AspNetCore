@@ -24,6 +24,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="2.2.3" />
+    <PackageReference Include="Kros.Identity.Extensions" Version="0.4.1" />
     <PackageReference Include="Kros.Utils" Version="1.9.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
