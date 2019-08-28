@@ -1,12 +1,11 @@
-﻿using Kros.Utils;
+﻿using Kros.AspNetCore.Exceptions;
+using Kros.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Net.Http;
-using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.Authorization
@@ -100,7 +99,19 @@ namespace Kros.AspNetCore.Authorization
                 }
                 else
                 {
-                    throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                    switch (response.StatusCode)
+                    {
+                        case System.Net.HttpStatusCode.Forbidden:
+                            throw new ResourceIsForbiddenException();
+                        case System.Net.HttpStatusCode.NotFound:
+                            throw new NotFoundException();
+                        case System.Net.HttpStatusCode.Unauthorized:
+                            throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                        case System.Net.HttpStatusCode.BadRequest:
+                            throw new BadRequestException();
+                        default:
+                            throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                    }
                 }
             }
         }
