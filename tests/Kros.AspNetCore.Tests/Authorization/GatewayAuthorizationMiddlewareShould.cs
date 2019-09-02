@@ -119,7 +119,6 @@ namespace Kros.AspNetCore.Tests.Authorization
                 => middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions())));
         }
 
-
         [Fact]
         public async void ThrowBadRequestExceptionWhenRequestIsBad()
         {
