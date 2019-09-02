@@ -24,7 +24,7 @@ namespace Kros.AspNetCore.Extensions
             {
                 healthChecksBuilder.AddUrlGroup(
                     new Uri(option.AuthorityUrl),
-                    name: $"IdentityServer handler for scheme {option.AuthenticationScheme}",
+                    name: string.Format(Properties.Resources.IdentityHealthCheckBuilderName, option.AuthenticationScheme),
                     tags: new string[] { "url" });
             }
 
