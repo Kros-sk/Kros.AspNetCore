@@ -99,20 +99,25 @@ namespace Kros.AspNetCore.Authorization
                 }
                 else
                 {
-                    switch (response.StatusCode)
-                    {
-                        case System.Net.HttpStatusCode.Forbidden:
-                            throw new ResourceIsForbiddenException();
-                        case System.Net.HttpStatusCode.NotFound:
-                            throw new NotFoundException();
-                        case System.Net.HttpStatusCode.Unauthorized:
-                            throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
-                        case System.Net.HttpStatusCode.BadRequest:
-                            throw new BadRequestException();
-                        default:
-                            throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
-                    }
+                    throw GetExceptionForResponse(response);
                 }
+            }
+        }
+
+        private static Exception GetExceptionForResponse(HttpResponseMessage response)
+        {
+            switch (response.StatusCode)
+            {
+                case System.Net.HttpStatusCode.Forbidden:
+                    return new ResourceIsForbiddenException();
+                case System.Net.HttpStatusCode.NotFound:
+                    return new NotFoundException();
+                case System.Net.HttpStatusCode.Unauthorized:
+                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                case System.Net.HttpStatusCode.BadRequest:
+                    return new BadRequestException();
+                default:
+                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
             }
         }
 
