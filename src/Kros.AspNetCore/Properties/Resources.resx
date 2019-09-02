@@ -133,7 +133,7 @@
     <comment>0 - Name of the section.</comment>
   </data>
   <data name="IdentityHealthCheckBuilderName" xml:space="preserve">
-    <value>IdentityServer handler for scheme {0}</value>
+    <value> IdentityServer handler for scheme {0}</value>
   </data>
   <data name="NotFound" xml:space="preserve">
     <value>Resource was not found.</value>

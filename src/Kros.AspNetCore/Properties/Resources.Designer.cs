@@ -97,7 +97,7 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IdentityServer handler for scheme {0}.
+        ///   Looks up a localized string similar to  IdentityServer handler for scheme {0}.
         /// </summary>
         internal static string IdentityHealthCheckBuilderName {
             get {
