@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Kros.AspNetCore.Authorization;
+using Kros.AspNetCore.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using NSubstitute;
 using System;
@@ -82,17 +82,54 @@ namespace Kros.AspNetCore.Tests.Authorization
         }
 
         [Theory()]
-        [InlineData(HttpStatusCode.Forbidden)]
-        [InlineData(HttpStatusCode.BadRequest)]
-        public void ThrowUnauthorizedAccessExceptionWhenIsNotauthorized(HttpStatusCode statusCode)
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        public async void ThrowUnauthorizedAccessExceptionWhenIsNotauthorized(HttpStatusCode statusCode)
         {
             (var httpClientFactoryMock, var middleware) = CreateMiddleware(statusCode);
 
             var context = new DefaultHttpContext();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
 
-            Assert.ThrowsAsync<UnauthorizedAccessException>(async ()
-                => await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions())));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(()
+                => middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions())));
+        }
+
+        [Fact]
+        public async void ThrowResourceIsForbiddenExceptionWhenIsNotForbidden()
+        {
+            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.Forbidden);
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+
+            await Assert.ThrowsAsync<ResourceIsForbiddenException>(()
+                => middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions())));
+        }
+
+        [Fact]
+        public async void ThrowNotFoundExceptionWhenResourceIsNotFound()
+        {
+            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.NotFound);
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+
+            await Assert.ThrowsAsync<NotFoundException>(()
+                => middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions())));
+        }
+
+
+        [Fact]
+        public async void ThrowBadRequestExceptionWhenRequestIsBad()
+        {
+            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.BadRequest);
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+
+            await Assert.ThrowsAsync<BadRequestException>(()
+                => middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions())));
         }
 
         private static (IHttpClientFactory, GatewayAuthorizationMiddleware) CreateMiddleware(HttpStatusCode statusCode)
