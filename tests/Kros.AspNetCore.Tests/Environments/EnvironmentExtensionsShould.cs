@@ -13,7 +13,7 @@ namespace Kros.AspNetCore.Tests.Environments
             IHostingEnvironment env = Substitute.For<IHostingEnvironment>();
             env.EnvironmentName.Returns(Microsoft.AspNetCore.Hosting.Environments.Test);
 
-            env.IsTest().Should().Be(true);
+            env.IsTest().Should().BeTrue();
         }
 
         [Fact]
@@ -21,7 +21,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IHostingEnvironment env = Substitute.For<IHostingEnvironment>();
             env.EnvironmentName.Returns(Microsoft.AspNetCore.Hosting.Environments.Development);
-            env.IsTest().Should().Be(false);
+            env.IsTest().Should().BeFalse();
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IHostingEnvironment env = Substitute.For<IHostingEnvironment>();
             env.EnvironmentName.Returns(Microsoft.AspNetCore.Hosting.Environments.Development);
-            env.IsTestOrDevelopment().Should().Be(true);
+            env.IsTestOrDevelopment().Should().BeTrue();
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IHostingEnvironment env = Substitute.For<IHostingEnvironment>();
             env.EnvironmentName.Returns(Microsoft.AspNetCore.Hosting.Environments.Staging);
-            env.IsTestOrDevelopment().Should().Be(false);
+            env.IsTestOrDevelopment().Should().BeFalse();
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IHostingEnvironment env = Substitute.For<IHostingEnvironment>();
             env.EnvironmentName.Returns(Microsoft.AspNetCore.Hosting.Environments.Staging);
-            env.IsStagingOrProduction().Should().Be(true);
+            env.IsStagingOrProduction().Should().BeTrue();
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IHostingEnvironment env = Substitute.For<IHostingEnvironment>();
             env.EnvironmentName.Returns(Microsoft.AspNetCore.Hosting.Environments.Test);
-            env.IsStagingOrProduction().Should().Be(false);
+            env.IsStagingOrProduction().Should().BeFalse();
         }
     }
 }
