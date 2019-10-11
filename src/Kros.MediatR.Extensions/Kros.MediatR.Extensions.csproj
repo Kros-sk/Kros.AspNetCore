@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.1.0-alpha4</Version>
+    <Version>1.1.0-alpha5</Version>
     <Authors>KROS a.s.</Authors>
     <Description>Extensions and helpers to facilitate work with MediatR library.</Description>
     <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.MediatR.Extensions</PackageProjectUrl>
