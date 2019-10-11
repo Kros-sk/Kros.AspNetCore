@@ -20,16 +20,20 @@ namespace Kros.MediatR.Extensions
         /// </summary>
         /// <typeparam name="TRequest">Request type.</typeparam>
         /// <param name="services">Service container.</param>
+        /// <param name="configAction">Pipeline behaviors config.</param>
         /// <exception cref="InvalidOperationException">When number of implementation
         /// <typeparamref name="TRequest"/> and response are different.</exception>
-        public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(this IServiceCollection services)
+        public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(this IServiceCollection services, Action<PipelineBehaviorsConfig> configAction = null)
         {
+            var config = new PipelineBehaviorsConfig();
+            configAction?.Invoke(config);
+
             Type requestType = typeof(TRequest);
             Type pipeLineType = typeof(IPipelineBehavior<,>);
             string requestInterfaceName = typeof(IRequest<>).Name;
 
-            IList<Type> requests = GetTypes(requestType);
-            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType);
+            IList<Type> requests = GetTypes(requestType, config.RequestsAssembly);
+            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType, config.PipelineBehaviorsAssembly);
 
             foreach (Type behavior in pipelineBehaviors)
             {
@@ -59,14 +63,15 @@ namespace Kros.MediatR.Extensions
             return services;
         }
 
-        private static IEnumerable<Type> GetPipelineBehaviors(Type requestType, Type pipeLineType)
-            => Assembly.GetAssembly(requestType).GetTypes()
+        private static IEnumerable<Type> GetPipelineBehaviors(Type requestType, Type pipeLineType, Assembly behavioursAssembly)
+            => (behavioursAssembly ?? Assembly.GetAssembly(requestType))
+            .GetTypes()
             .Where(t
                 => t.GetInterface(pipeLineType.Name) != null
                 && t.GetGenericArguments()[0].GetInterface(requestType.Name) != null);
 
-        private static IList<Type> GetTypes(Type type)
-            => Assembly.GetAssembly(type)
+        private static IList<Type> GetTypes(Type type, Assembly assembly)
+            => (assembly ?? Assembly.GetAssembly(type))
             .GetTypes()
             .Where(t => !t.IsInterface && !t.IsAbstract & type.IsAssignableFrom(t))
             .ToList();
