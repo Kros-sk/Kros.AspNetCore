@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using NSubstitute;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -67,6 +68,28 @@ namespace Kros.AspNetCore.Tests.Authorization
             cache.Get(HashCode.Combine(accessToken, context.Request.Path))
                 .Should()
                 .Be("MyJwtToken");
+        }
+
+        [Fact]
+        public async void JwtTokenWithoutCaching()
+        {
+            var ignoredPath = new List<string>();
+            ignoredPath.Add("/IgnoredPath");
+            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5), ignoredPath);
+            string accessToken = "access_token";
+
+            var context = new DefaultHttpContext();
+            var cache = new MemoryCache(new MemoryCacheOptions());
+
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Path = "/ignoredPath/";
+            context.Request.Method = HttpMethod.Get.ToString();
+            await middleware.Invoke(context, httpClientFactoryMock, cache);
+
+            var aaa = cache.Get(HashCode.Combine(accessToken, context.Request.Path));
+            cache.Get(HashCode.Combine(accessToken, context.Request.Path))
+                .Should()
+                .BeNull();
         }
 
         [Fact]
@@ -132,11 +155,17 @@ namespace Kros.AspNetCore.Tests.Authorization
         }
 
         private static (IHttpClientFactory, GatewayAuthorizationMiddleware) CreateMiddleware(HttpStatusCode statusCode)
-            => CreateMiddleware(statusCode, TimeSpan.Zero);
+            => CreateMiddleware(statusCode, TimeSpan.Zero, new List<string>());
+
+        private static (IHttpClientFactory, GatewayAuthorizationMiddleware) CreateMiddleware(
+           HttpStatusCode statusCode,
+           TimeSpan offset)
+            => CreateMiddleware(statusCode, offset, new List<string>());
 
         private static (IHttpClientFactory, GatewayAuthorizationMiddleware) CreateMiddleware(
             HttpStatusCode statusCode,
-            TimeSpan offset)
+            TimeSpan offset,
+            List<string> ignoredPathForCache)
         {
             var httpClientFactory = Substitute.For<IHttpClientFactory>();
             var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage()
@@ -148,14 +177,13 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             httpClientFactory.CreateClient("JwtAuthorizationClientName").Returns(fakeHttpClient);
 
-            var middleware = new GatewayAuthorizationMiddleware((c) =>
-            {
-                return Task.CompletedTask;
-            }, new GatewayJwtAuthorizationOptions()
+            var gatewayJwtAuthorizationOptions = new GatewayJwtAuthorizationOptions()
             {
                 AuthorizationUrl = "http://authorizationservice.com",
                 CacheSlidingExpirationOffset = offset
-            });
+            };
+            gatewayJwtAuthorizationOptions.IgnoredPathForCache.AddRange(ignoredPathForCache);
+            var middleware = new GatewayAuthorizationMiddleware((c) => Task.CompletedTask, gatewayJwtAuthorizationOptions);
 
             return (httpClientFactory, middleware);
         }

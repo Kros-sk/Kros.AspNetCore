@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Kros.AspNetCore.Authorization
 {
@@ -19,5 +20,10 @@ namespace Kros.AspNetCore.Authorization
         /// Default is <see cref="TimeSpan.Zero"/>.
         /// </remarks>
         public TimeSpan CacheSlidingExpirationOffset { get; set; } = TimeSpan.Zero;
+
+        /// <summary>
+        /// Roads that do not use JWT authorization caching 
+        /// </summary>
+        public List<string> IgnoredPathForCache { get; private set; } = new List<string>();
     }
 }
