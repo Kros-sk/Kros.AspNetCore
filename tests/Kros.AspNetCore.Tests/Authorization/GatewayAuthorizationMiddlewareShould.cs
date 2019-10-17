@@ -74,7 +74,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         public async void JwtTokenWithoutCaching()
         {
             var ignoredPath = new List<string>();
-            ignoredPath.Add("/ignoredpath");
+            ignoredPath.Add("/IgnoredPath");
             (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5), ignoredPath);
             string accessToken = "access_token";
 
@@ -183,10 +183,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 CacheSlidingExpirationOffset = offset
             };
             gatewayJwtAuthorizationOptions.IgnoredPathForCache.AddRange(ignoredPathForCache);
-            var middleware = new GatewayAuthorizationMiddleware((c) =>
-            {
-                return Task.CompletedTask;
-            }, gatewayJwtAuthorizationOptions);
+            var middleware = new GatewayAuthorizationMiddleware((c) => Task.CompletedTask, gatewayJwtAuthorizationOptions);
 
             return (httpClientFactory, middleware);
         }

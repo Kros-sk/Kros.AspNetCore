@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -125,7 +126,7 @@ namespace Kros.AspNetCore.Authorization
         {
             if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero &&
                !(request.Method == HttpMethod.Get.ToString() &&
-                 _jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.ToLower().TrimEnd('/'))))
+                 _jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase)))
             {
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
