@@ -125,8 +125,7 @@ namespace Kros.AspNetCore.Authorization
         private void SetTokenToCache(IMemoryCache memoryCache, int key, string jwtToken, HttpRequest request)
         {
             if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero &&
-               !(request.Method == HttpMethod.Get.ToString() &&
-                 _jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase)))
+                !_jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase))
             {
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
