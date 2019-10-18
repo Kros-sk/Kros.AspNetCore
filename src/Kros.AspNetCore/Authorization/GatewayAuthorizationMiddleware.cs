@@ -120,7 +120,6 @@ namespace Kros.AspNetCore.Authorization
                 default:
                     return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
             }
-
         }
 
         private void SetTokenToCache(IMemoryCache memoryCache, int key, string jwtToken, HttpRequest request)
