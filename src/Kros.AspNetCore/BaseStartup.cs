@@ -6,6 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+#if (NETCOREAPP3_0)
+
+using Microsoft.Extensions.Hosting;
+
+#endif
+
 namespace Kros.AspNetCore
 {
     /// <summary>
@@ -13,6 +19,8 @@ namespace Kros.AspNetCore
     /// </summary>
     public abstract class BaseStartup
     {
+#if (NETCOREAPP2_2)
+
         /// <summary>
         /// Ctor.
         /// </summary>
@@ -30,15 +38,47 @@ namespace Kros.AspNetCore
             Environment = env;
         }
 
+#else
+
+        /// <summary>
+        /// Ctor.
+        /// </summary>
+        /// <param name="env">Information about the web hosting environment.</param>
+        public BaseStartup(IWebHostEnvironment env)
+        {
+            IConfigurationBuilder builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile($"appsettings.local.json", optional: true)
+                .AddEnvironmentVariables();
+
+            Configuration = builder.Build();
+            Environment = env;
+        }
+
+#endif
+
         /// <summary>
         /// Application configuration.
         /// </summary>
         public IConfiguration Configuration { get; }
 
+#if (NETCOREAPP2_2)
+
         /// <summary>
         /// Application environment.
         /// </summary>
         public IHostingEnvironment Environment { get; }
+
+#else
+
+        /// <summary>
+        /// Application environment.
+        /// </summary>
+        public IWebHostEnvironment Environment { get; }
+
+#endif
 
         /// <summary>
         /// Application services configuration.
