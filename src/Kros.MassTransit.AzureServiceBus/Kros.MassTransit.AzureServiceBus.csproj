@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-alpha.1</Version>
+    <Version>1.0.0-alpha.2</Version>
     <Authors>KROS a.s.</Authors>
     <Company>KROS a.s.</Company>
     <Description>Simpler configuration of MassTransit library.</Description>
@@ -14,11 +14,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kros.AspNetCore" Version="1.2.0" />
-    <PackageReference Include="Kros.Utils" Version="1.9.0" />
-    <PackageReference Include="MassTransit.AspNetCore" Version="5.5.4" />
-    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="5.5.4" />
-    <PackageReference Include="Scrutor" Version="3.0.2" />
+    <PackageReference Include="Kros.Utils" Version="1.10.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="5.5.6" />
+    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="5.5.6" />
+    <PackageReference Include="Scrutor" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kros.AspNetCore\Kros.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,10 +1,8 @@
 ﻿using FluentAssertions;
 using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Builder.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
 using System.Collections.Generic;

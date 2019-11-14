@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Interfaces;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -29,7 +32,7 @@ namespace Kros.Swagger.Extensions
             IConfiguration configuration,
             Action<SwaggerGenOptions> setupAction = null)
         {
-            Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
+            OpenApiInfo swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
             if (swaggerDocumentationSettings is null)
             {
@@ -63,30 +66,44 @@ namespace Kros.Swagger.Extensions
             return services;
         }
 
-        private static void AddSwaggerSecurity(SwaggerGenOptions swaggerOptions, Info swaggerDocumentationSettings)
+        private static void AddSwaggerSecurity(SwaggerGenOptions swaggerOptions, OpenApiInfo swaggerDocumentationSettings)
         {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("TokenUrl", out object t) && t is string tokenUrl)
+            if (swaggerDocumentationSettings.Extensions.TryGetValue("TokenUrl", out IOpenApiExtension t) &&
+                t is OpenApiString tokenUrl)
             {
-                swaggerOptions.AddSecurityDefinition("Bearer", new OAuth2Scheme
+                swaggerOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Type = "oauth2",
-                    Flow = "password",
-                    TokenUrl = tokenUrl
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows()
+                    {
+                        Password = new OpenApiOAuthFlow()
+                        {
+                            TokenUrl = new Uri(tokenUrl?.Value)
+                        }
+                    }
                 });
-                swaggerOptions.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                swaggerOptions.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
                     {
-                        "Bearer", new string[] { }
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        new List<string>()
                     }
                 });
             }
         }
 
-        private static Info GetSwaggerDocumentationSettings(IConfiguration configuration)
+        private static OpenApiInfo GetSwaggerDocumentationSettings(IConfiguration configuration)
         {
             IConfigurationSection configurationSection = configuration.GetSection(SwaggerDocumentationSectionName);
 
-            return configurationSection.Exists() ? configurationSection.Get<Info>() : null;
+            return configurationSection.Exists() ? configurationSection.Get<OpenApiInfo>() : null;
         }
 
         private static string GetXmlDocumentationFilePath(string assemblyName)
@@ -105,7 +122,7 @@ namespace Kros.Swagger.Extensions
             Action<SwaggerOptions> setupAction = null,
             Action<SwaggerUIOptions> setupUiAction = null)
         {
-            Info swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
+            OpenApiInfo swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
 
             if (swaggerDocumentationSettings is null)
             {
@@ -119,7 +136,7 @@ namespace Kros.Swagger.Extensions
             {
                 c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
                 {
-                    swaggerDoc.BasePath = "/";
+                    swaggerDoc.Servers.Add(new OpenApiServer() { Url = "/" });
                 });
 
                 setupAction?.Invoke(c);
@@ -137,11 +154,12 @@ namespace Kros.Swagger.Extensions
             return app;
         }
 
-        private static string GetOAuthClientId(Info swaggerDocumentationSettings)
+        private static string GetOAuthClientId(OpenApiInfo swaggerDocumentationSettings)
         {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out object c) && c is string clientId)
+            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out IOpenApiExtension c) &&
+                c is OpenApiString clientId)
             {
-                return clientId;
+                return clientId?.Value;
             }
 
             return DefaultOAuthClientId;

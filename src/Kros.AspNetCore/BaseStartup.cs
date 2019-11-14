@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Kros.AspNetCore
@@ -17,7 +18,7 @@ namespace Kros.AspNetCore
         /// Ctor.
         /// </summary>
         /// <param name="env">Information about the web hosting environment.</param>
-        public BaseStartup(IHostingEnvironment env)
+        public BaseStartup(IWebHostEnvironment env)
         {
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -38,7 +39,7 @@ namespace Kros.AspNetCore
         /// <summary>
         /// Application environment.
         /// </summary>
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
 
         /// <summary>
         /// Application services configuration.
