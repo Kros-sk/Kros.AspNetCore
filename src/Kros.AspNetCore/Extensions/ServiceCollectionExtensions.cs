@@ -90,6 +90,5 @@ namespace Microsoft.Extensions.DependencyInjection
             => services.AddControllers();
 
 #endif
-
     }
 }
