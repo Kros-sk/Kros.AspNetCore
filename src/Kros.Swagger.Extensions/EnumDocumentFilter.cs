@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,13 @@ namespace Kros.Swagger.Extensions
     public class EnumDocumentFilter : IDocumentFilter
     {
         /// <inheritdoc />
-        public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
-            foreach (Schema schema in swaggerDoc.Definitions.Values)
+            foreach (OpenApiSchema schema in swaggerDoc.Components.Schemas.Values)
             {
-                foreach (Schema property in schema.Properties.Values)
+                foreach (OpenApiSchema property in schema.Properties.Values)
                 {
-                    IList<object> propertyEnums = property.Enum;
+                    IList<IOpenApiAny> propertyEnums = property.Enum;
 
                     if (propertyEnums != null && propertyEnums.Count > 0)
                     {
@@ -28,11 +29,15 @@ namespace Kros.Swagger.Extensions
 
             if (swaggerDoc.Paths.Count > 0)
             {
-                foreach (PathItem pathItem in swaggerDoc.Paths.Values)
+                foreach (OpenApiPathItem pathItem in swaggerDoc.Paths.Values)
                 {
                     DescribeEnumParameters(pathItem.Parameters);
 
-                    var possibleParameterisedOperations = new List<Operation> { pathItem.Get, pathItem.Post, pathItem.Put };
+                    pathItem.Operations.TryGetValue(OperationType.Get, out OpenApiOperation getOp);
+                    pathItem.Operations.TryGetValue(OperationType.Post, out OpenApiOperation postOp);
+                    pathItem.Operations.TryGetValue(OperationType.Put, out OpenApiOperation putOp);
+
+                    var possibleParameterisedOperations = new List<OpenApiOperation> { getOp, postOp, putOp };
                     possibleParameterisedOperations
                         .FindAll(x => x != null)
                         .ForEach(x => DescribeEnumParameters(x.Parameters));
@@ -40,14 +45,14 @@ namespace Kros.Swagger.Extensions
             }
         }
 
-        private static void DescribeEnumParameters(IList<IParameter> parameters)
+        private static void DescribeEnumParameters(IList<OpenApiParameter> parameters)
         {
             if (parameters is null)
             {
                 return;
             }
 
-            foreach (IParameter param in parameters)
+            foreach (OpenApiParameter param in parameters)
             {
                 if (param.Extensions.ContainsKey("enum") && (param.Extensions["enum"] is IList<object> paramEnums) &&
                     (paramEnums.Count > 0))
