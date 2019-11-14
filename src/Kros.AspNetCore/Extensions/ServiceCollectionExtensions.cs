@@ -1,6 +1,7 @@
 ﻿using Kros.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -9,10 +10,14 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class ServiceCollectionExtensions
     {
+#if (NETCOREAPP2_2)
+
         /// <summary>
         /// Default MVC compatibility version for <see cref="AddWebApi(IServiceCollection)"/>.
         /// </summary>
         public static CompatibilityVersion DefaultCompatibilityVersion => CompatibilityVersion.Version_2_2;
+
+#endif
 
         /// <summary>
         /// Configure options of type <typeparamref name="TOptions"/> and binds it to section with the name
@@ -42,6 +47,8 @@ namespace Microsoft.Extensions.DependencyInjection
             string sectionName) where TOptions : class
             => services.Configure<TOptions>(options => configuration.GetSection(sectionName).Bind(options));
 
+#if (NETCOREAPP2_2)
+
         /// <summary>
         /// Adds the minimum essential MVC services to the DI container for web API services.
         /// (MVC Core, JSON Formatters, CORS, API Explorer, Authorization)
@@ -69,5 +76,20 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddApiExplorer()
                 .AddAuthorization();
         }
+
+#else
+
+        /// <summary>
+        /// Adds the minimum essential MVC services to the DI container for web API services.
+        /// (MVC Core, JSON Formatters, CORS, API Explorer, Authorization)
+        /// Additional services must be added separately using the <see cref="IMvcBuilder"/> returned from this method.
+        /// </summary>
+        /// <param name="services">MVC builder.</param>
+        [Obsolete("AddWebApi is deprecated, please use AddControllers() instead.")]
+        public static IMvcBuilder AddWebApi(this IServiceCollection services)
+            => services.AddControllers();
+
+#endif
+
     }
 }
