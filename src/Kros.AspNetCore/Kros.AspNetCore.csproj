@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.6.1</Version>
+    <TargetFrameworks>netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
+    <Version>2.0.0-alpha.1</Version>
     <Authors>KROS a.s.</Authors>
     <Description>General utilities and helpers for building ASP.NET Core WEB API</Description>
     <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.AspNetCore</PackageProjectUrl>
@@ -24,9 +24,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Kros.Identity.Extensions" Version="0.4.2" />
+    <PackageReference Include="Kros.Utils" Version="1.10.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="2.2.3" />
-    <PackageReference Include="Kros.Identity.Extensions" Version="0.4.1" />
-    <PackageReference Include="Kros.Utils" Version="1.9.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
@@ -42,6 +45,17 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="3.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.8.2" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
