@@ -2,16 +2,26 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.0.0-alpha.2</Version>
-    <Authors>KROS a.s.</Authors>
-    <Company>KROS a.s.</Company>
+    <Authors>KROS a. s.</Authors>
+    <Company>KROS a. s.</Company>
     <Description>Simpler configuration of MassTransit library.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageIcon>packageIcon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIconUrl>https://en.gravatar.com/userimage/137934964/524e95fbd8c2e8779e02819ab6902bef.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
     <PackageTags>kros;masstransit;azure;service bus;</PackageTags>
     <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\packageIcon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Kros.Utils" Version="1.10.1" />
