@@ -2,8 +2,6 @@
 
 namespace Microsoft.Extensions.Hosting
 {
-#if (NETCOREAPP3_0)
-
     /// <summary>
     /// Extension for IWebHostEnvironment.
     /// </summary>
@@ -36,6 +34,4 @@ namespace Microsoft.Extensions.Hosting
         public static bool IsStagingOrProduction(this IWebHostEnvironment env)
             => env.IsStaging() || env.IsProduction();
     }
-
-#endif
 }
