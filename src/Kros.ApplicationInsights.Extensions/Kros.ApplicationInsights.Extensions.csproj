@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <Authors>KROS a.s.</Authors>
     <Description>Extensions to facilitate work with Application Insights.</Description>
     <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.ApplicationInsigths.Extensions</PackageProjectUrl>
@@ -11,13 +11,14 @@
     <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.1.0-alpha.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kros.Utils" Version="1.9.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Kros.Utils" Version="1.10.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.8.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.0.1" />
   </ItemGroup>
 
 </Project>
