@@ -1,28 +1,28 @@
-﻿namespace Microsoft.AspNetCore.Hosting
+﻿namespace Microsoft.Extensions.Hosting
 {
     /// <summary>
     /// Valid environments.
     /// </summary>
-    public static class Environments
+    public static class EnvironmentsEx
     {
         /// <summary>
         /// Development environment.
         /// </summary>
-        public const string Development = "Development";
+        public static readonly string Development = Environments.Development;
 
         /// <summary>
         /// Test environment.
         /// </summary>
-        public const string Test = "Test";
+        public static readonly string Test = "Test";
 
         /// <summary>
         /// Staging environment.
         /// </summary>
-        public const string Staging = "Staging";
+        public static readonly string Staging = Environments.Staging;
 
         /// <summary>
         /// Production environment.
         /// </summary>
-        public const string Production = "Production";
+        public static readonly string Production = Environments.Production;
     }
 }

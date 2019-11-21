@@ -11,6 +11,10 @@ namespace Kros.MassTransit.AzureServiceBus.Endpoints
     /// </summary>
     public abstract class Endpoint
     {
+        /// <summary>
+        /// Initialize new instance with specified <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">Name of the endpoint.</param>
         protected Endpoint(string name)
         {
             Name = Check.NotNullOrWhiteSpace(name, nameof(name));

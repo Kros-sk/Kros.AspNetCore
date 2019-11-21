@@ -24,7 +24,8 @@ namespace Microsoft.Extensions.DependencyInjection
             Type consumerNamespaceAnchor,
             Action<IMassTransitForAzureBuilder> busCfg = null)
         {
-            services.ConfigureOptions<AzureServiceBusOptions>(configuration);
+            const string sectionName = "AzureServiceBus";
+            services.Configure<AzureServiceBusOptions>(options => configuration.GetSection(sectionName).Bind(options));
 
             RegisterConsumers(services, consumerNamespaceAnchor);
 
