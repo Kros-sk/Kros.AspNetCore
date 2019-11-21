@@ -12,7 +12,7 @@ namespace Kros.AspNetCore.Tests.Environments
         public void IsTestReturnTrueIfTestEnvironment()
         {
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
-            env.EnvironmentName.Returns(EnvironmentsExtended.Test);
+            env.EnvironmentName.Returns(EnvironmentsEx.Test);
 
             env.IsTest().Should().BeTrue();
         }
@@ -53,7 +53,7 @@ namespace Kros.AspNetCore.Tests.Environments
         public void IsStagingOrProductionReturnFalseIfTestEnvironment()
         {
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
-            env.EnvironmentName.Returns(EnvironmentsExtended.Test);
+            env.EnvironmentName.Returns(EnvironmentsEx.Test);
             env.IsStagingOrProduction().Should().BeFalse();
         }
     }

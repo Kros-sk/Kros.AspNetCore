@@ -8,19 +8,19 @@ namespace Microsoft.Extensions.Hosting
     public static class IWebHostEnvironmentExtensions
     {
         /// <summary>
-        /// Check if current environment is <see cref="EnvironmentsExtended.Test"/>.
+        /// Check if current environment is <see cref="EnvironmentsEx.Test"/>.
         /// </summary>
         /// <param name="env">Current environment.</param>
-        /// <returns><see langword="true" /> if current environment is <see cref="EnvironmentsExtended.Test"/>,
+        /// <returns><see langword="true" /> if current environment is <see cref="EnvironmentsEx.Test"/>,
         /// <see langword="false" /> otherwise.</returns>
         public static bool IsTest(this IWebHostEnvironment env)
-            => env.IsEnvironment(EnvironmentsExtended.Test);
+            => env.IsEnvironment(EnvironmentsEx.Test);
 
         /// <summary>
-        /// Check if current environment is <see cref="EnvironmentsExtended.Test"/> or <see cref="Environments.Development"/>.
+        /// Check if current environment is <see cref="EnvironmentsEx.Test"/> or <see cref="Environments.Development"/>.
         /// </summary>
         /// <param name="env">Current environment.</param>
-        /// <returns><see langword="true" /> if current environment is <see cref="EnvironmentsExtended.Test"/> or
+        /// <returns><see langword="true" /> if current environment is <see cref="EnvironmentsEx.Test"/> or
         /// <see cref="Environments.Development"/>, <see langword="false" /> otherwise.</returns>
         public static bool IsTestOrDevelopment(this IWebHostEnvironment env)
             => env.IsTest() || env.IsDevelopment();

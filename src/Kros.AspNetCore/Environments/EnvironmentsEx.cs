@@ -3,7 +3,7 @@
     /// <summary>
     /// Valid environments.
     /// </summary>
-    public static class EnvironmentsExtended
+    public static class EnvironmentsEx
     {
         /// <summary>
         /// Development environment.
