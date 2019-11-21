@@ -20,8 +20,4 @@
     <PackageReference Include="Scrutor" Version="3.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Kros.AspNetCore\Kros.AspNetCore.csproj" />
-  </ItemGroup>
-
 </Project>
