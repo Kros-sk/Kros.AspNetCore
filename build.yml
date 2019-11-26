@@ -69,17 +69,11 @@ steps:
   - template: steps/delete-nupkgs.yml@templates
 
   - task: DotNetCoreCLI@2
-    displayName: 'Nuget restore'
-    inputs:
-      command: 'restore'
-      projects: '**/*.csproj'
-
-  - task: DotNetCoreCLI@2
     displayName: 'Build'
     inputs:
       command: build
       projects: '**/*.csproj'
-      arguments: '--configuration $(BuildConfiguration) --no-restore'
+      arguments: '--configuration $(BuildConfiguration)'
 
   - powershell: |
       $count = 0
@@ -90,12 +84,9 @@ steps:
       Write-Output ("##vso[task.setvariable variable=project.TestProjectsCount;]$count")
     displayName: Find Test Projects
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Tests'
-    condition: gt(variables['project.TestProjectsCount'], 0)
-    inputs:
-      command: test
-      projects: '**/$(project.current)*[Tt]ests*.csproj'
+  - template: steps/dotnet-test-and-publish-results.yml@templates
+    parameters:
+      buildConfiguration: '$(BuildConfiguration)'
 
   - task: DotNetCoreCLI@2
     displayName: 'Pack'
