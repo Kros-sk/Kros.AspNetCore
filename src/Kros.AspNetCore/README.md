@@ -2,15 +2,15 @@
 
 **Kros.AspNetCore** je univerzálna knižnica obsahujúca nástroje na zjednodušenie práce na Asp.Net Core web api projektoch.
 
-- [Kros.AspNetCore](#KrosAspNetCore)
-  - [Exceptions](#Exceptions)
-  - [Middlewares](#Middlewares)
-  - [Extensions](#Extensions)
-  - [BaseStartup](#BaseStartup)
-  - [Authorization](#Authorization)
-  - [JsonPatchDocumentExtensions](#JsonPatchDocumentExtensions)
-    - [Flattening pattern](#Flattening-pattern)
-    - [Custom mapping](#Custom-mapping)
+- [Exceptions](#Exceptions)
+- [Middlewares](#Middlewares)
+- [Extensions](#Extensions)
+  - [Configuration](#Configuration)
+- [BaseStartup](#BaseStartup)
+- [Authorization](#Authorization)
+- [JsonPatchDocumentExtensions](#JsonPatchDocumentExtensions)
+  - [Flattening pattern](#Flattening-pattern)
+  - [Custom mapping](#Custom-mapping)
 
 ## Exceptions
 
@@ -28,30 +28,84 @@ Menný priestor `Kros.AspNetCore.Middlewares` obsahuje užitočné middlewares, 
 
 V adresári `Extensions` sa nachádzajú rôzne rozšírenia štandardných tried (rozhraní) v Asp.Net Core, ktoré zjednodušujú prácu s nimi.
 
-- ### ConfigurationExtensions
+### Configuration
 
-  Jednoduchšie získavanie jednotlivých nastavení z konfigurácie.
+Na jednoduchú konfiguráciu slúži extension metóda `ConfigureOptions<TOptions>(Configuration)`. Táto metóda triedu `TOptions`
+napojí na nastavenia (konfigurácia napríklad v `appsettings.json`) podľa názvu triedy a triedu zaregistruje do DI kontajnera ako:
 
-- ### DistributedCacheExtensions
+- `IOptions<TOptions>`
+- Singleton `TOptions`
 
-  Jednoduchšie vkládanie/získavanie komplexných typov z/do distribuovanej keše.
+Keďže je trieda zaregistrovaná aj priamo, v iných triedach je možné ju priamo používať ako závislosť (tzn. nie je potrebné
+používať komplikovanejšiu závislosť na `IOptions<TOptions>`).
 
-  Taktiež umožňuje získať hodnotu z keše a keď tam nieje tak ju vytvoriť a do keše vložiť.
+Nastavenia v konfigurácii sa hľadajú podľa názvu triedy, pričom ak trieda má koncovku `Options`, alebo `Settings`, táto
+koncovka ignoruje. Tzn. trieda `SmtpSettings` alebo `SmtpOptions` je nastavená podľa sekcie s názvom `Smtp`.
 
-  ```CSharp
-  var toDo = await _cache.GetAndSetAsync(
-     "toDo:1",
-     () => _database.Query().FirstOrDefault(t=> t.Id == 1),
-     options);
-  ```
+Konfiguráciu je možné validovať implementovaním rozhrania `IValidatable` v triede nastavení. Rozhranie má jedinú metódu
+`Validate()`, ktorá vykonáva validáciu. V prípade chyby validácis vyvolá ľubovoľnú výnimku, pričom preferovaná je výnimka
+`SettingsValidationException`. Pre jednoduchšiu implementáciu nastavení ktoré sa validujú je vytvorená zíkladná trieda
+`AnnotatedSettingsBase`, ktorá implementuje validáciu pomocou *data annotations* atribútov. Takže samotnú validáciu nie je
+potrebné implementovať, akurát príslušnými atribútmi odekorovať potrebné vlastnosti. _(Ak validácia zlyhá, nie je vyvolaná
+výnimka `SettingsValidationException`, ale `ValidationException` z data annotácií.)_
 
-- ### ServiceCollectionExtensions
+Aby sa samotná validácia spustila, je potrebné v `ConfigureServices` zaregistrovať validačný `IStartupFilter` volaním
+extension metódy `UseConfigurationValidation()`. Validácia prebehne jednorázovo po spustení aplikácie, ale ešte pred tým,
+než sú obsluhované požiadavky. Pomocou validácie je možné vynútiť základné nutné nastavenia, bez ktorých nemá spustenie
+aplikácie zmysel.
 
-  Obsahuje jednoduchšie konfigurovanie options do DI kontajnera. A odľahčené registrovanie Mvc pre web api - `services.AddWebApi()`
+#### Príklad
 
-- ### CorsExtensions
+``` c#
+public class SmtpSettings : AnnotatedSettingsBase
+{
+    // This value is required, so it must be set in configuration file.
+    [Required]
+    public string Server { get; set; }
 
-  Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto domény je potrebné vymenovať v `appsettings.json` v sekcii `AllowedHosts`.
+    public int Port { get; set; }
+}
+
+public class Startup
+{
+    public virtual void ConfigureServices(IServiceCollection services)
+    {
+        // Adds SmtpSettings class into DI container and loads the settings from "Smtp" section in configuraion.
+        services.ConfigureOptions<SmtpSettings>(Configuration);
+        services.AddSingleton<SmtpEmailSender>();
+
+        // During startup, all IValidatable objects in DI container are validated and the startup fails if some
+        // validation fails. In this example, it will fail, if "SmtpSettings.Server" is not set in settings.
+        services.UseConfigurationValidation();
+    }
+}
+
+public class SmtpEmailSender
+{
+    // SmtpSettings is resolved from DI container.
+    public SmtpEmailSender(SmtpSettings settings)
+    {
+
+    }
+}
+```
+
+### DistributedCacheExtensions
+
+Jednoduchšie vkládanie/získavanie komplexných typov z/do distribuovanej keše.
+
+Taktiež umožňuje získať hodnotu z keše a keď tam nieje tak ju vytvoriť a do keše vložiť.
+
+```CSharp
+var toDo = await _cache.GetAndSetAsync(
+    "toDo:1",
+    () => _database.Query().FirstOrDefault(t=> t.Id == 1),
+    options);
+```
+
+### CorsExtensions
+
+Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto domény je potrebné vymenovať v `appsettings.json` v sekcii `AllowedHosts`.
 
 ## BaseStartup
 
