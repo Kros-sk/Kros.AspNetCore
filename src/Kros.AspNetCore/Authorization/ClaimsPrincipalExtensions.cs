@@ -13,9 +13,9 @@ namespace Kros.AspNetCore.Authorization
         /// </summary>
         /// <param name="claimsPrincipal">Claims principal which contains all user claims.</param>
         /// <returns>User id.</returns>
-        public static int GetUserId(this ClaimsPrincipal claimsPrincipal)
+        public static long GetUserId(this ClaimsPrincipal claimsPrincipal)
         {
-            if (int.TryParse(GetValueFromUserClaims(claimsPrincipal, UserClaimTypes.UserId), out int result))
+            if (long.TryParse(GetValueFromUserClaims(claimsPrincipal, UserClaimTypes.UserId), out long result))
             {
                 return result;
             }
