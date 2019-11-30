@@ -33,11 +33,12 @@ V adresári `Extensions` sa nachádzajú rôzne rozšírenia štandardných trie
 Na jednoduchú konfiguráciu slúži extension metóda `ConfigureOptions<TOptions>(Configuration)`. Táto metóda triedu `TOptions`
 napojí na nastavenia (konfigurácia napríklad v `appsettings.json`) podľa názvu triedy a triedu zaregistruje do DI kontajnera ako:
 
-- `IOptions<TOptions>`
-- Singleton `TOptions`
+- `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>` (štandardná registrácia metódou `Configure`)
+- `TOptions`
 
 Keďže je trieda zaregistrovaná aj priamo, v iných triedach je možné ju priamo používať ako závislosť (tzn. nie je potrebné
-používať komplikovanejšiu závislosť na `IOptions<TOptions>`).
+používať komplikovanejšiu závislosť na `IOptions<TOptions>`). Trieda je registrovaná ako `Transient` a podporuje _hot reload_.
+Takže ak sa zmenia nastavenia, ďalšia inštancia `TOptions` vypýtaná z DI kontajnera bude mať nové nastavenia.
 
 Nastavenia v konfigurácii sa hľadajú podľa názvu triedy, pričom ak trieda má koncovku `Options`, alebo `Settings`, táto
 koncovka ignoruje. Tzn. trieda `SmtpSettings` alebo `SmtpOptions` je nastavená podľa sekcie s názvom `Smtp`.

@@ -47,7 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
             string sectionName) where TOptions : class, new()
         {
             services.Configure<TOptions>(options => configuration.GetSection(sectionName).Bind(options));
-            services.AddSingleton<TOptions>(ctx => ctx.GetRequiredService<IOptions<TOptions>>().Value);
+            services.AddTransient<TOptions>(ctx => ctx.GetRequiredService<IOptionsSnapshot<TOptions>>().Value);
             if (typeof(IValidatable).IsAssignableFrom(typeof(TOptions)))
             {
                 services.AddSingleton<IValidatable>(ctx => (IValidatable)ctx.GetRequiredService<IOptions<TOptions>>().Value);
