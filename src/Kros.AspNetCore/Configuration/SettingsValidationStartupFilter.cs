@@ -20,7 +20,7 @@ namespace Kros.AspNetCore.Configuration
         /// <summary>
         /// Create a new instance of <see cref="SettingsValidationStartupFilter"/>
         /// </summary>
-        /// <param name="validatableObjects"></param>
+        /// <param name="validatableObjects">List of objects to validate.</param>
         public SettingsValidationStartupFilter(IEnumerable<IValidatable> validatableObjects)
         {
             _validatableObjects = Check.NotNull(validatableObjects, nameof(validatableObjects));

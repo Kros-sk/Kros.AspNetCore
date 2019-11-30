@@ -43,8 +43,8 @@ Nastavenia v konfigurácii sa hľadajú podľa názvu triedy, pričom ak trieda 
 koncovka ignoruje. Tzn. trieda `SmtpSettings` alebo `SmtpOptions` je nastavená podľa sekcie s názvom `Smtp`.
 
 Konfiguráciu je možné validovať implementovaním rozhrania `IValidatable` v triede nastavení. Rozhranie má jedinú metódu
-`Validate()`, ktorá vykonáva validáciu. V prípade chyby validácis vyvolá ľubovoľnú výnimku, pričom preferovaná je výnimka
-`SettingsValidationException`. Pre jednoduchšiu implementáciu nastavení ktoré sa validujú je vytvorená zíkladná trieda
+`Validate()`, ktorá vykonáva validáciu. V prípade chyby validácia vyvolá ľubovoľnú výnimku, pričom preferovaná je výnimka
+`SettingsValidationException`. Pre jednoduchšiu implementáciu nastavení ktoré sa validujú je vytvorená základná trieda
 `AnnotatedSettingsBase`, ktorá implementuje validáciu pomocou *data annotations* atribútov. Takže samotnú validáciu nie je
 potrebné implementovať, akurát príslušnými atribútmi odekorovať potrebné vlastnosti. _(Ak validácia zlyhá, nie je vyvolaná
 výnimka `SettingsValidationException`, ale `ValidationException` z data annotácií.)_
@@ -56,7 +56,7 @@ aplikácie zmysel.
 
 #### Príklad
 
-``` c#
+``` csharp
 public class SmtpSettings : AnnotatedSettingsBase
 {
     // This value is required, so it must be set in configuration file.
@@ -92,7 +92,7 @@ public class SmtpEmailSender
 
 ### DistributedCacheExtensions
 
-Jednoduchšie vkládanie/získavanie komplexných typov z/do distribuovanej keše.
+Jednoduchšie vkladanie/získavanie komplexných typov z/do distribuovanej keše.
 
 Taktiež umožňuje získať hodnotu z keše a keď tam nieje tak ju vytvoriť a do keše vložiť.
 

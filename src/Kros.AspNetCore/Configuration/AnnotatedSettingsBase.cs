@@ -3,7 +3,7 @@
 namespace Kros.AspNetCore.Configuration
 {
     /// <summary>
-    /// Base class for settings, where properties can be annotated using data annotations attributes and
+    /// Base class for settings, where properties can be annotated using data annotations attributes
     /// and the state of the object is validated against them.
     /// </summary>
     public abstract class AnnotatedSettingsBase : IValidatable
