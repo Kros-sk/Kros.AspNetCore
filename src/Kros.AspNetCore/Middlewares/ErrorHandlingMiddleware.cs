@@ -3,6 +3,7 @@ using Kros.AspNetCore.Extensions;
 using Kros.AspNetCore.Properties;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch.Exceptions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -37,6 +38,10 @@ namespace Kros.AspNetCore.Middlewares
             try
             {
                 await _next.Invoke(context);
+            }
+            catch (JsonPatchException ex)
+            {
+                SetResponseType(context, ex, StatusCodes.Status400BadRequest);
             }
             catch (BadRequestException ex)
             {
