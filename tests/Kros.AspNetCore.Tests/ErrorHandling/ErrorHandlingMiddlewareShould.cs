@@ -2,6 +2,7 @@
 using Kros.AspNetCore.Exceptions;
 using Kros.AspNetCore.Middlewares;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch.Exceptions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -15,6 +16,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
     {
         private static readonly (Exception ex, int statusCode)[] _knownExceptions = new (Exception, int)[]
         {
+            (new JsonPatchException(), StatusCodes.Status400BadRequest),
             (new BadRequestException(), StatusCodes.Status400BadRequest),
             (new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized),
             (new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden),
