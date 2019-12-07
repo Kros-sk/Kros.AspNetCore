@@ -8,6 +8,14 @@ namespace Kros.AspNetCore
     public static class Helpers
     {
         /// <summary>
+        /// Returns <see langword="true"/>, if application has system assigned identity in Azure,
+        /// otherwise <see langword="false"/>.
+        /// </summary>
+        public static bool IsManagedIdentity
+            => (Environment.GetEnvironmentVariable("MSI_ENDPOINT") != null)
+                && (Environment.GetEnvironmentVariable("MSI_SECRET") != null);
+
+        /// <summary>
         /// Get section name by <typeparamref name="TOptions"/> type. Section name is class name without <c>Options</c>
         /// or <c>Settings</c> suffix. So if class name is <c>SmtpOptions</c>, the name is <c>Smtp</c>.
         /// </summary>
