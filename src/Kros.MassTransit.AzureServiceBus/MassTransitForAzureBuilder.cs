@@ -167,7 +167,7 @@ namespace Kros.MassTransit.AzureServiceBus
                 IServiceBusHost host = CreateServiceHost(busCfg);
 
                 ConfigureServiceBus(busCfg, host);
-                AddEndpoints(busCfg, host);
+                AddEndpoints(busCfg);
 
                 if (_provider != null)
                 {
@@ -220,12 +220,11 @@ namespace Kros.MassTransit.AzureServiceBus
         /// Adds endpoints to service bus.
         /// </summary>
         /// <param name="busCfg">Service bus configuration.</param>
-        /// <param name="host">Service bus host.</param>
-        private void AddEndpoints(IServiceBusBusFactoryConfigurator busCfg, IServiceBusHost host)
+        private void AddEndpoints(IServiceBusBusFactoryConfigurator busCfg)
         {
             foreach (Endpoint endpoint in _endpoints)
             {
-                endpoint.SetEndpoint(busCfg, host);
+                endpoint.SetEndpoint(busCfg);
             }
         }
 
