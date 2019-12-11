@@ -225,7 +225,7 @@ namespace Kros.MassTransit.AzureServiceBus
         {
             foreach (Endpoint endpoint in _endpoints)
             {
-                endpoint.SetEndpoint(busCfg, host);
+                endpoint.SetEndpoint(busCfg);
             }
         }
 
