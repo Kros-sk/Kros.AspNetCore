@@ -2,18 +2,26 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Company>KROS a.s.</Company>
-    <Authors>KROS a.s.</Authors>
+    <Version>1.1.0</Version>
+    <Authors>KROS a. s.</Authors>
+    <Company>KROS a. s.</Company>
     <Description>Extensions to facilitate work with Swagger documentation.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.Swagger.Extensions</PackageProjectUrl>
-    <PackageIconUrl>https://en.gravatar.com/userimage/137934964/524e95fbd8c2e8779e02819ab6902bef.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore/tree/master/src/Kros.AspNetCore</RepositoryUrl>
-    <PackageTags>ASP.NET core;Swagger;Extensions;</PackageTags>
-    <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0-alpha.1</Version>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageIcon>packageIcon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
+    <PackageTags>ASP.NET core;Swagger;Extensions;</PackageTags>
+    <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\packageIcon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.0.1" />

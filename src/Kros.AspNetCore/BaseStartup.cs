@@ -1,5 +1,5 @@
-﻿using Kros.AspNetCore.Extensions;
-using Kros.AspNetCore.Options;
+﻿using Kros.AspNetCore.Configuration;
+using Kros.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +18,7 @@ namespace Kros.AspNetCore
         /// Ctor.
         /// </summary>
         /// <param name="env">Information about the web hosting environment.</param>
-        public BaseStartup(IWebHostEnvironment env)
+        protected BaseStartup(IWebHostEnvironment env)
         {
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)

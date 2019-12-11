@@ -1,4 +1,6 @@
-﻿namespace Kros.AspNetCore
+﻿using System;
+
+namespace Kros.AspNetCore
 {
     /// <summary>
     /// General helpers.
@@ -6,22 +8,36 @@
     public static class Helpers
     {
         /// <summary>
-        /// Get section name by <typeparamref name="TOptions"/> type.
-        /// Section name is class name without <c>Options</c> suffix, so if class name is <c>SmtpOptions</c>, the section
-        /// name is <c>Smtp</c>.
+        /// Returns <see langword="true"/>, if application has system assigned identity in Azure,
+        /// otherwise <see langword="false"/>.
+        /// </summary>
+        public static bool IsManagedIdentity
+            => (Environment.GetEnvironmentVariable("MSI_ENDPOINT") != null)
+                && (Environment.GetEnvironmentVariable("MSI_SECRET") != null);
+
+        /// <summary>
+        /// Get section name by <typeparamref name="TOptions"/> type. Section name is class name without <c>Options</c>
+        /// or <c>Settings</c> suffix. So if class name is <c>SmtpOptions</c>, the name is <c>Smtp</c>.
         /// </summary>
         /// <typeparam name="TOptions">Option type.</typeparam>
         /// <returns>Class name without Options suffix.</returns>
         public static string GetSectionName<TOptions>() where TOptions : class
+            => GetSectionName(typeof(TOptions));
+
+        internal static string GetSectionName(Type optionsType)
         {
-            const string uselessSuffix = "Options";
-            string sectionName = typeof(TOptions).Name;
+            const string uselessSuffixOptions = "Options";
+            const string uselessSuffixSettings = "Settings";
+            string sectionName = optionsType.Name;
 
-            if (sectionName.EndsWith(uselessSuffix))
+            if (sectionName.EndsWith(uselessSuffixOptions, StringComparison.OrdinalIgnoreCase))
             {
-                return sectionName.Substring(0, sectionName.Length - uselessSuffix.Length);
+                return sectionName.Substring(0, sectionName.Length - uselessSuffixOptions.Length);
             }
-
+            else if (sectionName.EndsWith(uselessSuffixSettings, StringComparison.OrdinalIgnoreCase))
+            {
+                return sectionName.Substring(0, sectionName.Length - uselessSuffixSettings.Length);
+            }
             return sectionName;
         }
     }

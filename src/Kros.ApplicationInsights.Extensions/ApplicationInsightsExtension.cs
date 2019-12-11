@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// Extensions for simpler use of Application insights.
+    /// </summary>
     public static partial class ApplicationInsightsExtension
     {
         private const string ApplicationInsightsSectionName = "ApplicationInsights";

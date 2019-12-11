@@ -57,7 +57,6 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <summary>
         /// Ctor.
         /// </summary>
-        /// <param name="configuration">Service configuration.</param>
         /// <param name="provider">DI container.</param>
         public MassTransitForAzureBuilder(IServiceProvider provider)
         {
