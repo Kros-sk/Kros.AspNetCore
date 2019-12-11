@@ -54,7 +54,6 @@ namespace Kros.MassTransit.AzureServiceBus.Endpoints
         /// Sets endpoint and its consumers during service bus initialization.
         /// </summary>
         /// <param name="busCfg">Service bus configuration.</param>
-        /// <param name="host">Service bus host.</param>
-        public abstract void SetEndpoint(IServiceBusBusFactoryConfigurator busCfg, IServiceBusHost host);
+        public abstract void SetEndpoint(IServiceBusBusFactoryConfigurator busCfg);
     }
 }
