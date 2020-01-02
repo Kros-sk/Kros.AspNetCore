@@ -9,9 +9,24 @@ namespace Kros.AspNetCore.Authorization
     public class GatewayJwtAuthorizationOptions
     {
         /// <summary>
-        /// Authorization service url.
+        /// Base authorization service url.
         /// </summary>
-        public string AuthorizationUrl { get; set; }
+        public string BaseUrl { get; set; }
+
+        /// <summary>
+        /// Authorization service path.
+        /// </summary>
+        public string AuthorizationPath { get; set; }
+
+        /// <summary>
+        /// Hash authorization service path.
+        /// </summary>
+        public string HashAuthorizationPath { get; set; }
+
+        /// <summary>
+        /// Hash authorization service path.
+        /// </summary>
+        public string HashParameterName { get; set; }
 
         /// <summary>
         /// Cache sliding expiration offset.

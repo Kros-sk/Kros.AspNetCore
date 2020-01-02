@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -69,10 +70,17 @@ namespace Kros.AspNetCore.Authorization
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key);
+                    var authUrl = $"{_jwtAuthorizationOptions.BaseUrl}{_jwtAuthorizationOptions.AuthorizationPath}{httpContext.Request.Path.Value}";
+                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key, authUrl);
                 }
 
                 return jwtToken;
+            }
+            else if (httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
+            {
+                int key = GetKey(httpContext, hashValue);
+                var authUrl = $"{_jwtAuthorizationOptions.BaseUrl}{_jwtAuthorizationOptions.HashAuthorizationPath}?{_jwtAuthorizationOptions.HashParameterName}={hashValue}";
+                return await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, StringValues.Empty, key, authUrl);
             }
 
             return string.Empty;
@@ -82,19 +90,23 @@ namespace Kros.AspNetCore.Authorization
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
             IMemoryCache memoryCache,
-            StringValues value,
-            int key)
+            StringValues authHeader,
+            int cacheKey,
+            string authorizationUrl)
         {
             using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
             {
-                client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
+                if (authHeader.Any())
+                {
+                    client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
+                }
 
-                HttpResponseMessage response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value);
+                HttpResponseMessage response = await client.GetAsync(authorizationUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
                     string jwtToken = await response.Content.ReadAsStringAsync();
-                    SetTokenToCache(memoryCache, key, jwtToken, httpContext.Request);
+                    SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
 
                     return jwtToken;
                 }
