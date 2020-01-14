@@ -21,7 +21,8 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             (new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized),
             (new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden),
             (new NotFoundException(), StatusCodes.Status404NotFound),
-            (new TimeoutException(), StatusCodes.Status408RequestTimeout)
+            (new TimeoutException(), StatusCodes.Status408RequestTimeout),
+            (new RequestConflictException(), StatusCodes.Status409Conflict)
         };
 
         [Theory]
