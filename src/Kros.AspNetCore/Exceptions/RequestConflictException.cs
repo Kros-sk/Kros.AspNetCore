@@ -9,7 +9,6 @@ namespace Kros.AspNetCore.Exceptions
     /// </summary>
     public class RequestConflictException : Exception
     {
-
         /// <summary>
         /// Initializes a new instance of <see cref="RequestConflictException"/> class.
         /// </summary>
