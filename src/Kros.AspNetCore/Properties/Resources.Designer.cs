@@ -79,6 +79,15 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User request cannot be finished because of conflict(409)..
+        /// </summary>
+        internal static string Conflict {
+            get {
+                return ResourceManager.GetString("Conflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exception {0} was thrown during request pipeline. Status code of the response was changed to {1}..
         /// </summary>
         internal static string ErrorHandlingMiddleware_StatusCodeChange {
