@@ -13,6 +13,6 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="configurationBuilder">Configuration builder.</param>
         /// <returns>The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.</returns>
         public static IConfigurationBuilder AddLocalConfiguration(this IConfigurationBuilder configurationBuilder)
-            => configurationBuilder.AddJsonFile("appsettings.local.json", optional: true);            
+            => configurationBuilder.AddJsonFile("appsettings.local.json", optional: true);
     }
 }

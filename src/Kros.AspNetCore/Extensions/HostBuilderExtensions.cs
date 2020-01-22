@@ -17,7 +17,7 @@ namespace Kros.AspNetCore.Extensions
             => hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
             {
                 config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
-                      .AddJsonFile("appsettings.local.json", optional: true);
+                    .AddLocalConfiguration();
             });
     }
 }
