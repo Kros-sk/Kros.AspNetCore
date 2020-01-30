@@ -14,7 +14,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void ReturnsForbideenExceptionForStatusCode403()
         {
-            HttpResponseMessage response = CreateHttpResponseMessageSubstituteWithCode(HttpStatusCode.Forbidden);
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
             Exception ex = response.GetExceptionForStatusCode();
             ex.Should().BeOfType<ResourceIsForbiddenException>();
         }
@@ -22,7 +22,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void ReturnsNotFoundExceptionForStatusCode404()
         {
-            HttpResponseMessage response = CreateHttpResponseMessageSubstituteWithCode(HttpStatusCode.NotFound);
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.NotFound };
             Exception ex = response.GetExceptionForStatusCode();
             ex.Should().BeOfType<NotFoundException>();
         }
@@ -30,7 +30,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void ReturnsUnathorizedxceptionForStatusCode401()
         {
-            HttpResponseMessage response = CreateHttpResponseMessageSubstituteWithCode(HttpStatusCode.Unauthorized);
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
             Exception ex = response.GetExceptionForStatusCode();
             ex.Should().BeOfType<UnauthorizedAccessException>();
         }
@@ -38,32 +38,34 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void ReturnsBadRequestExceptionForStatusCode400()
         {
-            HttpResponseMessage response = CreateHttpResponseMessageSubstituteWithCode(HttpStatusCode.BadRequest);
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest };
             Exception ex = response.GetExceptionForStatusCode();
             ex.Should().BeOfType<BadRequestException>();
         }
 
         [Fact]
-        public void ReturnsSystemExceptionForUnsupportedStatusCode()
+        public void ReturnsRequestConflictExceptionForStatusCode409()
         {
-            HttpResponseMessage response = CreateHttpResponseMessageSubstituteWithCode(HttpStatusCode.NoContent);
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Conflict };
             Exception ex = response.GetExceptionForStatusCode();
-            ex.Should().BeOfType<Exception>();
+            ex.Should().BeOfType<RequestConflictException>();
+        }
+
+        [Fact]
+        public void ReturnUnknownStatusCodeExceptionWithCodeInMessageForUnsupportedStatusCode()
+        {
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent };
+            Exception ex = response.GetExceptionForStatusCode();
+            ex.Should().BeOfType<UnknownStatusCodeException>();
+            ex.Message.Should().Contain(((int) HttpStatusCode.NoContent).ToString());
         }
 
         [Fact]
         public void ReturnsGivenDefaultExceptionForUnsupportedStatusCode()
         {
-            HttpResponseMessage response = CreateHttpResponseMessageSubstituteWithCode(HttpStatusCode.NoContent);
+            HttpResponseMessage response = new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent };
             Exception ex = response.GetExceptionForStatusCode(new WebException());
             ex.Should().BeOfType<WebException>();
-        }
-
-        private static HttpResponseMessage CreateHttpResponseMessageSubstituteWithCode(HttpStatusCode code)
-        {
-            HttpResponseMessage response = Substitute.For<HttpResponseMessage>();
-            response.StatusCode = code;
-            return response;
         }
     }
 }

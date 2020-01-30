@@ -26,6 +26,8 @@ namespace Kros.AspNetCore.Extensions
                     return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
                 case System.Net.HttpStatusCode.BadRequest:
                     return new BadRequestException();
+                case System.Net.HttpStatusCode.Conflict:
+                    return new RequestConflictException();
                 default:
                     if (defaultException != null)
                     {
@@ -33,7 +35,7 @@ namespace Kros.AspNetCore.Extensions
                     }
                     else
                     {
-                        return new Exception();
+                        return new UnknownStatusCodeException(response.StatusCode);
                     }
             }
         }
