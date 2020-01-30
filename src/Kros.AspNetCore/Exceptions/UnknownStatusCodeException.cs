@@ -9,6 +9,5 @@ namespace Kros.AspNetCore.Exceptions
             base(string.Format(Properties.Resources.UnknownStatusCode, (int)statusCode))
         {
         }
-
     }
 }
