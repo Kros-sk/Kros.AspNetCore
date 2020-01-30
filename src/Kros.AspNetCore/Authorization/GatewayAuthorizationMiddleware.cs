@@ -1,4 +1,4 @@
-﻿using Kros.AspNetCore.Exceptions;
+﻿using Kros.AspNetCore.Extensions;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -89,7 +89,8 @@ namespace Kros.AspNetCore.Authorization
             {
                 client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
 
-                HttpResponseMessage response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value);
+                HttpResponseMessage response =
+                    await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -100,32 +101,18 @@ namespace Kros.AspNetCore.Authorization
                 }
                 else
                 {
-                    throw GetExceptionForResponse(response);
+                    throw response.GetExceptionForStatusCode(
+                        new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
                 }
-            }
-        }
-
-        private static Exception GetExceptionForResponse(HttpResponseMessage response)
-        {
-            switch (response.StatusCode)
-            {
-                case System.Net.HttpStatusCode.Forbidden:
-                    return new ResourceIsForbiddenException();
-                case System.Net.HttpStatusCode.NotFound:
-                    return new NotFoundException();
-                case System.Net.HttpStatusCode.Unauthorized:
-                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
-                case System.Net.HttpStatusCode.BadRequest:
-                    return new BadRequestException();
-                default:
-                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
             }
         }
 
         private void SetTokenToCache(IMemoryCache memoryCache, int key, string jwtToken, HttpRequest request)
         {
             if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero &&
-                !_jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase))
+                !_jwtAuthorizationOptions.IgnoredPathForCache.Contains(
+                    request.Path.Value.TrimEnd('/'),
+                    StringComparer.OrdinalIgnoreCase))
             {
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
