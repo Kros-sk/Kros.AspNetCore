@@ -17,17 +17,11 @@ namespace Kros.AspNetCore
         /// <summary>
         /// Ctor.
         /// </summary>
+        /// <param name="configuration">Application configuration.</param>
         /// <param name="env">Information about the web hosting environment.</param>
-        protected BaseStartup(IWebHostEnvironment env)
+        protected BaseStartup(IConfiguration configuration, IWebHostEnvironment env)
         {
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddJsonFile($"appsettings.local.json", optional: true)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
             Environment = env;
         }
 

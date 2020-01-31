@@ -123,6 +123,9 @@
   <data name="BadRequest" xml:space="preserve">
     <value>User request is invalid.</value>
   </data>
+  <data name="Conflict" xml:space="preserve">
+    <value>User request cannot be finished because of conflict(409).</value>
+  </data>
   <data name="ErrorHandlingMiddleware_StatusCodeChange" xml:space="preserve">
     <value>Exception {0} was thrown during request pipeline. Status code of the response was changed to {1}.</value>
     <comment>0 - Full type name of exception.
