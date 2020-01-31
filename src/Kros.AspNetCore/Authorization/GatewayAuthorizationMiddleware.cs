@@ -88,22 +88,15 @@ namespace Kros.AspNetCore.Authorization
             using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
             {
                 client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
+                var defaultException =
+                    new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
 
-                HttpResponseMessage response =
-                    await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value);
+                string jwtToken = await client.GetStringAndCheckResponseAsync(
+                    _jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value,
+                    defaultException);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    string jwtToken = await response.Content.ReadAsStringAsync();
-                    SetTokenToCache(memoryCache, key, jwtToken, httpContext.Request);
-
-                    return jwtToken;
-                }
-                else
-                {
-                    throw response.GetExceptionForStatusCode(
-                        new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
-                }
+                SetTokenToCache(memoryCache, key, jwtToken, httpContext.Request);
+                return jwtToken;
             }
         }
 

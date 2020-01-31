@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Kros.AspNetCore.Exceptions;
 using Kros.AspNetCore.Extensions;
-using NSubstitute;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -12,60 +11,67 @@ namespace Kros.AspNetCore.Tests.Extensions
     public class HttpResponseMessageExtensionsShould
     {
         [Fact]
-        public void ReturnsForbideenExceptionForStatusCode403()
+        public void ThrowsForbideenExceptionForStatusCode403()
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
-            Exception ex = response.GetExceptionForStatusCode();
-            ex.Should().BeOfType<ResourceIsForbiddenException>();
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().ThrowExactly<ResourceIsForbiddenException>();
         }
 
         [Fact]
-        public void ReturnsNotFoundExceptionForStatusCode404()
+        public void ThrowsNotFoundExceptionForStatusCode404()
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.NotFound };
-            Exception ex = response.GetExceptionForStatusCode();
-            ex.Should().BeOfType<NotFoundException>();
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().ThrowExactly<NotFoundException>();
         }
 
         [Fact]
-        public void ReturnsUnathorizedxceptionForStatusCode401()
+        public void ThrowsUnathorizedxceptionForStatusCode401()
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
-            Exception ex = response.GetExceptionForStatusCode();
-            ex.Should().BeOfType<UnauthorizedAccessException>();
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().ThrowExactly<UnauthorizedAccessException>();
         }
 
         [Fact]
-        public void ReturnsBadRequestExceptionForStatusCode400()
+        public void ThrowsBadRequestExceptionForStatusCode400()
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest };
-            Exception ex = response.GetExceptionForStatusCode();
-            ex.Should().BeOfType<BadRequestException>();
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().ThrowExactly<BadRequestException>();
         }
 
         [Fact]
-        public void ReturnsRequestConflictExceptionForStatusCode409()
+        public void ThrowsRequestConflictExceptionForStatusCode409()
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Conflict };
-            Exception ex = response.GetExceptionForStatusCode();
-            ex.Should().BeOfType<RequestConflictException>();
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().ThrowExactly<RequestConflictException>();
         }
 
         [Fact]
-        public void ReturnUnknownStatusCodeExceptionWithCodeInMessageForUnsupportedStatusCode()
+        public void ThrowUnknownStatusCodeExceptionWithCodeInMessageForUnsupportedStatusCode()
         {
-            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent };
-            Exception ex = response.GetExceptionForStatusCode();
-            ex.Should().BeOfType<UnknownStatusCodeException>();
-            ex.Message.Should().Contain(((int) HttpStatusCode.NoContent).ToString());
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.InsufficientStorage };
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().ThrowExactly<UnknownStatusCodeException>().WithMessage($"*{(int)HttpStatusCode.InsufficientStorage}*");
         }
 
         [Fact]
-        public void ReturnsGivenDefaultExceptionForUnsupportedStatusCode()
+        public void ThrowsGivenDefaultExceptionForUnsupportedStatusCode()
         {
-            HttpResponseMessage response = new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent };
-            Exception ex = response.GetExceptionForStatusCode(new WebException());
-            ex.Should().BeOfType<WebException>();
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.InsufficientStorage };
+            Action act = () => response.ThrowIfNotSuccessStatusCode(new WebException());
+            act.Should().ThrowExactly<WebException>();
+        }
+
+        [Fact]
+        public void NotThrowsExceptionForSuccessStatusCode()
+        {
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.OK };
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().NotThrow();
         }
     }
 }
