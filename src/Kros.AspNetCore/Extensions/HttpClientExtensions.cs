@@ -8,7 +8,6 @@ namespace Kros.AspNetCore.Extensions
 {
     public static class HttpClientExtensions
     {
-
         /// <summary>
         /// Get response from http request and throws exception if request is unsuccessful.
         /// </summary>
