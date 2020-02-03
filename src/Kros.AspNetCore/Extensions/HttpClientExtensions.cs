@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.Extensions
 {
+    /// <summary>
+    /// Extension methods for HttpClient class.
+    /// </summary>
     public static class HttpClientExtensions
     {
         /// <summary>
