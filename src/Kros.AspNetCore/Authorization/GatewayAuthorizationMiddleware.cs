@@ -78,10 +78,15 @@ namespace Kros.AspNetCore.Authorization
             }
             else if (httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
             {
-                int key = GetKey(httpContext, hashValue);
-                var queryString = QueryString.Create(_jwtAuthorizationOptions.HashParameterName, hashValue);
-                var authUrl = $"{_jwtAuthorizationOptions.HashAuthorizationUrl}{queryString.ToUriComponent()}";
-                return await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, StringValues.Empty, key, authUrl);
+                int key = GetKey(httpContext, hashValue.ToString());
+                if (!memoryCache.TryGetValue(key, out string jwtToken))
+                {
+                    var queryString = QueryString.Create(_jwtAuthorizationOptions.HashParameterName, hashValue.ToString());
+                    var authUrl = $"{_jwtAuthorizationOptions.HashAuthorizationUrl}{queryString.ToUriComponent()}";
+                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, StringValues.Empty, key, authUrl);
+                }
+
+                return jwtToken;
             }
 
             return string.Empty;
