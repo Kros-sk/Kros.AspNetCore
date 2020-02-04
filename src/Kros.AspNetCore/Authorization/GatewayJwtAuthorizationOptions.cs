@@ -14,6 +14,16 @@ namespace Kros.AspNetCore.Authorization
         public string AuthorizationUrl { get; set; }
 
         /// <summary>
+        /// Hash authorization url.
+        /// </summary>
+        public string HashAuthorizationUrl { get; set; }
+
+        /// <summary>
+        /// Hash authorization parameter name.
+        /// </summary>
+        public string HashParameterName { get; set; }
+
+        /// <summary>
         /// Cache sliding expiration offset.
         /// </summary>
         /// <remarks>
