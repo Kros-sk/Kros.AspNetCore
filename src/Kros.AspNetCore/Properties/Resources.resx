@@ -141,6 +141,10 @@
   <data name="NotFound" xml:space="preserve">
     <value>Resource was not found.</value>
   </data>
+  <data name="UnknownStatusCode" xml:space="preserve">
+    <value>Request returned unknown status code: {0}.</value>
+    <comment>0 - status code</comment>
+  </data>
   <data name="UserDoNotHavePermissionToAccessRequestedResource" xml:space="preserve">
     <value>User does not have permission to access requested resource.</value>
   </data>

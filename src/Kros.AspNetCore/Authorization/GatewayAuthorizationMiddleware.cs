@@ -1,11 +1,10 @@
-﻿using Kros.AspNetCore.Exceptions;
+﻿using Kros.AspNetCore.Extensions;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -107,36 +106,11 @@ namespace Kros.AspNetCore.Authorization
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
                 }
 
-                HttpResponseMessage response = await client.GetAsync(authorizationUrl);
+                string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
+                    new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
+                SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    string jwtToken = await response.Content.ReadAsStringAsync();
-                    SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
-
-                    return jwtToken;
-                }
-                else
-                {
-                    throw GetExceptionForResponse(response);
-                }
-            }
-        }
-
-        private static Exception GetExceptionForResponse(HttpResponseMessage response)
-        {
-            switch (response.StatusCode)
-            {
-                case System.Net.HttpStatusCode.Forbidden:
-                    return new ResourceIsForbiddenException();
-                case System.Net.HttpStatusCode.NotFound:
-                    return new NotFoundException();
-                case System.Net.HttpStatusCode.Unauthorized:
-                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
-                case System.Net.HttpStatusCode.BadRequest:
-                    return new BadRequestException();
-                default:
-                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                return jwtToken;
             }
         }
 

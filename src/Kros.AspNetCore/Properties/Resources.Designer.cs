@@ -124,6 +124,15 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Request returned unknown status code: {0}..
+        /// </summary>
+        internal static string UnknownStatusCode {
+            get {
+                return ResourceManager.GetString("UnknownStatusCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User does not have permission to access requested resource..
         /// </summary>
         internal static string UserDoNotHavePermissionToAccessRequestedResource {
