@@ -1,10 +1,11 @@
-﻿using Kros.AspNetCore.Extensions;
+﻿using Kros.AspNetCore.Exceptions;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -69,7 +70,20 @@ namespace Kros.AspNetCore.Authorization
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key);
+                    var authUrl = $"{_jwtAuthorizationOptions.AuthorizationUrl}{httpContext.Request.Path.Value}";
+                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key, authUrl);
+                }
+
+                return jwtToken;
+            }
+            else if (httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
+            {
+                int key = GetKey(httpContext, hashValue.ToString());
+                if (!memoryCache.TryGetValue(key, out string jwtToken))
+                {
+                    var queryString = QueryString.Create(_jwtAuthorizationOptions.HashParameterName, hashValue.ToString());
+                    var authUrl = $"{_jwtAuthorizationOptions.HashAuthorizationUrl}{queryString.ToUriComponent()}";
+                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, StringValues.Empty, key, authUrl);
                 }
 
                 return jwtToken;
@@ -82,30 +96,54 @@ namespace Kros.AspNetCore.Authorization
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
             IMemoryCache memoryCache,
-            StringValues value,
-            int key)
+            StringValues authHeader,
+            int cacheKey,
+            string authorizationUrl)
         {
             using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
             {
-                client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
-                var defaultException =
-                    new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                if (authHeader.Any())
+                {
+                    client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
+                }
 
-                string jwtToken = await client.GetStringAndCheckResponseAsync(
-                    _jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value,
-                    defaultException);
+                HttpResponseMessage response = await client.GetAsync(authorizationUrl);
 
-                SetTokenToCache(memoryCache, key, jwtToken, httpContext.Request);
-                return jwtToken;
+                if (response.IsSuccessStatusCode)
+                {
+                    string jwtToken = await response.Content.ReadAsStringAsync();
+                    SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
+
+                    return jwtToken;
+                }
+                else
+                {
+                    throw GetExceptionForResponse(response);
+                }
+            }
+        }
+
+        private static Exception GetExceptionForResponse(HttpResponseMessage response)
+        {
+            switch (response.StatusCode)
+            {
+                case System.Net.HttpStatusCode.Forbidden:
+                    return new ResourceIsForbiddenException();
+                case System.Net.HttpStatusCode.NotFound:
+                    return new NotFoundException();
+                case System.Net.HttpStatusCode.Unauthorized:
+                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                case System.Net.HttpStatusCode.BadRequest:
+                    return new BadRequestException();
+                default:
+                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
             }
         }
 
         private void SetTokenToCache(IMemoryCache memoryCache, int key, string jwtToken, HttpRequest request)
         {
             if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero &&
-                !_jwtAuthorizationOptions.IgnoredPathForCache.Contains(
-                    request.Path.Value.TrimEnd('/'),
-                    StringComparer.OrdinalIgnoreCase))
+                !_jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase))
             {
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
