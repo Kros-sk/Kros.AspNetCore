@@ -47,6 +47,23 @@ namespace Kros.AspNetCore.Tests.Authorization
                 .Should()
                 .HaveCount(1)
                 .And
+                .Contain("Bearer HashJwtToken");
+        }
+
+        [Fact]
+        public async void AddJwtTokenIntoHeader_WithAccessTokenPriorityOverHash()
+        {
+            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK);
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
+            await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()));
+
+            context.Request.Headers[HeaderNames.Authorization]
+                .Should()
+                .HaveCount(1)
+                .And
                 .Contain("Bearer MyJwtToken");
         }
 
@@ -120,7 +137,7 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             cache.Get(HashCode.Combine(context.Request.Query["hash"].ToString(), context.Request.Path))
                 .Should()
-                .Be("MyJwtToken");
+                .Be("HashJwtToken");
         }
 
         [Fact]
@@ -234,16 +251,6 @@ namespace Kros.AspNetCore.Tests.Authorization
             TimeSpan offset,
             List<string> ignoredPathForCache)
         {
-            var httpClientFactory = Substitute.For<IHttpClientFactory>();
-            var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage()
-            {
-                StatusCode = statusCode,
-                Content = new StringContent("MyJwtToken")
-            });
-            var fakeHttpClient = new HttpClient(fakeHttpMessageHandler);
-
-            httpClientFactory.CreateClient("JwtAuthorizationClientName").Returns(fakeHttpClient);
-
             var gatewayJwtAuthorizationOptions = new GatewayJwtAuthorizationOptions()
             {
                 AuthorizationUrl = "http://authorizationservice.com",
@@ -252,9 +259,37 @@ namespace Kros.AspNetCore.Tests.Authorization
                 CacheSlidingExpirationOffset = offset
             };
             gatewayJwtAuthorizationOptions.IgnoredPathForCache.AddRange(ignoredPathForCache);
+
+            var httpClientFactory = Substitute.For<IHttpClientFactory>();
+
+            FakeHttpMessageHandler fakeHttpMessageHandler = CreateFakeHttpMessageHandler(statusCode, gatewayJwtAuthorizationOptions);
+            var fakeHttpClient = new HttpClient(fakeHttpMessageHandler);
+            httpClientFactory.CreateClient("JwtAuthorizationClientName").Returns(fakeHttpClient);
+
             var middleware = new GatewayAuthorizationMiddleware((c) => Task.CompletedTask, gatewayJwtAuthorizationOptions);
 
             return (httpClientFactory, middleware);
+        }
+
+        private static FakeHttpMessageHandler CreateFakeHttpMessageHandler(HttpStatusCode statusCode, GatewayJwtAuthorizationOptions gatewayJwtAuthorizationOptions)
+        {
+            var responses = new List<KeyValuePair<FakeHttpMessageHandler.HttpRequestFilter, HttpResponseMessage>>();
+            responses.Add(new KeyValuePair<FakeHttpMessageHandler.HttpRequestFilter, HttpResponseMessage>(
+                (req) => req.RequestUri.AbsoluteUri.Contains(gatewayJwtAuthorizationOptions.AuthorizationUrl),
+                new HttpResponseMessage()
+                {
+                    StatusCode = statusCode,
+                    Content = new StringContent("MyJwtToken")
+                }));
+            responses.Add(new KeyValuePair<FakeHttpMessageHandler.HttpRequestFilter, HttpResponseMessage>(
+                (req) => req.RequestUri.AbsoluteUri.Contains(gatewayJwtAuthorizationOptions.HashAuthorizationUrl),
+                new HttpResponseMessage()
+                {
+                    StatusCode = statusCode,
+                    Content = new StringContent("HashJwtToken")
+                }));
+
+            return new FakeHttpMessageHandler(responses);
         }
     }
 }
