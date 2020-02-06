@@ -69,8 +69,9 @@ namespace Kros.AspNetCore.Authorization
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    var authUrl = $"{_jwtAuthorizationOptions.AuthorizationUrl}{httpContext.Request.Path.Value}";
-                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key, authUrl);
+                    var uriBuilder = new UriBuilder(_jwtAuthorizationOptions.AuthorizationUrl);
+                    uriBuilder.Path = httpContext.Request.Path.Value;
+                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key, uriBuilder.Uri.ToString());
                 }
 
                 return jwtToken;
@@ -80,9 +81,9 @@ namespace Kros.AspNetCore.Authorization
                 int key = GetKey(httpContext, hashValue.ToString());
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    var queryString = QueryString.Create(_jwtAuthorizationOptions.HashParameterName, hashValue.ToString());
-                    var authUrl = $"{_jwtAuthorizationOptions.HashAuthorizationUrl}{queryString.ToUriComponent()}";
-                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, StringValues.Empty, key, authUrl);
+                    var uriBuilder = new UriBuilder(_jwtAuthorizationOptions.HashAuthorizationUrl);
+                    uriBuilder.Query = QueryString.Create(_jwtAuthorizationOptions.HashParameterName, hashValue.ToString()).ToUriComponent();
+                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, StringValues.Empty, key, uriBuilder.Uri.ToString());
                 }
 
                 return jwtToken;
