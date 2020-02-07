@@ -69,9 +69,8 @@ namespace Kros.AspNetCore.Authorization
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    var uriBuilder = new UriBuilder(_jwtAuthorizationOptions.AuthorizationUrl);
-                    uriBuilder.Path = httpContext.Request.Path.Value;
-                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key, uriBuilder.Uri.ToString());
+                    var authUrl = _jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value;
+                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key, authUrl);
                 }
 
                 return jwtToken;
