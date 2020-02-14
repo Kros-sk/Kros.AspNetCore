@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +22,7 @@ namespace Kros.AspNetCore
         /// <param name="env">Information about the web hosting environment.</param>
         protected BaseStartup(IConfiguration configuration, IWebHostEnvironment env)
         {
-            Configuration = configuration;
+            Configuration = Configure(configuration, env);
             Environment = env;
         }
 
@@ -44,6 +45,8 @@ namespace Kros.AspNetCore
             if (Environment.IsDevelopment())
             {
                 services.AddAllowAnyOriginCors();
+                // replace configuration so it contains configuration with azure key vault
+                services.Replace(new ServiceDescriptor(typeof(IConfiguration), Configuration));
             }
             else
             {
@@ -67,6 +70,11 @@ namespace Kros.AspNetCore
             {
                 app.UseCustomOriginsCors(CorsOptions.CorsPolicyName);
             }
+        }
+
+        private IConfiguration Configure(IConfiguration configuration, IWebHostEnvironment env)
+        {
+            return env.IsDevelopment() ? configuration.AddAzureKeyVault() : configuration;
         }
     }
 }
