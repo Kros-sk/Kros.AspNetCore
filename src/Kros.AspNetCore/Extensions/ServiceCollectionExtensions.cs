@@ -71,7 +71,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Attempts to set proxy to HttpClient.
         /// </summary>
         /// <param name="services">DI container.</param>
-        /// <param name="configuration">App configuration.</param>
+        /// <param name="configuration">App configuration. A configuration section called "Proxy" with "Address"
+        /// value is required.</param>
         public static IServiceCollection SetProxy(this IServiceCollection services, IConfiguration configuration)
         {
             var section = configuration.GetSection("Proxy");
