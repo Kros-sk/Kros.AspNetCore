@@ -45,20 +45,5 @@ namespace Microsoft.Extensions.Configuration
 
             return origins;
         }
-
-        /// <summary>
-        /// Creates copy of configuration with additional azure key vault configuration.
-        /// For more info see <see cref="ConfigurationBuilderExtenstions.AddAzureKeyVault(IConfigurationBuilder)"/>.
-        /// </summary>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IConfiguration AddAzureKeyVault(this IConfiguration configuration)
-        {
-            var configBuilder = new ConfigurationBuilder();
-
-            return configBuilder.AddConfiguration(configuration)
-                .AddAzureKeyVault()
-                .Build();
-        }
     }
 }
