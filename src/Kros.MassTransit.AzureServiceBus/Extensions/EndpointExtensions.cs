@@ -13,7 +13,7 @@ namespace Kros.MassTransit.AzureServiceBus.Extensions
         /// Returns the name of the endpoint if isDevelopment == false.
         /// If isDevelopment == true and name of the endpoint contains machine name
         /// placeholder replaces machine name placeholder with machine name or guid.
-        /// <see cref="ReplaceMachineNamePlaceholder"/>.
+        /// See <see cref="ReplaceMachineNamePlaceholder"/>.
         /// </summary>
         /// <param name="endpoint"></param>
         /// <param name="isDevelopment"></param>
