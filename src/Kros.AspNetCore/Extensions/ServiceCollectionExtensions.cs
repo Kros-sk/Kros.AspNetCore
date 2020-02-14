@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System;
+using System.Net;
+using System.Net.Http;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -64,5 +66,25 @@ namespace Microsoft.Extensions.DependencyInjection
         [Obsolete("AddWebApi() is deprecated, please use AddControllers() instead.")]
         public static IMvcBuilder AddWebApi(this IServiceCollection services)
             => services.AddControllers();
+
+        /// <summary>
+        /// Attempts to set proxy to HttpClient.
+        /// </summary>
+        /// <param name="services">DI container.</param>
+        /// <param name="configuration">App configuration.</param>
+        public static IServiceCollection SetProxy(this IServiceCollection services, IConfiguration configuration)
+        {
+            var section = configuration.GetSection("Proxy");
+            if (section.Exists())
+            {
+                WebProxy proxy = section.Get<WebProxy>();
+                if (!string.IsNullOrEmpty(proxy.Address?.AbsolutePath))
+                {
+                    HttpClient.DefaultProxy = proxy;
+                }
+            }
+
+            return services;
+        }
     }
 }
