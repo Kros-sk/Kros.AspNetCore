@@ -31,7 +31,7 @@ namespace Kros.MassTransit.AzureServiceBus.Extensions
                 return endpointName;
             }
 
-            if (endpointName.Contains(machineNamePlaceholder))
+            if (endpointName.Contains(machineNamePlaceholder, StringComparison.OrdinalIgnoreCase))
             {
                 endpointName = endpointName.ReplaceMachineNamePlaceholder(machineNamePlaceholder);
             }
