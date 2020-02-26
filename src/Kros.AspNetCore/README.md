@@ -90,6 +90,30 @@ public class SmtpEmailSender
     }
 }
 ```
+### ConfigurationBuilderExtensions
+Na pridanie Azure App Configuration slúži metóda `AddAzureAppConfiguration(HostBuilderContext)`.
+
+#### Príklad
+Konfigurácia obsahuje hodhoty:
+```json
+{
+  "AppConfig": {
+    "Endpoint": "https://example.azconfig.io",
+    "Settings": [ "Example" ]
+  }
+}
+```
+
+Nasledujúci kód pridá konfiguračné hodnoty (ktorých kľúč má predponu "Examle") z Azure App Configuration.
+
+```CSharp
+Host.CreateDefaultBuilder(args)
+	.ConfigureAppConfiguration((hostingContext, config) =>
+	{
+		config.AddAzureAppConfiguration(hostingContext);                
+	});
+```
+
 
 ### DistributedCacheExtensions
 

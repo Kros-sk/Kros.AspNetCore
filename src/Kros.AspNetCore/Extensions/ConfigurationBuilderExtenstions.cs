@@ -26,6 +26,9 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="hostingContext">The hosting context.</param>
+        /// <remarks>
+        /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
+        /// </remarks>
         public static IConfigurationBuilder AddAzureAppConfiguration(
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext)
