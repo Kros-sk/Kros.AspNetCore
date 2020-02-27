@@ -34,4 +34,10 @@
     <ProjectReference Include="..\..\src\Kros.AspNetCore\Kros.AspNetCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="servicediscoveryAppsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
