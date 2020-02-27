@@ -34,6 +34,29 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
             uri.ToString().Should().Be(expectedUri);
         }
 
+        [Fact]
+        public void ThrowExceptionIfServiceDoesntExist()
+        {
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOption.Default);
+
+            Action action = () => provider.GetService("doesntExist");
+
+            action.Should().Throw<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData("Users", "create")]
+        [InlineData("projects", "getById")]
+        [InlineData("doesntExist", "getById")]
+        public void ThrowExceptionIfServiceOrPathDoesntExist(string serviceName, string pathName)
+        {
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOption.Default);
+
+            Action action = () => provider.GetPath(serviceName, pathName);
+
+            action.Should().Throw<ArgumentException>();
+        }
+
         private static IConfiguration GetConfiguration() =>
             new ConfigurationBuilder()
                 .AddJsonFile("servicediscoveryAppsettings.json")

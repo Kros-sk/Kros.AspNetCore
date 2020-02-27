@@ -124,6 +124,24 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Service &apos;{0}&apos; does not have definition for path &apos;{1}&apos;..
+        /// </summary>
+        internal static string PathDefinitionDoesntExist {
+            get {
+                return ResourceManager.GetString("PathDefinitionDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service &apos;{0}&apos; does not exist in configuration section &apos;{1}&apos;..
+        /// </summary>
+        internal static string ServiceDefinitionDoesntExist {
+            get {
+                return ResourceManager.GetString("ServiceDefinitionDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Request returned unknown status code: {0}..
         /// </summary>
         internal static string UnknownStatusCode {

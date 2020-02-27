@@ -1,4 +1,6 @@
-﻿using Kros.Utils;
+﻿using Kros.AspNetCore.Properties;
+using Kros.Extensions;
+using Kros.Utils;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -28,7 +30,15 @@ namespace Kros.AspNetCore.ServiceDiscovery
         public Uri GetPath(string serviceName, string pathName)
         {
             var uriBuilder = new UriBuilder(GetService(serviceName));
-            uriBuilder.Path = _configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:Paths:{pathName}");
+
+            string path = _configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:Paths:{pathName}");
+
+            if (path.IsNullOrEmpty())
+            {
+                throw new ArgumentException(string.Format(Resources.PathDefinitionDoesntExist, serviceName, pathName));
+            }
+
+            uriBuilder.Path = path;
 
             return uriBuilder.Uri;
         }
@@ -36,6 +46,17 @@ namespace Kros.AspNetCore.ServiceDiscovery
 
         /// <inheritdoc />
         public Uri GetService(string serviceName)
-            => new Uri(_configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:DownstreamPath"));
+        {
+            string uri = _configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:DownstreamPath");
+
+            if (uri.IsNullOrEmpty())
+            {
+                throw new ArgumentException(
+                    string.Format(Resources.ServiceDefinitionDoesntExist, serviceName, _option.SectionName));
+            }
+
+            return new Uri(uri);
+        }
+
     }
 }
