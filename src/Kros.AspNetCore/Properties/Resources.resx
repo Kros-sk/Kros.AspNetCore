@@ -141,6 +141,16 @@
   <data name="NotFound" xml:space="preserve">
     <value>Resource was not found.</value>
   </data>
+  <data name="PathDefinitionDoesntExist" xml:space="preserve">
+    <value>Service '{0}' does not have definition for path '{1}'.</value>
+    <comment>0- Service name
+1 - Path name</comment>
+  </data>
+  <data name="ServiceDefinitionDoesntExist" xml:space="preserve">
+    <value>Service '{0}' does not exist in configuration section '{1}'.</value>
+    <comment>0- Service name
+1 - Section name</comment>
+  </data>
   <data name="UnknownStatusCode" xml:space="preserve">
     <value>Request returned unknown status code: {0}.</value>
     <comment>0 - status code</comment>
