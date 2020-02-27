@@ -35,6 +35,18 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         }
 
         [Fact]
+        public void FindServiceUriByNameInAnoutherSection()
+        {
+            var provider = new ServiceDiscoveryProvider(
+                GetConfiguration(),
+                new ServiceDiscoveryOption() { SectionName = "ApiServices" });
+
+            Uri uri = provider.GetService("ToDos");
+
+            uri.AbsoluteUri.Should().Be("http://localhost:9004/");
+        }
+
+        [Fact]
         public void ThrowExceptionIfServiceDoesntExist()
         {
             var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOption.Default);
