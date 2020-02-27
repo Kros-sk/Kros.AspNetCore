@@ -21,6 +21,8 @@ namespace Kros.AspNetCore.Tests.Authorization
     {
         private const string AuthorizationUrl = "http://authorizationservice.com";
         private const string HashAuthorizationUrl = "http://hashauthorizationservice.com";
+        private const string JwtToken = "MyJwtToken";
+        private const string HashJwtToken = "HashJwtToken";
 
         [Fact]
         public async void AddJwtTokenIntoHeader()
@@ -178,7 +180,7 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             cache.Get(HashCode.Combine(accessToken, context.Request.Path))
                 .Should()
-                .Be("MyJwtToken");
+                .Be(JwtToken);
         }
 
         [Fact]
@@ -194,7 +196,7 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             cache.Get(HashCode.Combine(context.Request.Query["hash"].ToString(), context.Request.Path))
                 .Should()
-                .Be("HashJwtToken");
+                .Be(HashJwtToken);
         }
 
         [Fact]
@@ -360,14 +362,14 @@ namespace Kros.AspNetCore.Tests.Authorization
                 new HttpResponseMessage()
                 {
                     StatusCode = statusCode,
-                    Content = new StringContent("MyJwtToken")
+                    Content = new StringContent(JwtToken)
                 }));
             responses.Add(new KeyValuePair<FakeHttpMessageHandler.HttpRequestFilter, HttpResponseMessage>(
                 (req) => req.RequestUri.AbsoluteUri.Contains(HashAuthorizationUrl),
                 new HttpResponseMessage()
                 {
                     StatusCode = statusCode,
-                    Content = new StringContent("HashJwtToken")
+                    Content = new StringContent(HashJwtToken)
                 }));
 
             return new FakeHttpMessageHandler(responses);
@@ -380,6 +382,5 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             return provider;
         }
-
     }
 }

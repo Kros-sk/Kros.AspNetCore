@@ -35,7 +35,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         }
 
         [Fact]
-        public void FindServiceUriByNameInAnoutherSection()
+        public void FindServiceUriByNameInAnotherSection()
         {
             var provider = new ServiceDiscoveryProvider(
                 GetConfiguration(),

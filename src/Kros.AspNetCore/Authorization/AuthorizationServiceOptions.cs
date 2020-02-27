@@ -1,7 +1,7 @@
 ﻿namespace Kros.AspNetCore.Authorization
 {
     /// <summary>
-    /// Authorization service definition
+    /// Authorization service definition.
     /// </summary>
     public class AuthorizationServiceOptions
     {

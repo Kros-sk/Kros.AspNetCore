@@ -56,6 +56,5 @@ namespace Kros.AspNetCore.ServiceDiscovery
 
             return new Uri(uri);
         }
-
     }
 }
