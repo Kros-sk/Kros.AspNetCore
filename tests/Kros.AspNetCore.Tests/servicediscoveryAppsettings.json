@@ -1,15 +1,15 @@
 {
   "Services": {
     "Users": {
-      "DownstreamPath": "http://localhost:9003",
-      "Paths": {
+      "downstreamPath": "http://localhost:9003",
+      "paths": {
         "getAll": "/api/users",
         "getById":  "/api/users/{id}"
       }
     },
     "projects": {
       "DownstreamPath": "http://localhost:9002",
-      "Paths": {
+      "paths": {
         "create": "/api/projects"
       }
     },

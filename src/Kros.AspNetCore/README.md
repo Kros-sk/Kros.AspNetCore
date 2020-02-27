@@ -2,15 +2,24 @@
 
 **Kros.AspNetCore** je univerzálna knižnica obsahujúca nástroje na zjednodušenie práce na Asp.Net Core web api projektoch.
 
-- [Exceptions](#Exceptions)
-- [Middlewares](#Middlewares)
-- [Extensions](#Extensions)
-  - [Configuration](#Configuration)
-- [BaseStartup](#BaseStartup)
-- [Authorization](#Authorization)
-- [JsonPatchDocumentExtensions](#JsonPatchDocumentExtensions)
-  - [Flattening pattern](#Flattening-pattern)
-  - [Custom mapping](#Custom-mapping)
+- [Kros.AspNetCore](#krosaspnetcore)
+  - [Exceptions](#exceptions)
+  - [Middlewares](#middlewares)
+  - [Extensions](#extensions)
+    - [Configuration](#configuration)
+      - [Príklad](#pr%c3%adklad)
+    - [ConfigurationBuilderExtensions](#configurationbuilderextensions)
+      - [Príklad](#pr%c3%adklad-1)
+    - [DistributedCacheExtensions](#distributedcacheextensions)
+    - [CorsExtensions](#corsextensions)
+  - [BaseStartup](#basestartup)
+  - [Authorization](#authorization)
+  - [JsonPatchDocumentExtensions](#jsonpatchdocumentextensions)
+    - [Flattening pattern](#flattening-pattern)
+    - [Custom mapping](#custom-mapping)
+    - [Service Discovery Provider](#service-discovery-provider)
+      - [Get started](#get-started)
+      - [GatewayAuthorizationMiddleware](#gatewayauthorizationmiddleware)
 
 ## Exceptions
 
@@ -110,7 +119,7 @@ Nasledujúci kód pridá konfiguračné hodnoty (ktorých kľúč má predponu "
 Host.CreateDefaultBuilder(args)
 	.ConfigureAppConfiguration((hostingContext, config) =>
 	{
-		config.AddAzureAppConfiguration(hostingContext);                
+		config.AddAzureAppConfiguration(hostingContext);
 	});
 ```
 
@@ -205,4 +214,64 @@ JsonPatchMapperConfig<Document>
 
       return src;
   });
+```
+
+### Service Discovery Provider
+
+Častokrát sa stáva, že niektorá služba potrebuje robiť dotaz na inú službu. V taktomto prípade býva niekde v settingoch konfigurácia, ktorá obsahuje adresu danej služby. Keďže už v rámci ApiGateway budeme používať [Service Discovery Provider](https://github.com/Burgyn/MMLib.Ocelot.Provider.AppConfiguration) na definíciu služieb. Tak tieto konfigurácie môžme využiť aj na to aby sme nemuseli zbytočne vo všetkých službách definovať tie isté adresy.
+
+#### Get started
+
+1. Definujme si služby
+
+```json
+"Services": {
+  "organizations": {
+    "DownstreamPath": "http://localhost:9003"
+  },
+  "authorization": {
+    "DownstreamPath": "http://localhost:9002",
+    "Paths":{
+      "jwt": "/api/authorization/jwt-token"
+    }
+  },
+  "toDos": {
+    "DownstreamPath": "http://localhost:9001"
+  }
+}
+```
+
+> Ideálne však v Azure AppConfiguration, aby sme jednotlivé definície mohli zdieľať naprieš službami.
+
+2. Pridajme si `IServiceDiscoveryProvider`
+
+```CSharp
+services.AddServiceDiscovery();
+```
+
+3. Použime `IServiceDiscoveryProvider` injecnutý do vašich tried
+
+```CSharp
+provider.GetPath("authorization","jwt");
+```
+
+#### GatewayAuthorizationMiddleware
+
+Už aj `GatewayAuthorizationMiddleware` podporuje `IServiceDiscoveryProvider`
+
+```json
+"GatewayJwtAuthorization": {
+    "Authorization": {
+      "ServiceName": "authorization",
+      "PathName": "jwt"
+    },
+    "HashAuthorization": {
+      "ServiceName": "authorization",
+      "PathName": "jwt"
+    },
+    "CacheSlidingExpirationOffset": "00:00:00",
+    "IgnoredPathForCache": [
+      "/organizations"
+    ]
+  }
 ```

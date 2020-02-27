@@ -43,7 +43,6 @@ namespace Kros.AspNetCore.ServiceDiscovery
             return uriBuilder.Uri;
         }
 
-
         /// <inheritdoc />
         public Uri GetService(string serviceName)
         {
