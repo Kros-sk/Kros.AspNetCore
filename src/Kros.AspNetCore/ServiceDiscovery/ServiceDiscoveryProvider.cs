@@ -13,14 +13,14 @@ namespace Kros.AspNetCore.ServiceDiscovery
     public class ServiceDiscoveryProvider : IServiceDiscoveryProvider
     {
         private readonly IConfiguration _configuration;
-        private readonly ServiceDiscoveryOption _option;
+        private readonly ServiceDiscoveryOptions _option;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceDiscoveryProvider"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="option">The option.</param>
-        public ServiceDiscoveryProvider(IConfiguration configuration, ServiceDiscoveryOption option)
+        public ServiceDiscoveryProvider(IConfiguration configuration, ServiceDiscoveryOptions option)
         {
             _configuration = Check.NotNull(configuration, nameof(configuration));
             _option = Check.NotNull(option, nameof(option));

@@ -3,7 +3,7 @@
     /// <summary>
     /// Options for <see cref="ServiceDiscoveryProvider"/>
     /// </summary>
-    public class ServiceDiscoveryOption
+    public class ServiceDiscoveryOptions
     {
         /// <summary>
         /// Gets or sets the name of the section where is store information about services.
@@ -13,6 +13,6 @@
         /// <summary>
         /// Gets the default instance.
         /// </summary>
-        public static ServiceDiscoveryOption Default { get; } = new ServiceDiscoveryOption();
+        public static ServiceDiscoveryOptions Default { get; } = new ServiceDiscoveryOptions();
     }
 }

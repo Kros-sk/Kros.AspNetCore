@@ -16,12 +16,12 @@ namespace Kros.AspNetCore.ServiceDiscovery
         /// <param name="options">The configure.</param>
         public static IServiceCollection AddServiceDiscovery(
             this IServiceCollection services,
-            Action<ServiceDiscoveryOption> options = null)
+            Action<ServiceDiscoveryOptions> options = null)
         {
-            options?.Invoke(ServiceDiscoveryOption.Default);
+            options?.Invoke(ServiceDiscoveryOptions.Default);
 
             services.AddScoped<IServiceDiscoveryProvider>((f) =>
-                new ServiceDiscoveryProvider(f.GetService<IConfiguration>(), ServiceDiscoveryOption.Default));
+                new ServiceDiscoveryProvider(f.GetService<IConfiguration>(), ServiceDiscoveryOptions.Default));
 
             return services;
         }

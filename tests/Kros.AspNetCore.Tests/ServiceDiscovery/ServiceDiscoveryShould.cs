@@ -14,7 +14,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("Authorization", "https://authorizationservice.domain.com/")]
         public void FindServiceUriByName(string serviceName, string expectedUri)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOption.Default);
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Uri uri = provider.GetService(serviceName);
 
@@ -27,7 +27,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("Projects", "create", "http://localhost:9002/api/projects")]
         public void FindPathUriByServiceAndPathName(string serviceName, string pathName, string expectedUri)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOption.Default);
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Uri uri = provider.GetPath(serviceName, pathName);
 
@@ -39,7 +39,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         {
             var provider = new ServiceDiscoveryProvider(
                 GetConfiguration(),
-                new ServiceDiscoveryOption() { SectionName = "ApiServices" });
+                new ServiceDiscoveryOptions() { SectionName = "ApiServices" });
 
             Uri uri = provider.GetService("ToDos");
 
@@ -49,7 +49,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [Fact]
         public void ThrowExceptionIfServiceDoesntExist()
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOption.Default);
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Action action = () => provider.GetService("doesntExist");
 
@@ -62,7 +62,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("doesntExist", "getById")]
         public void ThrowExceptionIfServiceOrPathDoesntExist(string serviceName, string pathName)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOption.Default);
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Action action = () => provider.GetPath(serviceName, pathName);
 
