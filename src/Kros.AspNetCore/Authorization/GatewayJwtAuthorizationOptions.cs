@@ -21,7 +21,7 @@ namespace Kros.AspNetCore.Authorization
         public AuthorizationServiceOptions Authorization { get; set; }
 
         internal string GetAuthorizationUrl(IServiceDiscoveryProvider provider)
-            => AuthorizationUrl ?? GetUrl(provider, HashAuthorization);
+            => AuthorizationUrl ?? GetUrl(provider, Authorization);
 
         /// <summary>
         /// Hash authorization url.
