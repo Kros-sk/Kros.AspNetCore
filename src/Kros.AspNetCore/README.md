@@ -216,11 +216,11 @@ JsonPatchMapperConfig<Document>
   });
 ```
 
-### Service Discovery Provider
+## Service Discovery Provider
 
 Častokrát sa stáva, že niektorá služba potrebuje robiť dotaz na inú službu. V taktomto prípade býva niekde v settingoch konfigurácia, ktorá obsahuje adresu danej služby. Keďže už v rámci ApiGateway budeme používať [Service Discovery Provider](https://github.com/Burgyn/MMLib.Ocelot.Provider.AppConfiguration) na definíciu služieb. Tak tieto konfigurácie môžme využiť aj na to aby sme nemuseli zbytočne vo všetkých službách definovať tie isté adresy.
 
-#### Get started
+### Get started
 
 1. Definujme si služby
 
@@ -255,7 +255,7 @@ services.AddServiceDiscovery();
 provider.GetPath("authorization","jwt");
 ```
 
-#### GatewayAuthorizationMiddleware
+### GatewayAuthorizationMiddleware
 
 Už aj `GatewayAuthorizationMiddleware` podporuje `IServiceDiscoveryProvider`
 
