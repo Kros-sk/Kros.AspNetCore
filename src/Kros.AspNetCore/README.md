@@ -17,9 +17,9 @@
   - [JsonPatchDocumentExtensions](#jsonpatchdocumentextensions)
     - [Flattening pattern](#flattening-pattern)
     - [Custom mapping](#custom-mapping)
-    - [Service Discovery Provider](#service-discovery-provider)
-      - [Get started](#get-started)
-      - [GatewayAuthorizationMiddleware](#gatewayauthorizationmiddleware)
+  - [Service Discovery Provider](#service-discovery-provider)
+    - [Get started](#get-started)
+    - [GatewayAuthorizationMiddleware](#gatewayauthorizationmiddleware)
 
 ## Exceptions
 
