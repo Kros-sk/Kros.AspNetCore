@@ -1,18 +1,13 @@
 ﻿namespace Kros.AspNetCore.Authorization
 {
     /// <summary>
-    /// JWT authorization options for api services.
+    /// JWT authorization options for api services. Contains all authorization schemes.
     /// </summary>
     public class ApiJwtAuthorizationOptions
     {
         /// <summary>
-        /// Secret for jwt digital sign.
+        /// List of schemes.
         /// </summary>
-        public string JwtSecret { get; set; }
-
-        /// <summary>
-        /// Https is required. Default value is <see langword="true"/>.
-        /// </summary>
-        public bool RequireHttpsMetadata { get; set; } = true;
+        public ApiJwtAuthorizationScheme[] Schemes { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace Kros.AspNetCore.Authorization
         public string HashAuthorizationUrl { get; set; }
 
         /// <summary>
-        /// Gets or sets the authorization.
+        /// Gets or sets the hash authorization.
         /// </summary>
         public AuthorizationServiceOptions HashAuthorization { get; set; }
 
