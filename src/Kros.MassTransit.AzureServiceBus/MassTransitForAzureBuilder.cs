@@ -240,7 +240,6 @@ namespace Kros.MassTransit.AzureServiceBus
             }
         }
 
-
         #endregion
     }
 }
