@@ -21,6 +21,7 @@ namespace Kros.MassTransit.AzureServiceBus
         private readonly string _connectionString;
         private TimeSpan _tokenTimeToLive;
         private readonly IServiceProvider _provider;
+        private readonly string _messageTypePrefix;
         private Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> _busConfigurator;
         private readonly List<Endpoint> _endpoints = new List<Endpoint>();
         private Endpoint _currentEndpoint;
@@ -68,6 +69,7 @@ namespace Kros.MassTransit.AzureServiceBus
                 ? TimeSpan.FromSeconds(options.TokenTimeToLive)
                 : ConfigDefaults.TokenTimeToLive;
             _provider = provider;
+            _messageTypePrefix = options.MessageTypePrefix;
         }
 
         /// <summary>
@@ -167,6 +169,7 @@ namespace Kros.MassTransit.AzureServiceBus
                 IServiceBusHost host = CreateServiceHost(busCfg);
 
                 ConfigureServiceBus(busCfg, host);
+                AddMessageTypePrefix(busCfg);
                 AddEndpoints(busCfg);
 
                 if (_provider != null)
@@ -227,6 +230,16 @@ namespace Kros.MassTransit.AzureServiceBus
                 endpoint.SetEndpoint(busCfg);
             }
         }
+
+        private void AddMessageTypePrefix(IServiceBusBusFactoryConfigurator configurator)
+        {
+            if (!string.IsNullOrWhiteSpace(_messageTypePrefix))
+            {
+                configurator.MessageTopology.SetEntityNameFormatter(
+                    new PrefixEntityNameFormatter(configurator.MessageTopology.EntityNameFormatter, _messageTypePrefix));
+            }
+        }
+
 
         #endregion
     }
