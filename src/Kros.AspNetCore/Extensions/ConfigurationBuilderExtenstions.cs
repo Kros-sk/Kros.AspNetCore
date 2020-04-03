@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Kros.Extensions;
 using Azure.Identity;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 namespace Kros.AspNetCore.Extensions
 {
@@ -52,8 +53,8 @@ namespace Kros.AspNetCore.Extensions
                 foreach (string service in services)
                 {
                     options
+                        .Select($"{service}:*", LabelFilter.Null)
                         .Select($"{service}:*", hostingContext.HostingEnvironment.EnvironmentName)
-                        .Select($"{service}:*")
                         .TrimKeyPrefix($"{service}:");
                 }
             });
