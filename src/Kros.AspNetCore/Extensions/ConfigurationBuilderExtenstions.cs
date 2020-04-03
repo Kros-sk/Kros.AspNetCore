@@ -53,6 +53,7 @@ namespace Kros.AspNetCore.Extensions
                 {
                     options
                         .Select($"{service}:*", hostingContext.HostingEnvironment.EnvironmentName)
+                        .Select($"{service}:*")
                         .TrimKeyPrefix($"{service}:");
                 }
             });
