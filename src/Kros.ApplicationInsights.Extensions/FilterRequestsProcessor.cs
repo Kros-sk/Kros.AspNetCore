@@ -4,15 +4,17 @@ using Microsoft.ApplicationInsights.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
+[assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
 {
     /// <summary>
     /// Telemetry Processor to filter out requests for specific endpoints (/health).
     /// </summary>
     /// <seealso cref="Microsoft.ApplicationInsights.Extensibility.ITelemetryProcessor" />
-    class FilterRequestsProcessor : ITelemetryProcessor
+    internal class FilterRequestsProcessor : ITelemetryProcessor
     {
         private ITelemetryProcessor Next { get; set; }
 

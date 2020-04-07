@@ -2,15 +2,17 @@
 using Microsoft.ApplicationInsights.Extensibility;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
+[assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
 {
     /// <summary>
     /// Telemetry Processor to filter out synthetic requests(bots, web search...).
     /// </summary>
-    /// <seealso cref="Microsoft.ApplicationInsights.Extensibility.ITelemetryInitializer" />
-    class FilterSyntheticRequestsProcessor : ITelemetryProcessor
+    /// <seealso cref="Microsoft.ApplicationInsights.Extensibility.ITelemetryProcessor" />
+    internal class FilterSyntheticRequestsProcessor : ITelemetryProcessor
     {
         private ITelemetryProcessor Next { get; set; }
 

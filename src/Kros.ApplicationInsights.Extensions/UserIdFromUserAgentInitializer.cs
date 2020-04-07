@@ -4,15 +4,17 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
+[assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
 {
     /// <summary>
     /// Configuration of user id in Application Insights telemetry.
     /// </summary>
     /// <seealso cref="Microsoft.ApplicationInsights.Extensibility.ITelemetryInitializer" />
-    class UserIdFromUserAgentInitializer : ITelemetryInitializer
+    internal class UserIdFromUserAgentInitializer : ITelemetryInitializer
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -30,7 +32,8 @@ namespace Kros.ApplicationInsights.Extensions
         /// </summary>
         public void Initialize(ITelemetry telemetry)
         {
-            if (telemetry is RequestTelemetry requestTelemetry)
+            if (telemetry is RequestTelemetry requestTelemetry
+                && _httpContextAccessor.HttpContext.Request.Headers.ContainsKey("User-Agent"))
             {
                 requestTelemetry.Context.User.Id = _httpContextAccessor.HttpContext.Request.Headers["User-Agent"];
             }
