@@ -1,6 +1,5 @@
 ﻿using Kros.AspNetCore;
-using Kros.AspNetCore.Options;
-using System;
+using Kros.AspNetCore.Configuration;
 
 namespace Microsoft.Extensions.Configuration
 {

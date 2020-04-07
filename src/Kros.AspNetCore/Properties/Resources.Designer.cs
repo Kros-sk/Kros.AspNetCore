@@ -79,6 +79,15 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User request cannot be finished because of conflict(409)..
+        /// </summary>
+        internal static string Conflict {
+            get {
+                return ResourceManager.GetString("Conflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exception {0} was thrown during request pipeline. Status code of the response was changed to {1}..
         /// </summary>
         internal static string ErrorHandlingMiddleware_StatusCodeChange {
@@ -111,6 +120,33 @@ namespace Kros.AspNetCore.Properties {
         internal static string NotFound {
             get {
                 return ResourceManager.GetString("NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service &apos;{0}&apos; does not have definition for path &apos;{1}&apos;..
+        /// </summary>
+        internal static string PathDefinitionDoesntExist {
+            get {
+                return ResourceManager.GetString("PathDefinitionDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service &apos;{0}&apos; does not exist in configuration section &apos;{1}&apos;..
+        /// </summary>
+        internal static string ServiceDefinitionDoesntExist {
+            get {
+                return ResourceManager.GetString("ServiceDefinitionDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request returned unknown status code: {0}..
+        /// </summary>
+        internal static string UnknownStatusCode {
+            get {
+                return ResourceManager.GetString("UnknownStatusCode", resourceCulture);
             }
         }
         

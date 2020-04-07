@@ -18,6 +18,11 @@ namespace Kros.AspNetCore.Authorization
         public const string JwtSchemeName = "JwtAuthorization";
 
         /// <summary>
+        /// Hash jwt authentication scheme name.
+        /// </summary>
+        public const string HashJwtSchemeName = "JwtHashAuthorization";
+
+        /// <summary>
         /// OAuth authentication scheme name.
         /// </summary>
         public const string OAuthSchemeName = "OAuthAuthorization";

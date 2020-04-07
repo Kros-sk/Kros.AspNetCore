@@ -7,6 +7,8 @@ namespace Kros.AspNetCore.Tests.Authorization
 {
     public class ClaimsPrincipalExtensionsShould
     {
+        private const string _customClaim = "CustomClaim";
+
         [Fact]
         public void GetUserIdWhenExist()
         {
@@ -43,11 +45,30 @@ namespace Kros.AspNetCore.Tests.Authorization
                 .Should().BeEmpty();
         }
 
+        [Fact]
+        public void GetCustomClaimWhenItExists()
+        {
+            ClaimsPrincipal user = CreateUser();
+
+            user.GetValueFromUserClaims(_customClaim)
+                .Should().Be("something");
+        }
+
+        [Fact]
+        public void GetCustomClaimWhenItDoesNotExist()
+        {
+            ClaimsPrincipal user = new ClaimsPrincipal();
+
+            user.GetValueFromUserClaims(_customClaim)
+                .Should().Be(string.Empty);
+        }
+
         private static ClaimsPrincipal CreateUser()
             => new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
                  new Claim(UserClaimTypes.UserId, "22"),
-                 new Claim(ClaimTypes.Email, "bob@gmail.com")
+                 new Claim(ClaimTypes.Email, "bob@gmail.com"),
+                 new Claim(_customClaim, "something")
             }));
     }
 }
