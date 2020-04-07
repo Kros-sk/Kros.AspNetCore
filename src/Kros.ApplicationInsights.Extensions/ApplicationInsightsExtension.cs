@@ -70,7 +70,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return configurationSection.Get<ApplicationInsightsOptions>();
         }
-
-
     }
 }

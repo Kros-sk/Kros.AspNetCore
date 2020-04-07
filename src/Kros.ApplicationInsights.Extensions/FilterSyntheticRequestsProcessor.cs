@@ -12,7 +12,6 @@ namespace Kros.ApplicationInsights.Extensions
     /// <seealso cref="Microsoft.ApplicationInsights.Extensibility.ITelemetryInitializer" />
     class FilterSyntheticRequestsProcessor : ITelemetryProcessor
     {
-
         private ITelemetryProcessor Next { get; set; }
 
         /// <summary>
@@ -30,7 +29,6 @@ namespace Kros.ApplicationInsights.Extensions
         /// <param name="item">ITelemetry instance.</param>
         public void Process(ITelemetry item)
         {
-
             if (!string.IsNullOrEmpty(item.Context.Operation.SyntheticSource))
             {
                 return;
