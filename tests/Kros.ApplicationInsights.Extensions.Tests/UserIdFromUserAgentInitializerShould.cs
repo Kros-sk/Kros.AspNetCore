@@ -32,10 +32,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         }
         private ITelemetry FakeTelemetry()
         {
-            return new RequestTelemetry()
-            {
-
-            };
+            return new RequestTelemetry();
         }
 
         private IHttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)

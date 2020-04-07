@@ -8,7 +8,6 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 {
     internal class PassedToNextTelemetryProcessor : ITelemetryProcessor
     {
-
         public PassedToNextTelemetryProcessor()
         {
         }

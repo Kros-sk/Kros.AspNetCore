@@ -9,7 +9,6 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 {
     public class FilterSyntheticRequestsProcesorShould
     {
-
         [Fact]
         public void PassRequestToNextIfItIsNotSynthetic()
         {
@@ -24,7 +23,6 @@ namespace Kros.ApplicationInsights.Extensions.Tests
             RequestTelemetry requestTelemetry = ProcessItems(true);
 
             requestTelemetry.Sequence.Should().NotBe("TestPassed");
-
         }
 
         private RequestTelemetry ProcessItems(bool isSynthetic)

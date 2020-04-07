@@ -7,7 +7,6 @@ using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
 {
-
     public class FilterRequestsProcessorShould
     {
         private readonly string[] _skippedRequests =
@@ -38,7 +37,6 @@ namespace Kros.ApplicationInsights.Extensions.Tests
             }
 
             passedRequests.Should().Be(0);
-
         }
 
         private RequestTelemetry ProcessItems(string name)
@@ -56,6 +54,5 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             return requestTelemetry;
         }
-
     }
 }
