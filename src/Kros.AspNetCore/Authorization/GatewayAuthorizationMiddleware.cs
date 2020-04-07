@@ -1,4 +1,5 @@
-﻿using Kros.AspNetCore.Exceptions;
+﻿using Kros.AspNetCore.Extensions;
+using Kros.AspNetCore.ServiceDiscovery;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -43,12 +44,18 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="httpContext">Http context.</param>
         /// <param name="httpClientFactory">Http client factory.</param>
         /// <param name="memoryCache">Cache for caching authorization token.</param>
+        /// <param name="serviceDiscoveryProvider">The service discovery provider.</param>
         public async Task Invoke(
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
-            string userJwt = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache);
+            string userJwt = await GetUserAuthorizationJwtAsync(
+                httpContext,
+                httpClientFactory,
+                memoryCache,
+                serviceDiscoveryProvider);
 
             if (!string.IsNullOrEmpty(userJwt))
             {
@@ -61,7 +68,8 @@ namespace Kros.AspNetCore.Authorization
         private async Task<string> GetUserAuthorizationJwtAsync(
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
             if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues value))
             {
@@ -69,7 +77,35 @@ namespace Kros.AspNetCore.Authorization
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    jwtToken = await GetUserAuthorizationJwtAsync(httpContext, httpClientFactory, memoryCache, value, key);
+                    var authUrl =
+                        _jwtAuthorizationOptions.GetAuthorizationUrl(serviceDiscoveryProvider) + httpContext.Request.Path.Value;
+                    jwtToken = await GetUserAuthorizationJwtAsync(
+                        httpContext,
+                        httpClientFactory,
+                        memoryCache,
+                        value,
+                        key,
+                        authUrl);
+                }
+
+                return jwtToken;
+            }
+            else if (httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
+            {
+                int key = GetKey(httpContext, hashValue.ToString());
+                if (!memoryCache.TryGetValue(key, out string jwtToken))
+                {
+                    var uriBuilder = new UriBuilder(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
+                    uriBuilder.Query = QueryString.Create(
+                        _jwtAuthorizationOptions.HashParameterName,
+                        hashValue.ToString()).ToUriComponent();
+                    jwtToken = await GetUserAuthorizationJwtAsync(
+                        httpContext,
+                        httpClientFactory,
+                        memoryCache,
+                        StringValues.Empty,
+                        key,
+                        uriBuilder.Uri.ToString());
                 }
 
                 return jwtToken;
@@ -82,43 +118,22 @@ namespace Kros.AspNetCore.Authorization
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
             IMemoryCache memoryCache,
-            StringValues value,
-            int key)
+            StringValues authHeader,
+            int cacheKey,
+            string authorizationUrl)
         {
             using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
             {
-                client.DefaultRequestHeaders.Add(HeaderNames.Authorization, value.ToString());
-
-                HttpResponseMessage response = await client.GetAsync(_jwtAuthorizationOptions.AuthorizationUrl + httpContext.Request.Path.Value);
-
-                if (response.IsSuccessStatusCode)
+                if (authHeader.Any())
                 {
-                    string jwtToken = await response.Content.ReadAsStringAsync();
-                    SetTokenToCache(memoryCache, key, jwtToken, httpContext.Request);
-
-                    return jwtToken;
+                    client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
                 }
-                else
-                {
-                    throw GetExceptionForResponse(response);
-                }
-            }
-        }
 
-        private static Exception GetExceptionForResponse(HttpResponseMessage response)
-        {
-            switch (response.StatusCode)
-            {
-                case System.Net.HttpStatusCode.Forbidden:
-                    return new ResourceIsForbiddenException();
-                case System.Net.HttpStatusCode.NotFound:
-                    return new NotFoundException();
-                case System.Net.HttpStatusCode.Unauthorized:
-                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
-                case System.Net.HttpStatusCode.BadRequest:
-                    return new BadRequestException();
-                default:
-                    return new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
+                    new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
+                SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
+
+                return jwtToken;
             }
         }
 
