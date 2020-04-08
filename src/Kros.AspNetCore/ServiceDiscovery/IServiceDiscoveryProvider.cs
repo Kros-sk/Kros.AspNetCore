@@ -25,5 +25,24 @@ namespace Kros.AspNetCore.ServiceDiscovery
         /// </returns>
         /// <exception cref="ArgumentException">If service <paramref name="serviceName"/> does not exist.</exception>
         Uri GetPath(string serviceName, string pathName);
+
+        /// <summary>
+        /// Gets the service URI.
+        /// </summary>
+        /// <param name="serviceType">Enum with service type.</param>
+        /// <returns>Service URI if exist.</returns>
+        /// <exception cref="ArgumentException">If service <paramref name="serviceType"/> does not exist.</exception>
+        Uri GetService(Enum serviceType);
+
+        /// <summary>
+        /// Gets the specific path.
+        /// </summary>
+        /// <param name="serviceType">Enum with service type.</param>
+        /// <param name="pathName">Name of the path.</param>
+        /// <returns>
+        /// URI <paramref name="serviceType"/><paramref name="pathName"/>
+        /// </returns>
+        /// <exception cref="ArgumentException">If service <paramref name="serviceType"/> does not exist.</exception>
+        Uri GetPath(Enum serviceType, string pathName);
     }
 }
