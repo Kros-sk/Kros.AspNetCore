@@ -265,8 +265,7 @@ public enum ServiceType
     [ServiceName("organizations")]
     Organizations,
     [ServiceName("toDos")]
-    ToDos,
-        
+    ToDos
 } 
 ```
 
