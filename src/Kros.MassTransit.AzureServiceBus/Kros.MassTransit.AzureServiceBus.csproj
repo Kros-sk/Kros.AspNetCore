@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.0-alpha.4</Version>
+    <Version>1.0.0-alpha.5</Version>
     <Authors>KROS a. s.</Authors>
     <Company>KROS a. s.</Company>
     <Description>Simpler configuration of MassTransit library.</Description>
@@ -24,10 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kros.Utils" Version="1.10.1" />
-    <PackageReference Include="MassTransit.AspNetCore" Version="6.0.0" />
-    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="6.0.0" />
-    <PackageReference Include="Scrutor" Version="3.1.0" />
+    <PackageReference Include="Kros.Utils" Version="1.13.0" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="6.2.4" />
+    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="6.2.4" />
+    <PackageReference Include="Scrutor" Version="3.2.0" />
   </ItemGroup>
 
 </Project>
