@@ -255,6 +255,30 @@ services.AddServiceDiscovery();
 provider.GetPath("authorization","jwt");
 ```
 
+Druhá možnosť ako používať provider na získanie služby, je vytvoriť si ľuboboľný Enum na rozlíšenie služieb, a jednotlivým hodnotám enumu nastaviť atribút `ServiceNameAttribute`
+
+```CSharp
+public enum ServiceType
+{
+    [ServiceName("authorization")]
+    Authorization,
+    [ServiceName("organizations")]
+    Organizations,
+    [ServiceName("toDos")]
+    ToDos
+} 
+```
+
+Potom je možné volať získavanie služieb pomocou hodnôt enumu
+
+```CSharp
+provider.GetPath(ServiceType.Authorization, "jwt");
+```
+alebo
+```CSharp
+provider.GetService(ServiceType.Organizations);
+```
+
 ### GatewayAuthorizationMiddleware
 
 Už aj `GatewayAuthorizationMiddleware` podporuje `IServiceDiscoveryProvider`
