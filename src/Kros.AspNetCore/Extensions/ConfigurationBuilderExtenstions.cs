@@ -57,6 +57,15 @@ namespace Kros.AspNetCore.Extensions
                         .Select($"{service}:*", hostingContext.HostingEnvironment.EnvironmentName)
                         .TrimKeyPrefix($"{service}:");
                 }
+
+                string useFeatureFlagsSetting = settings["AppConfig:UseFeatureFlags"];
+                if (bool.TryParse(useFeatureFlagsSetting, out bool useFeatureFlags) && useFeatureFlags)
+                {
+                    options
+                        .Select("_", LabelFilter.Null)
+                        .Select("_", hostingContext.HostingEnvironment.EnvironmentName)
+                        .UseFeatureFlags();
+                }
             });
 
             return config;
