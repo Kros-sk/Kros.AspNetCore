@@ -90,7 +90,8 @@ namespace Kros.AspNetCore.Authorization
 
                 return jwtToken;
             }
-            else if (httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
+            else if (!string.IsNullOrEmpty(_jwtAuthorizationOptions.HashParameterName)
+                && httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
             {
                 int key = GetKey(httpContext, hashValue.ToString());
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
