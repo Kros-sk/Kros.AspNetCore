@@ -30,7 +30,7 @@ namespace Kros.AspNetCore.Extensions
         /// <remarks>
         /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
         /// </remarks>
-        public static IConfigurationBuilder AddAzureAppConfiguration(
+        public static IConfigurationBuilder AddAzureAppConfig(
             this IConfigurationBuilder config, string environmentName)
         {
             var settings = config.Build();
@@ -82,7 +82,7 @@ namespace Kros.AspNetCore.Extensions
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext)
         {
-            return config.AddAzureAppConfiguration(hostingContext.HostingEnvironment.EnvironmentName);
+            return config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName);
         }
     }
 }
