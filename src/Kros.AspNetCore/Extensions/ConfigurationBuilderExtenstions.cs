@@ -26,13 +26,12 @@ namespace Kros.AspNetCore.Extensions
         /// Adds the azure application configuration.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        /// <param name="hostingContext">The hosting context.</param>
+        /// <param name="environmentName">Environment name.</param>
         /// <remarks>
         /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
         /// </remarks>
-        public static IConfigurationBuilder AddAzureAppConfiguration(
-            this IConfigurationBuilder config,
-            HostBuilderContext hostingContext)
+        public static IConfigurationBuilder AddAzureAppConfig(
+            this IConfigurationBuilder config, string environmentName)
         {
             var settings = config.Build();
 
@@ -54,7 +53,7 @@ namespace Kros.AspNetCore.Extensions
                 {
                     options
                         .Select($"{service}:*", LabelFilter.Null)
-                        .Select($"{service}:*", hostingContext.HostingEnvironment.EnvironmentName)
+                        .Select($"{service}:*", environmentName)
                         .TrimKeyPrefix($"{service}:");
                 }
 
@@ -63,12 +62,24 @@ namespace Kros.AspNetCore.Extensions
                 {
                     options
                         .Select("_", LabelFilter.Null)
-                        .Select("_", hostingContext.HostingEnvironment.EnvironmentName)
+                        .Select("_", environmentName)
                         .UseFeatureFlags();
                 }
             });
 
             return config;
         }
+
+        /// <summary>
+        /// Adds the azure application configuration.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="hostingContext">The hosting context.</param>
+        /// <remarks>
+        /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
+        /// </remarks>
+        public static IConfigurationBuilder AddAzureAppConfiguration(
+            this IConfigurationBuilder config,
+            HostBuilderContext hostingContext) => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName);
     }
 }

@@ -4,22 +4,30 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using FluentAssertions;
+using NSubstitute;
 
 namespace Kros.AspNetCore.Tests.Extensions
 {
     public class ConfigurationBuilderExtensionsShould
     {
         [Fact]
-        public void AddConfigurationSource()
+        public void AddAzureAppConfigurationSource()
         {
-            // arrange
             IConfigurationBuilder config = new ConfigurationBuilder();
             HostBuilderContext builderContext = CreateHostBuilderContext();
 
-            // act
             config.AddAzureAppConfiguration(builderContext);
 
-            // assert
+            config.Sources.Count.Should().Be(1);
+        }
+
+        [Fact]
+        public void AddAzureAppConfigurationSource2()
+        {
+            IConfigurationBuilder config = new ConfigurationBuilder();
+
+            config.AddAzureAppConfig("Development");
+
             config.Sources.Count.Should().Be(1);
         }
 
@@ -27,6 +35,8 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             var context = new HostBuilderContext(new Dictionary<object, object>());
             context.Configuration = GetConfiguration();
+            context.HostingEnvironment = Substitute.For<IHostEnvironment>();
+            context.HostingEnvironment.EnvironmentName.Returns("Development");
             return context;
         }
 
