@@ -13,27 +13,21 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void AddAzureAppConfigurationSource()
         {
-            // arrange
             IConfigurationBuilder config = new ConfigurationBuilder();
             HostBuilderContext builderContext = CreateHostBuilderContext();
 
-            // act
             config.AddAzureAppConfiguration(builderContext);
 
-            // assert
             config.Sources.Count.Should().Be(1);
         }
 
         [Fact]
         public void AddAzureAppConfigurationSource2()
         {
-            // arrange
             IConfigurationBuilder config = new ConfigurationBuilder();
 
-            // act
             config.AddAzureAppConfig("Development");
 
-            // assert
             config.Sources.Count.Should().Be(1);
         }
 

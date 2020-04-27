@@ -80,9 +80,6 @@ namespace Kros.AspNetCore.Extensions
         /// </remarks>
         public static IConfigurationBuilder AddAzureAppConfiguration(
             this IConfigurationBuilder config,
-            HostBuilderContext hostingContext)
-        {
-            return config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName);
-        }
+            HostBuilderContext hostingContext) => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName);
     }
 }
