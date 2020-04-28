@@ -89,7 +89,8 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="config">The configuration.</param>
         /// <param name="environmentName">Environment name.</param>
         /// <remarks>
-        /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
+        /// Configuration can contain attribute AppConfig:Endpoint. If it contains AppConfig:Endpoint,
+        /// it should contain AppConfig:Settings.
         /// </remarks>
         public static IConfigurationBuilder AddAzureAppConfigurationIfEndpointDefined(
             this IConfigurationBuilder config,
