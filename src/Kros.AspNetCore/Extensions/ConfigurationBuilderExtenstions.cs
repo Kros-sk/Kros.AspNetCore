@@ -35,6 +35,12 @@ namespace Kros.AspNetCore.Extensions
         {
             var settings = config.Build();
 
+            string appConfigEndpoint = settings["AppConfig:Endpoint"];
+            if (string.IsNullOrWhiteSpace(appConfigEndpoint))
+            {
+                return config;
+            }
+
             config.AddAzureAppConfiguration(options =>
             {
                 var credential = new DefaultAzureCredential();

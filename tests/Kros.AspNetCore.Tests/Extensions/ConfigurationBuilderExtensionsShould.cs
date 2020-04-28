@@ -11,24 +11,53 @@ namespace Kros.AspNetCore.Tests.Extensions
     public class ConfigurationBuilderExtensionsShould
     {
         [Fact]
-        public void AddAzureAppConfigurationSource()
+        public void AddAzureAppConfigurationSourceIfEndpointDefined1()
+        {
+            IConfigurationBuilder config = new ConfigurationBuilder();
+            HostBuilderContext builderContext = CreateHostBuilderContext();
+            config.AddInMemoryCollection(
+                new List<KeyValuePair<string, string>>() {
+                    new KeyValuePair<string, string>("AppConfig:Endpoint", "endpoint")
+                });
+
+            config.AddAzureAppConfiguration(builderContext);
+
+            config.Sources.Count.Should().Be(2);
+        }
+
+        [Fact]
+        public void NotAddAzureAppConfigurationSourceIfEndpointNotDefined1()
         {
             IConfigurationBuilder config = new ConfigurationBuilder();
             HostBuilderContext builderContext = CreateHostBuilderContext();
 
             config.AddAzureAppConfiguration(builderContext);
 
-            config.Sources.Count.Should().Be(1);
+            config.Sources.Count.Should().Be(0);
         }
 
         [Fact]
-        public void AddAzureAppConfigurationSource2()
+        public void AddAzureAppConfigurationSourceIfEndpointDefined()
+        {
+            IConfigurationBuilder config = new ConfigurationBuilder();
+            config.AddInMemoryCollection(
+                new List<KeyValuePair<string, string>>() {
+                    new KeyValuePair<string, string>("AppConfig:Endpoint", "endpoint")
+                });
+
+            config.AddAzureAppConfig("Development");
+
+            config.Sources.Count.Should().Be(2);
+        }
+
+        [Fact]
+        public void NotAddAzureAppConfigurationSourceIfEndpointNotDefined()
         {
             IConfigurationBuilder config = new ConfigurationBuilder();
 
             config.AddAzureAppConfig("Development");
 
-            config.Sources.Count.Should().Be(1);
+            config.Sources.Count.Should().Be(0);
         }
 
         private HostBuilderContext CreateHostBuilderContext()
