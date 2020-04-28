@@ -31,6 +31,34 @@ namespace Kros.AspNetCore.Tests.Extensions
             config.Sources.Count.Should().Be(1);
         }
 
+        [Fact]
+        public void AddAzureAppConfigurationSourceIfEndpointDefined()
+        {
+            IConfigurationBuilder config = new ConfigurationBuilder();
+            config.AddInMemoryCollection(
+                new List<KeyValuePair<string, string>>() {
+                    new KeyValuePair<string, string>("AppConfig:Endpoint", "endpoint")
+                });
+
+            config.AddAzureAppConfigurationIfEndpointDefined("Development");
+
+            config.Sources.Count.Should().Be(2);
+        }
+
+        [Fact]
+        public void NotAddAzureAppConfigurationSourceIfEndpointNotDefined()
+        {
+            IConfigurationBuilder config = new ConfigurationBuilder();
+            config.AddInMemoryCollection(
+                new List<KeyValuePair<string, string>>() {
+                    new KeyValuePair<string, string>("AppConfig:Endpoint", "")
+                });
+
+            config.AddAzureAppConfigurationIfEndpointDefined("Development");
+
+            config.Sources.Count.Should().Be(1);
+        }
+
         private HostBuilderContext CreateHostBuilderContext()
         {
             var context = new HostBuilderContext(new Dictionary<object, object>());
