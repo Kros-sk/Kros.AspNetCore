@@ -35,6 +35,12 @@ namespace Kros.AspNetCore.Extensions
         {
             var settings = config.Build();
 
+            string appConfigEndpoint = settings["AppConfig:Endpoint"];
+            if (string.IsNullOrWhiteSpace(appConfigEndpoint))
+            {
+                return config;
+            }
+
             config.AddAzureAppConfiguration(options =>
             {
                 var credential = new DefaultAzureCredential();
@@ -81,28 +87,5 @@ namespace Kros.AspNetCore.Extensions
         public static IConfigurationBuilder AddAzureAppConfiguration(
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext) => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName);
-
-        /// <summary>
-        /// Adds the azure application configuration if AppConfig:Endpoint is defined.
-        /// Does not throw exception if AppConfig:Endpoint is not defined.
-        /// </summary>
-        /// <param name="config">The configuration.</param>
-        /// <param name="environmentName">Environment name.</param>
-        /// <remarks>
-        /// Configuration can contain attribute AppConfig:Endpoint. If it contains AppConfig:Endpoint,
-        /// it should contain AppConfig:Settings.
-        /// </remarks>
-        public static IConfigurationBuilder AddAzureAppConfigurationIfEndpointDefined(
-            this IConfigurationBuilder config,
-            string environmentName)
-        {
-            var settings = config.Build();
-            string appConfigEndpoint = settings["AppConfig:Endpoint"];
-            if (!string.IsNullOrWhiteSpace(appConfigEndpoint))
-            {
-                config.AddAzureAppConfig(environmentName);
-            }
-            return config;
-        }
     }
 }
