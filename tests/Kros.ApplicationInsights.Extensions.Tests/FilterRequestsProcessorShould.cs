@@ -1,51 +1,41 @@
 ﻿using FluentAssertions;
 using Microsoft.ApplicationInsights.DataContracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
 {
     public class FilterRequestsProcessorShould
     {
-        private readonly string[] _skippedRequests =
+        [Theory]
+        [InlineData("/health", "")]
+        [InlineData("someRequests", "TestPassed")]
+        public void ReturnCorrectSequenceForRequestName(string name, string expectedSequence)
         {
-            "/health"
-        };
-
-        [Fact]
-        public void PassRequestToNextIfItIsNotForbbidenRequest()
-        {
-            RequestTelemetry requestTelemetry = ProcessItems("someRequests");
-
-            requestTelemetry.Sequence.Should().Be("TestPassed");
+            RequestTelemetry requestTelemetry = ProcessItems(name, "NotMatter");
+            requestTelemetry.Sequence.Should().Be(expectedSequence);
         }
 
-        [Fact]
-        public void DontPassRequestToNextIfItIsForbbidenRequest()
+        [Theory]
+        [InlineData("postman", "")]
+        [InlineData("postman/7.5", "")]
+        [InlineData("Safari", "TestPassed")]
+        [InlineData("Safari/4.23", "TestPassed")]
+        [InlineData("Chrome/4.23", "TestPassed")]
+        [InlineData("Opera/4.23", "TestPassed")]
+        public void ReturnCorrectSequenceForUserAgent(string agentName, string expectedSequence)
         {
-            int passedRequests = 0;
-            RequestTelemetry requestTelemetry;
-            foreach (string name in _skippedRequests)
-            {
-                requestTelemetry = ProcessItems(name);
-                if(requestTelemetry.Sequence.Equals("TestPassed"))
-                {
-                    passedRequests++;
-                }
-            }
-
-            passedRequests.Should().Be(0);
+            RequestTelemetry requestTelemetry = ProcessItems("someRequests", agentName);
+            requestTelemetry.Sequence.Should().Be(expectedSequence);
         }
 
-        private RequestTelemetry ProcessItems(string name)
+        private RequestTelemetry ProcessItems(string name, string agentName)
         {
             RequestTelemetry requestTelemetry = new RequestTelemetry()
             {
                 Name = name,
                 Sequence = ""
             };
+            requestTelemetry.Context.User.Id = agentName;
 
             PassedToNextTelemetryProcessor next = new PassedToNextTelemetryProcessor();
             FilterRequestsProcessor filterRequestsProcessor = new FilterRequestsProcessor(next);
