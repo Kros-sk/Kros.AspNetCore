@@ -2,10 +2,8 @@
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 [assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
@@ -21,6 +19,11 @@ namespace Kros.ApplicationInsights.Extensions
         private readonly string[] _skippedRequests =
         {
             "/health"
+        };
+
+        private readonly string[] _skippedAgents =
+        {
+            "postman"
         };
 
         /// <summary>
@@ -39,12 +42,17 @@ namespace Kros.ApplicationInsights.Extensions
         public void Process(ITelemetry item)
         {
             var request = item as RequestTelemetry;
-            if(request != null && _skippedRequests.Any(x => request.Name.Contains(x)))
+            if (request != null
+                && (_skippedRequests.Any(x => request.Name.Contains(x))
+                || _skippedAgents.Any(a => GetUserAgentName(request).Contains(a, StringComparison.InvariantCultureIgnoreCase))))
             {
                 return;
             }
 
             Next.Process(item);
         }
+
+        private string GetUserAgentName(RequestTelemetry request)
+         => request?.Context?.User?.Id ?? string.Empty;
     }
 }
