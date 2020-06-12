@@ -6,64 +6,26 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 {
     public class FilterRequestsProcessorShould
     {
-        private readonly string[] _skippedRequests =
+        [Theory]
+        [InlineData("/health", "")]
+        [InlineData("someRequests", "TestPassed")]
+        public void ReturnCorrectSequenceForRequestName(string name, string expectedSequence)
         {
-            "/health"
-        };
-
-        private readonly string[] _skippedAgents =
-        {
-            "postman"
-        };
-
-        [Fact]
-        public void PassRequestToNextIfItIsNotForbbidenRequest()
-        {
-            RequestTelemetry requestTelemetry = ProcessItems("someRequests", "NotMatter");
-
-            requestTelemetry.Sequence.Should().Be("TestPassed");
+            RequestTelemetry requestTelemetry = ProcessItems(name, "NotMatter");
+            requestTelemetry.Sequence.Should().Be(expectedSequence);
         }
 
-        [Fact]
-        public void DontPassRequestToNextIfItIsForbbidenRequest()
+        [Theory]
+        [InlineData("postman", "")]
+        [InlineData("postman/7.5", "")]
+        [InlineData("Safari", "TestPassed")]
+        [InlineData("Safari/4.23", "TestPassed")]
+        [InlineData("Chrome/4.23", "TestPassed")]
+        [InlineData("Opera/4.23", "TestPassed")]
+        public void ReturnCorrectSequenceForUserAgent(string agentName, string expectedSequence)
         {
-            int passedRequests = 0;
-            RequestTelemetry requestTelemetry;
-            foreach (string name in _skippedRequests)
-            {
-                requestTelemetry = ProcessItems(name, "NotMatter");
-                if (requestTelemetry.Sequence.Equals("TestPassed"))
-                {
-                    passedRequests++;
-                }
-            }
-
-            passedRequests.Should().Be(0);
-        }
-
-        [Fact]
-        public void PassRequestToNextIfItIsNotForbbidenUserAgent()
-        {
-            RequestTelemetry requestTelemetry = ProcessItems("someRequests", "Safari/4.23");
-
-            requestTelemetry.Sequence.Should().Be("TestPassed");
-        }
-
-        [Fact]
-        public void DontPassRequestToNextIfItIsForbbidenUserAgent()
-        {
-            int passedRequests = 0;
-            RequestTelemetry requestTelemetry;
-            foreach (string agentName in _skippedAgents)
-            {
-                requestTelemetry = ProcessItems("someRequests", agentName);
-                if (requestTelemetry.Sequence.Equals("TestPassed"))
-                {
-                    passedRequests++;
-                }
-            }
-
-            passedRequests.Should().Be(0);
+            RequestTelemetry requestTelemetry = ProcessItems("someRequests", agentName);
+            requestTelemetry.Sequence.Should().Be(expectedSequence);
         }
 
         private RequestTelemetry ProcessItems(string name, string agentName)
