@@ -30,7 +30,7 @@
     <PackageReference Include="Azure.Identity" Version="1.1.1" />
     <PackageReference Include="Kros.Identity.Extensions" Version="0.4.2" />
     <PackageReference Include="Kros.Utils" Version="1.10.1" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.8.2" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="3.0.0" />
