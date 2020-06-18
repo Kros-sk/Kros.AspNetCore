@@ -23,7 +23,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             ApplicationInsightsOptions options = GetApplicationInsightsOptions(configuration);
             services
-                .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
+                .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
+                {
                     EnableAdaptiveSampling = false
                 })
                 .AddApplicationInsightsTelemetryProcessor<FilterSyntheticRequestsProcessor>()
@@ -33,6 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddSingleton<ITelemetryInitializer>(new CloudRoleNameInitializer(options.ServiceName));
             }
             services.AddSingleton<ITelemetryInitializer, UserIdFromUserAgentInitializer>();
+            services.AddSingleton<ITelemetryInitializer, UserCompanyInitializer>();
 
             return services;
         }

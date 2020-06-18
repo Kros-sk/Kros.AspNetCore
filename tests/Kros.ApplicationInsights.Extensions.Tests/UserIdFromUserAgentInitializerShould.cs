@@ -2,7 +2,6 @@
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
-using System;
 using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
@@ -30,6 +29,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             (telemetry as RequestTelemetry).Context.User.Id.Should().NotBe("User-Agent");
         }
+
         private ITelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
