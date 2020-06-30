@@ -40,9 +40,9 @@ namespace Kros.AspNetCore.Middlewares
                                                as Microsoft.AspNetCore.Http.Features.IEndpointFeature;
                 var endpoint = endpointFeature?.Endpoint;
 
-                if (endpoint != null)
+                if (endpoint is RouteEndpoint e && e?.RoutePattern != null)
                 {
-                    rawText += $" {(endpoint as RouteEndpoint)?.RoutePattern?.RawText}";
+                    rawText += $" {e.RoutePattern.RawText}";
                 }
 
                 var claimsIdentity = new ClaimsIdentity(new[] { new Claim(RoutePatternClaimType, rawText) });
