@@ -33,6 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddSingleton<ITelemetryInitializer>(new CloudRoleNameInitializer(options.ServiceName));
             }
             services.AddSingleton<ITelemetryInitializer, UserIdFromUserAgentInitializer>();
+            services.AddSingleton<ITelemetryInitializer, RoutePatternInitializer>();
 
             return services;
         }
