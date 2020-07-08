@@ -151,6 +151,9 @@
     <comment>0- Service name
 1 - Section name</comment>
   </data>
+  <data name="ServiceTypeWithtouAttribute" xml:space="preserve">
+    <value>Service type '{0}' of enum '{1}' does not have correctly set attribute '{2}'.</value>
+  </data>
   <data name="UnknownStatusCode" xml:space="preserve">
     <value>Request returned unknown status code: {0}.</value>
     <comment>0 - status code</comment>
