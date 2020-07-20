@@ -38,10 +38,10 @@ namespace Kros.MassTransit.AzureServiceBus
         public int TokenTimeToLive { get; set; }
 
         /// <summary>
-        /// Message type prefix.
+        /// Topic name prefix.
         /// </summary>
         /// <remarks>Used by MassTransit for creating topic names.</remarks>
-        public string MessageTypePrefix { get; set; }
+        public string TopicNamePrefix { get; set; }
 
         /// <summary>
         /// Dictionary of supported service bus endpoints.
