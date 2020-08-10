@@ -143,7 +143,7 @@ Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `
 
 ## BaseStartup
 
-Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` režime sú pre `CORS` povolené všetky domény.
+Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` a `test` režime sú pre `CORS` povolené všetky domény.
 
 ## Authorization
 

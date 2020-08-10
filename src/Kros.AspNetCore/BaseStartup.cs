@@ -41,7 +41,7 @@ namespace Kros.AspNetCore
         /// <param name="services">IoC container.</param>
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            if (Environment.IsDevelopment())
+            if (Environment.IsTestOrDevelopment())
             {
                 services.AddAllowAnyOriginCors();
             }
@@ -59,7 +59,7 @@ namespace Kros.AspNetCore
         /// <param name="loggerFactory">The logger factory.</param>
         public virtual void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            if (Environment.IsDevelopment())
+            if (Environment.IsTestOrDevelopment())
             {
                 app.UseAllowAllOriginsCors();
             }
