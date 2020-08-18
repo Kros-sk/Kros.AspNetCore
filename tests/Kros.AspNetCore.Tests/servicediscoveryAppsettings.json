@@ -1,0 +1,26 @@
+{
+  "Services": {
+    "Users": {
+      "downstreamPath": "http://localhost:9003",
+      "paths": {
+        "getAll": "/api/users",
+        "getById":  "/api/users/{id}"
+      }
+    },
+    "projects": {
+      "DownstreamPath": "http://localhost:9002",
+      "paths": {
+        "create": "/api/projects"
+      }
+    },
+    "Authorization": {
+      "DownstreamPath": "https://authorizationService.domain.com"
+    }
+  },
+
+  "ApiServices": {
+    "ToDos": {
+      "DownstreamPath": "http://localhost:9004"
+    }
+  }
+}

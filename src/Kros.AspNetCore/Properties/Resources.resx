@@ -123,6 +123,9 @@
   <data name="BadRequest" xml:space="preserve">
     <value>User request is invalid.</value>
   </data>
+  <data name="Conflict" xml:space="preserve">
+    <value>User request cannot be finished because of conflict(409).</value>
+  </data>
   <data name="ErrorHandlingMiddleware_StatusCodeChange" xml:space="preserve">
     <value>Exception {0} was thrown during request pipeline. Status code of the response was changed to {1}.</value>
     <comment>0 - Full type name of exception.
@@ -137,6 +140,23 @@
   </data>
   <data name="NotFound" xml:space="preserve">
     <value>Resource was not found.</value>
+  </data>
+  <data name="PathDefinitionDoesntExist" xml:space="preserve">
+    <value>Service '{0}' does not have definition for path '{1}'.</value>
+    <comment>0- Service name
+1 - Path name</comment>
+  </data>
+  <data name="ServiceDefinitionDoesntExist" xml:space="preserve">
+    <value>Service '{0}' does not exist in configuration section '{1}'.</value>
+    <comment>0- Service name
+1 - Section name</comment>
+  </data>
+  <data name="ServiceTypeWithtouAttribute" xml:space="preserve">
+    <value>Service type '{0}' of enum '{1}' does not have correctly set attribute '{2}'.</value>
+  </data>
+  <data name="UnknownStatusCode" xml:space="preserve">
+    <value>Request returned unknown status code: {0}.</value>
+    <comment>0 - status code</comment>
   </data>
   <data name="UserDoNotHavePermissionToAccessRequestedResource" xml:space="preserve">
     <value>User does not have permission to access requested resource.</value>

@@ -19,13 +19,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.ApplicationInsights.Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.Swagger.Extensions", "src\Kros.Swagger.Extensions\Kros.Swagger.Extensions.csproj", "{BC8159E1-64B5-404E-917F-F17330AC6624}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kros.MassTransit.AzureServiceBus", "src\Kros.MassTransit.AzureServiceBus\Kros.MassTransit.AzureServiceBus.csproj", "{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.MassTransit.AzureServiceBus", "src\Kros.MassTransit.AzureServiceBus\Kros.MassTransit.AzureServiceBus.csproj", "{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{821CE0B1-32F3-42A6-9169-B7EDAFA86FB2}"
 	ProjectSection(SolutionItems) = preProject
 		build-ci.yml = build-ci.yml
 		build.yml = build.yml
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.ApplicationInsights.Extensions.Tests", "tests\Kros.ApplicationInsights.Extensions.Tests\Kros.ApplicationInsights.Extensions.Tests.csproj", "{3D90E8DD-C871-4B50-B610-B854E65807F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,10 @@ Global
 		{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D90E8DD-C871-4B50-B610-B854E65807F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D90E8DD-C871-4B50-B610-B854E65807F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D90E8DD-C871-4B50-B610-B854E65807F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D90E8DD-C871-4B50-B610-B854E65807F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{879989F6-7103-4F06-A865-E862EBC31468} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
 		{BC8159E1-64B5-404E-917F-F17330AC6624} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
 		{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
+		{3D90E8DD-C871-4B50-B610-B854E65807F1} = {F2FE0B51-B10D-491C-AC69-1C9D08D4514E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF06D895-E4AC-4374-95F5-89F47567F9F6}

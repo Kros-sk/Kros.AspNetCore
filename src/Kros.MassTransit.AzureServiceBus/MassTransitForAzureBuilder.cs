@@ -21,6 +21,7 @@ namespace Kros.MassTransit.AzureServiceBus
         private readonly string _connectionString;
         private TimeSpan _tokenTimeToLive;
         private readonly IServiceProvider _provider;
+        private readonly string _topicNamePrefix;
         private Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> _busConfigurator;
         private readonly List<Endpoint> _endpoints = new List<Endpoint>();
         private Endpoint _currentEndpoint;
@@ -68,6 +69,7 @@ namespace Kros.MassTransit.AzureServiceBus
                 ? TimeSpan.FromSeconds(options.TokenTimeToLive)
                 : ConfigDefaults.TokenTimeToLive;
             _provider = provider;
+            _topicNamePrefix = options.TopicNamePrefix;
         }
 
         /// <summary>
@@ -167,7 +169,8 @@ namespace Kros.MassTransit.AzureServiceBus
                 IServiceBusHost host = CreateServiceHost(busCfg);
 
                 ConfigureServiceBus(busCfg, host);
-                AddEndpoints(busCfg, host);
+                AddMessageTypePrefix(busCfg);
+                AddEndpoints(busCfg);
 
                 if (_provider != null)
                 {
@@ -220,12 +223,20 @@ namespace Kros.MassTransit.AzureServiceBus
         /// Adds endpoints to service bus.
         /// </summary>
         /// <param name="busCfg">Service bus configuration.</param>
-        /// <param name="host">Service bus host.</param>
-        private void AddEndpoints(IServiceBusBusFactoryConfigurator busCfg, IServiceBusHost host)
+        private void AddEndpoints(IServiceBusBusFactoryConfigurator busCfg)
         {
             foreach (Endpoint endpoint in _endpoints)
             {
-                endpoint.SetEndpoint(busCfg, host);
+                endpoint.SetEndpoint(busCfg);
+            }
+        }
+
+        private void AddMessageTypePrefix(IServiceBusBusFactoryConfigurator configurator)
+        {
+            if (!string.IsNullOrWhiteSpace(_topicNamePrefix))
+            {
+                configurator.MessageTopology.SetEntityNameFormatter(
+                    new PrefixEntityNameFormatter(configurator.MessageTopology.EntityNameFormatter, _topicNamePrefix));
             }
         }
 

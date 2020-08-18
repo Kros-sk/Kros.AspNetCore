@@ -63,6 +63,10 @@ namespace Kros.AspNetCore.Middlewares
             {
                 SetResponseType(context, ex, StatusCodes.Status408RequestTimeout);
             }
+            catch (RequestConflictException ex)
+            {
+                SetResponseType(context, ex, StatusCodes.Status409Conflict);
+            }
             catch (Exception ex) when (!context.Response.HasStarted && IsSuccessStatusCode(context.Response.StatusCode))
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
