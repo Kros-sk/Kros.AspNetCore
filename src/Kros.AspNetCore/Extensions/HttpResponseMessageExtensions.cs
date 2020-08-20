@@ -27,7 +27,7 @@ namespace Kros.AspNetCore.Extensions
                     case System.Net.HttpStatusCode.Unauthorized:
                         throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
                     case System.Net.HttpStatusCode.BadRequest:
-                        throw new BadRequestException();
+                        throw new BadRequestException(response.Content.ReadAsStringAsync().Result);
                     case System.Net.HttpStatusCode.Conflict:
                         throw new RequestConflictException();
                     default:

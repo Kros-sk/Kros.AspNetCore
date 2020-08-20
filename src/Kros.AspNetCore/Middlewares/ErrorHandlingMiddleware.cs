@@ -81,6 +81,7 @@ namespace Kros.AspNetCore.Middlewares
             {
                 context.Response.ClearExceptCorsHeaders();
                 context.Response.StatusCode = statusCode;
+                context.Response.WriteAsync(ex.Message).Wait();
                 LogStatusCodeChange(ex, statusCode);
             }
             _logger.LogError(ex, ex.Message);
