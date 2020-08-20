@@ -37,9 +37,13 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void ThrowsBadRequestExceptionForStatusCode400()
         {
-            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest };
+            var response = new HttpResponseMessage {
+                StatusCode = HttpStatusCode.BadRequest,
+                Content = new StringContent("Bad request reason")
+            };
+
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<BadRequestException>();
+            act.Should().ThrowExactly<BadRequestException>().WithMessage("Bad request reason");
         }
 
         [Fact]
