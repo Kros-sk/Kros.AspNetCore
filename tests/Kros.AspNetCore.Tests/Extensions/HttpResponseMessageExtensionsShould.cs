@@ -11,7 +11,7 @@ namespace Kros.AspNetCore.Tests.Extensions
     public class HttpResponseMessageExtensionsShould
     {
         [Fact]
-        public void ThrowsForbidenExceptionForStatusCode403()
+        public void ThrowsForbiddenExceptionForStatusCode403()
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
