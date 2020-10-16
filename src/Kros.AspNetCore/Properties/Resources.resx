@@ -146,6 +146,9 @@
     <comment>0- Service name
 1 - Path name</comment>
   </data>
+  <data name="PaymentRequired" xml:space="preserve">
+    <value>Payment required.</value>
+  </data>
   <data name="ServiceDefinitionDoesntExist" xml:space="preserve">
     <value>Service '{0}' does not exist in configuration section '{1}'.</value>
     <comment>0- Service name
