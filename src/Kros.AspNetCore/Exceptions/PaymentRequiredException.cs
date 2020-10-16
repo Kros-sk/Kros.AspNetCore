@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Kros.AspNetCore.Exceptions
 {
     /// <summary>
-    ///  The exception which is thrown when request cannot be completed because of conflict.
+    ///  The exception which is thrown when request cannot be completed because of missing payment.
     /// </summary>
-    public class RequestConflictException : Exception
+    public class PaymentRequiredException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="RequestConflictException"/> class.
+        /// Initializes a new instance of <see cref="PaymentRequiredException"/> class.
         /// </summary>
-        public RequestConflictException()
-            : this(Properties.Resources.Conflict)
+        public PaymentRequiredException()
+            : this(Properties.Resources.PaymentRequired)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="RequestConflictException"/> class.
+        /// Initializes a new instance of <see cref="PaymentRequiredException"/> class.
         /// </summary>
         /// <param name="message">Message.</param>
-        public RequestConflictException(string message)
+        public PaymentRequiredException(string message)
             : base(message)
         {
         }

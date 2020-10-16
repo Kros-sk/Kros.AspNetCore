@@ -11,9 +11,17 @@ namespace Kros.AspNetCore.Tests.Extensions
     public class HttpResponseMessageExtensionsShould
     {
         [Fact]
-        public void ThrowsForbideenExceptionForStatusCode403()
+        public void ThrowsForbidenExceptionForStatusCode403()
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
+            Action act = () => response.ThrowIfNotSuccessStatusCode();
+            act.Should().ThrowExactly<ResourceIsForbiddenException>();
+        }
+
+        [Fact]
+        public void ThrowsPaymentRequiredExceptionForStatusCode402()
+        {
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.PaymentRequired };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
             act.Should().ThrowExactly<ResourceIsForbiddenException>();
         }
