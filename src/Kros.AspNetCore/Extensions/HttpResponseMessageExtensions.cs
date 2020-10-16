@@ -26,6 +26,8 @@ namespace Kros.AspNetCore.Extensions
                         throw new NotFoundException();
                     case System.Net.HttpStatusCode.Unauthorized:
                         throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
+                    case System.Net.HttpStatusCode.PaymentRequired:
+                        throw new PaymentRequiredException();
                     case System.Net.HttpStatusCode.BadRequest:
                         throw new BadRequestException(response.Content.ReadAsStringAsync().Result);
                     case System.Net.HttpStatusCode.Conflict:
