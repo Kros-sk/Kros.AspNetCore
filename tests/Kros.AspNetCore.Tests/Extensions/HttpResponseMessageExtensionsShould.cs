@@ -23,7 +23,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             var response = new HttpResponseMessage { StatusCode = HttpStatusCode.PaymentRequired };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<ResourceIsForbiddenException>();
+            act.Should().ThrowExactly<PaymentRequiredException>();
         }
 
         [Fact]
