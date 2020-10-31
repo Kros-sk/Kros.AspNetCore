@@ -3,17 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Version>2.18.0</Version>
-    <Authors>KROS a. s.</Authors>
-    <Company>KROS a. s.</Company>
     <Description>General utilities and helpers for building ASP.NET Core WEB API</Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageIcon>packageIcon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
     <PackageTags>ASP.NET Core;Utils;Utility;Helpers;Extensions;</PackageTags>
