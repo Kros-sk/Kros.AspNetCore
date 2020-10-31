@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kros.Utils" Version="1.15.0" />
+    <PackageReference Include="Kros.Utils" Version="1.16.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.9" />
