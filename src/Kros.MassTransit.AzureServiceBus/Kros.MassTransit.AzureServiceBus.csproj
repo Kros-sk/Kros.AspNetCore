@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kros.Utils" Version="1.16.0" />
+    <PackageReference Include="Kros.Utils" Version="1.16.2" />
     <PackageReference Include="MassTransit.AspNetCore" Version="6.2.5" />
     <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="6.2.5" />
     <PackageReference Include="Scrutor" Version="3.2.2" />
