@@ -105,7 +105,7 @@ namespace Kros.MassTransit.Analyzers
             string typeName = type?.Name;
 
             string prefix = type.TypeKind == TypeKind.Interface ? MessagePrefix : string.Empty;
-            if ($"{prefix}{endpointKeyName}{MessageSufix}" != typeName)
+            if (typeName != $"{prefix}{endpointKeyName}{MessageSufix}")
             {
                 var diagnostic = Diagnostic.Create(_rule, location, new Dictionary<string, string>()
                     { { NewNameProperty, GetNewName(type.TypeKind, typeName)} }.ToImmutableDictionary(),
