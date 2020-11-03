@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kros.MassTransit.Analyzers\Kros.MassTransit.Analyzers\Kros.MassTransit.Analyzers.csproj">
+    <ProjectReference Include="..\Kros.MassTransit.Analyzers\Kros.MassTransit.Analyzers.csproj">
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
       <IncludeAssets>Kros.MassTransit.Analyzers.dll</IncludeAssets>
     </ProjectReference>
