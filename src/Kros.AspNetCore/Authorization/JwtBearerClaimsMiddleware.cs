@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Kros.AspNetCore.Authorization
 {
     /// <summary>
-    /// Adds claims from bearer authorization jwt token to current request.
+    /// Adds claims from jwt bearer token to current request.
     /// </summary>
     public class JwtBearerClaimsMiddleware
     {
