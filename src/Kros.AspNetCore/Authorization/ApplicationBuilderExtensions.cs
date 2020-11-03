@@ -43,5 +43,13 @@ namespace Kros.AspNetCore.Authorization
             this IApplicationBuilder app,
             Func<GatewayJwtAuthorizationOptions> configureOptions)
             => app.UseMiddleware<GatewayAuthorizationMiddleware>(configureOptions());
+
+        /// <summary>
+        /// Add JwtBearerClaims middleware.
+        /// </summary>
+        /// <param name="app"><see cref="IApplicationBuilder"/> where middleware is added.</param>
+        public static IApplicationBuilder UseJwtBearerClaims(
+            this IApplicationBuilder app)
+            => app.UseMiddleware<JwtBearerClaimsMiddleware>();
     }
 }
