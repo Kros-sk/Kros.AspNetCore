@@ -53,7 +53,7 @@ namespace Kros.AspNetCore.Authorization
                 string authHeaderToken = authHeader.First();
                 if (authHeaderToken.StartsWith(AuthTokenPrefix))
                 {
-                    tokenValue = authHeaderToken.ToString().Substring(AuthTokenPrefix.Length);
+                    tokenValue = authHeaderToken.Substring(AuthTokenPrefix.Length);
                     return true;
                 }
             }
