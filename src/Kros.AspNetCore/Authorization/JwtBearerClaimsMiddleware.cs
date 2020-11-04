@@ -1,5 +1,6 @@
 ﻿using Kros.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -34,12 +35,15 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="httpContext">The http context.</param>
         public async Task Invoke(HttpContext httpContext)
         {
-            string authHeader = httpContext.Request.Headers[HeaderNames.Authorization];
-            if (authHeader.StartsWith(AuthTokenPrefix))
+            if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues authHeader)
+                && authHeader.ToString().StartsWith(AuthTokenPrefix))
             {
-                string tokenValue = authHeader.Substring(AuthTokenPrefix.Length);
-                JwtSecurityToken token = _tokenHandler.ReadJwtToken(tokenValue);
-                httpContext.User.AddIdentity(new ClaimsIdentity(token.Claims));
+                string tokenValue = authHeader.ToString().Substring(AuthTokenPrefix.Length);
+                if (_tokenHandler.CanReadToken(tokenValue))
+                {
+                    JwtSecurityToken token = _tokenHandler.ReadJwtToken(tokenValue);
+                    httpContext.User.AddIdentity(new ClaimsIdentity(token.Claims));
+                }
             }
 
             await _next(httpContext);
