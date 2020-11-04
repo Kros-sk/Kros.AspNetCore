@@ -79,7 +79,7 @@ namespace Kros.MassTransit.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The endpoint key name doesn&apos;t match the message type name..
+        ///   Looks up a localized string similar to The endpoint key name does not match the message type name..
         /// </summary>
         internal static string EndpointKeyNamingAnalyzerTitle {
             get {

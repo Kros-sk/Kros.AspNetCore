@@ -59,7 +59,7 @@ namespace Kros.MassTransit.Analyzers
             {
                 ArgumentSyntax invocationArgument = node.ArgumentList.Arguments.FirstOrDefault();
                 TypeSyntax genericType = name.TypeArgumentList.Arguments.FirstOrDefault();
-                if (invocationArgument == null || genericType == null)
+                if (invocationArgument is null || genericType is null)
                 {
                     return;
                 }
