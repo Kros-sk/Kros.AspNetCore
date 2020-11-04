@@ -156,6 +156,9 @@ and then register `app.UseGatewayJwtAuthorization()` to the pipeline.
 
 You can use `JwtAuthorizationHelper` to generate a Jwt token.
 
+If you need to use claims from credential token right away, adding `JwtBearerClaimsMiddleware` after `GatewayAuthorizationMiddleware` will add claims from cretential token to httpContext claims.
+To add `JwtBearerClaimsMiddleware` register it's dependencies with `services.AddJwtBearerClaims` and register `app.UseJwtBearerClaims` to the pipeline. 
+
 ## JsonPatchDocumentExtensions
 
 This package contains extension for mapping JSON patch operations paths from `JsonPatchDocument<TModel>` class to database columns names.
