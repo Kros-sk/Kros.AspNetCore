@@ -69,9 +69,56 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
             action.Should().Throw<ArgumentException>();
         }
 
+        [Theory]
+        [InlineData(TestServiceType.UsersServiceType, "http://localhost:9003/")]
+        [InlineData(TestServiceType.ProjectsServiceType, "http://localhost:9002/")]
+        [InlineData(TestServiceType.AuthorizationServiceType, "https://authorizationservice.domain.com/")]
+        public void FindServiceUriByType(TestServiceType serviceType, string expectedUri)
+        {
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+
+            Uri uri = provider.GetService(serviceType);
+
+            uri.AbsoluteUri.Should().Be(expectedUri);
+        }
+
+        [Theory]
+        [InlineData(TestServiceType.UsersServiceType, "getAll", "http://localhost:9003/api/users")]
+        [InlineData(TestServiceType.UsersServiceType, "getById", "http://localhost:9003/api/users/{id}")]
+        [InlineData(TestServiceType.ProjectsServiceType, "create", "http://localhost:9002/api/projects")]
+        public void FindPathUriByServiceTypeAndPathName(TestServiceType serviceType, string pathName, string expectedUri)
+        {
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+
+            Uri uri = provider.GetPath(serviceType, pathName);
+
+            uri.ToString().Should().Be(expectedUri);
+        }
+
+        [Fact]
+        public void ThrowExceptionIfServiceTypeWithoutAttribute()
+        {
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+
+            Action action = () => provider.GetService(TestServiceType.WithtoutParameter);
+
+            action.Should().Throw<ArgumentException>();
+        }
+
         private static IConfiguration GetConfiguration() =>
             new ConfigurationBuilder()
                 .AddJsonFile("servicediscoveryAppsettings.json")
                 .Build();
+    }
+
+    public enum TestServiceType
+    {
+        [ServiceName("Authorization")]
+        AuthorizationServiceType,
+        [ServiceName("Users")]
+        UsersServiceType,
+        [ServiceName("projects")]
+        ProjectsServiceType,
+        WithtoutParameter
     }
 }

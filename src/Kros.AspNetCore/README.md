@@ -143,7 +143,7 @@ Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `
 
 ## BaseStartup
 
-Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` režime sú pre `CORS` povolené všetky domény.
+Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfiguráciu `CORS` policy. V `development` a `test` režime sú pre `CORS` povolené všetky domény.
 
 ## Authorization
 
@@ -253,6 +253,30 @@ services.AddServiceDiscovery();
 
 ```CSharp
 provider.GetPath("authorization","jwt");
+```
+
+Druhá možnosť ako používať provider na získanie služby, je vytvoriť si ľuboboľný Enum na rozlíšenie služieb, a jednotlivým hodnotám enumu nastaviť atribút `ServiceNameAttribute`
+
+```CSharp
+public enum ServiceType
+{
+    [ServiceName("authorization")]
+    Authorization,
+    [ServiceName("organizations")]
+    Organizations,
+    [ServiceName("toDos")]
+    ToDos
+} 
+```
+
+Potom je možné volať získavanie služieb pomocou hodnôt enumu
+
+```CSharp
+provider.GetPath(ServiceType.Authorization, "jwt");
+```
+alebo
+```CSharp
+provider.GetService(ServiceType.Organizations);
 ```
 
 ### GatewayAuthorizationMiddleware

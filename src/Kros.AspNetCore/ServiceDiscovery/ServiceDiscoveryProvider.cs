@@ -3,6 +3,7 @@ using Kros.Extensions;
 using Kros.Utils;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 
 namespace Kros.AspNetCore.ServiceDiscovery
 {
@@ -44,6 +45,10 @@ namespace Kros.AspNetCore.ServiceDiscovery
         }
 
         /// <inheritdoc />
+        public Uri GetPath(Enum serviceType, string pathName)
+            => GetPath(GetServiceNameFromEnumAttribute(serviceType), pathName);
+
+        /// <inheritdoc />
         public Uri GetService(string serviceName)
         {
             string uri = _configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:DownstreamPath");
@@ -55,6 +60,26 @@ namespace Kros.AspNetCore.ServiceDiscovery
             }
 
             return new Uri(uri);
+        }
+
+        /// <inheritdoc />
+        public Uri GetService(Enum serviceType)
+            => GetService(GetServiceNameFromEnumAttribute(serviceType));
+
+        private string GetServiceNameFromEnumAttribute(Enum enumValue)
+        {
+            var serviceNameAttribute = (ServiceNameAttribute)enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault()
+                .GetCustomAttributes(typeof(ServiceNameAttribute), false).FirstOrDefault();
+            if (serviceNameAttribute == null)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        Resources.ServiceTypeWithtouAttribute,
+                        enumValue.ToString(),
+                        enumValue.GetType().Name,
+                        nameof(ServiceNameAttribute)));
+            }
+            return serviceNameAttribute.ServiceName;
         }
     }
 }

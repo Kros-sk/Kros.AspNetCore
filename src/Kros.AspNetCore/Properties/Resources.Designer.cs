@@ -142,6 +142,15 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Service type &apos;{0}&apos; of enum &apos;{1}&apos; does not have correctly set attribute &apos;{2}&apos;..
+        /// </summary>
+        internal static string ServiceTypeWithtouAttribute {
+            get {
+                return ResourceManager.GetString("ServiceTypeWithtouAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Request returned unknown status code: {0}..
         /// </summary>
         internal static string UnknownStatusCode {
