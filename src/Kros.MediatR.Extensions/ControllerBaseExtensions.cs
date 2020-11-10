@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.Mvc
         {
             var ret = new { id = await controller.Mediator().Send(command) };
             string url = actionName != null
-                ? controller.Url.Link(actionName, ret)
+                ? controller.Url.Link(actionName, ret) ?? string.Empty
                 : string.Empty;
 
             return controller.Created(url, ret);

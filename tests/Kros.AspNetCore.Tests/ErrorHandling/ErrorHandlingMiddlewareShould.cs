@@ -19,6 +19,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             (new JsonPatchException(), StatusCodes.Status400BadRequest),
             (new BadRequestException(), StatusCodes.Status400BadRequest),
             (new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized),
+            (new PaymentRequiredException(), StatusCodes.Status402PaymentRequired),
             (new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden),
             (new NotFoundException(), StatusCodes.Status404NotFound),
             (new TimeoutException(), StatusCodes.Status408RequestTimeout),

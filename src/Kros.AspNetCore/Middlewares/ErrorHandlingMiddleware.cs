@@ -51,6 +51,10 @@ namespace Kros.AspNetCore.Middlewares
             {
                 SetResponseType(context, ex, StatusCodes.Status401Unauthorized);
             }
+            catch (PaymentRequiredException ex)
+            {
+                SetResponseType(context, ex, StatusCodes.Status402PaymentRequired);
+            }
             catch (ResourceIsForbiddenException ex)
             {
                 SetResponseType(context, ex, StatusCodes.Status403Forbidden);
@@ -81,6 +85,7 @@ namespace Kros.AspNetCore.Middlewares
             {
                 context.Response.ClearExceptCorsHeaders();
                 context.Response.StatusCode = statusCode;
+                context.Response.WriteAsync(ex.Message).Wait();
                 LogStatusCodeChange(ex, statusCode);
             }
             _logger.LogError(ex, ex.Message);

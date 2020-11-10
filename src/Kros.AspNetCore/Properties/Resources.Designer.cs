@@ -133,6 +133,15 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Payment required..
+        /// </summary>
+        internal static string PaymentRequired {
+            get {
+                return ResourceManager.GetString("PaymentRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Service &apos;{0}&apos; does not exist in configuration section &apos;{1}&apos;..
         /// </summary>
         internal static string ServiceDefinitionDoesntExist {

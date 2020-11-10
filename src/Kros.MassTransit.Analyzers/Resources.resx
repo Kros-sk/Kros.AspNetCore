@@ -1,17 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -117,51 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AuthorizationServiceForbiddenRequest" xml:space="preserve">
-    <value>Authorization service forbidden this request.</value>
+  <data name="EndpointKeyNamingAnalyzerDescription" xml:space="preserve">
+    <value>The endpoint key name must match the message type name.</value>
   </data>
-  <data name="BadRequest" xml:space="preserve">
-    <value>User request is invalid.</value>
+  <data name="EndpointKeyNamingAnalyzerMessageFormat" xml:space="preserve">
+    <value>The endpoint key name `{0}` must match the message type name `{1}`.</value>
   </data>
-  <data name="Conflict" xml:space="preserve">
-    <value>User request cannot be finished because of conflict(409).</value>
+  <data name="EndpointKeyNamingAnalyzerTitle" xml:space="preserve">
+    <value>The endpoint key name does not match the message type name.</value>
+    <comment>The title of the diagnostic.</comment>
   </data>
-  <data name="ErrorHandlingMiddleware_StatusCodeChange" xml:space="preserve">
-    <value>Exception {0} was thrown during request pipeline. Status code of the response was changed to {1}.</value>
-    <comment>0 - Full type name of exception.
-1 - New status code for response (number).</comment>
-  </data>
-  <data name="GatewayJwtAuthorizationMissingSection" xml:space="preserve">
-    <value>'{0}' configuration section is missing or empty.</value>
-    <comment>0 - Name of the section.</comment>
-  </data>
-  <data name="IdentityHealthCheckBuilderName" xml:space="preserve">
-    <value> IdentityServer handler for scheme {0}</value>
-  </data>
-  <data name="NotFound" xml:space="preserve">
-    <value>Resource was not found.</value>
-  </data>
-  <data name="PathDefinitionDoesntExist" xml:space="preserve">
-    <value>Service '{0}' does not have definition for path '{1}'.</value>
-    <comment>0- Service name
-1 - Path name</comment>
-  </data>
-  <data name="PaymentRequired" xml:space="preserve">
-    <value>Payment required.</value>
-  </data>
-  <data name="ServiceDefinitionDoesntExist" xml:space="preserve">
-    <value>Service '{0}' does not exist in configuration section '{1}'.</value>
-    <comment>0- Service name
-1 - Section name</comment>
-  </data>
-  <data name="ServiceTypeWithtouAttribute" xml:space="preserve">
-    <value>Service type '{0}' of enum '{1}' does not have correctly set attribute '{2}'.</value>
-  </data>
-  <data name="UnknownStatusCode" xml:space="preserve">
-    <value>Request returned unknown status code: {0}.</value>
-    <comment>0 - status code</comment>
-  </data>
-  <data name="UserDoNotHavePermissionToAccessRequestedResource" xml:space="preserve">
-    <value>User does not have permission to access requested resource.</value>
+  <data name="EndpointKeyNamingCodeFixTitle" xml:space="preserve">
+    <value>Rename to match message name</value>
   </data>
 </root>
