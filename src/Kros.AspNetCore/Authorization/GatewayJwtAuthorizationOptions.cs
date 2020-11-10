@@ -53,8 +53,13 @@ namespace Kros.AspNetCore.Authorization
         public TimeSpan CacheSlidingExpirationOffset { get; set; } = TimeSpan.Zero;
 
         /// <summary>
-        /// Paths that do not use JWT authorization caching
+        /// Paths that do not use JWT authorization caching.
         /// </summary>
         public List<string> IgnoredPathForCache { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// Headers which if are in request, will be forwarded to client.
+        /// </summary>
+        public List<string> ForwardedHeaders { get; private set; } = new List<string>();
     }
 }

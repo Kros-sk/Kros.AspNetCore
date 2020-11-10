@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -129,12 +130,27 @@ namespace Kros.AspNetCore.Authorization
                 {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
                 }
+                if (_jwtAuthorizationOptions.ForwardedHeaders.Any())
+                {
+                    AddForwardedHeaders(client, httpContext.Request.Headers);
+                }
 
                 string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
                     new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
                 SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
 
                 return jwtToken;
+            }
+        }
+
+        private void AddForwardedHeaders(HttpClient client, IHeaderDictionary headers)
+        {
+            foreach (string headerName in _jwtAuthorizationOptions.ForwardedHeaders)
+            {
+                if (headers.TryGetValue(headerName, out StringValues value))
+                {
+                    client.DefaultRequestHeaders.Add(headerName, (IEnumerable<string>)value);
+                }
             }
         }
 
