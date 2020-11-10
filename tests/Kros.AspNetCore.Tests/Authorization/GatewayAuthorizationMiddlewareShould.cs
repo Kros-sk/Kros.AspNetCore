@@ -41,6 +41,42 @@ namespace Kros.AspNetCore.Tests.Authorization
         }
 
         [Fact]
+        public async void AddCustomHeaderToHeadersIfItIsInOptions()
+        {
+            List<string> forwardedHeaders = new List<string>() { "ApplicationType" };
+
+            (var httpClientFactoryMock, var middleware, var htttpClient) = CreateMiddlewareForForwardedHeaders(
+                HttpStatusCode.OK,
+                forwardedHeaders
+                );
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers.Add("ApplicationType" , "25");
+            await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
+
+            htttpClient.DefaultRequestHeaders.GetValues("ApplicationType").Should().Equal("25");
+        }
+
+        [Fact]
+        public async void NotAddCustomHeaderToHeadersIfItIsNotInOptions()
+        {
+            List<string> forwardedHeaders = new List<string>();
+
+            (var httpClientFactoryMock, var middleware, var htttpClient) = CreateMiddlewareForForwardedHeaders(
+                HttpStatusCode.OK,
+                forwardedHeaders
+                );
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers.Add("ApplicationType", "25");
+            await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
+
+            htttpClient.DefaultRequestHeaders.TryGetValues("ApplicationType", out IEnumerable<string> values).Should().BeFalse();
+        }
+
+        [Fact]
         public async void AddJwtTokenIntoHeaderWithServiceDiscovery()
         {
             (var httpClientFactoryMock, var middleware) = CreateMiddleware(
@@ -352,6 +388,30 @@ namespace Kros.AspNetCore.Tests.Authorization
             var middleware = new GatewayAuthorizationMiddleware((c) => Task.CompletedTask, options);
 
             return (httpClientFactory, middleware);
+        }
+
+        private static (IHttpClientFactory, GatewayAuthorizationMiddleware, HttpClient) CreateMiddlewareForForwardedHeaders(
+            HttpStatusCode statusCode,
+            List<string> forwardedHeaders)
+        {
+            GatewayJwtAuthorizationOptions options = new GatewayJwtAuthorizationOptions()
+            {
+                AuthorizationUrl = AuthorizationUrl,
+                HashAuthorizationUrl = HashAuthorizationUrl,
+                HashParameterName = "hash",
+                CacheSlidingExpirationOffset = TimeSpan.Zero
+            };
+            options.ForwardedHeaders.AddRange(forwardedHeaders);
+
+            var httpClientFactory = Substitute.For<IHttpClientFactory>();
+
+            FakeHttpMessageHandler fakeHttpMessageHandler = CreateFakeHttpMessageHandler(statusCode);
+            var fakeHttpClient = new HttpClient(fakeHttpMessageHandler);
+            httpClientFactory.CreateClient("JwtAuthorizationClientName").Returns(fakeHttpClient);
+
+            var middleware = new GatewayAuthorizationMiddleware((c) => Task.CompletedTask, options);
+
+            return (httpClientFactory, middleware, fakeHttpClient);
         }
 
         private static FakeHttpMessageHandler CreateFakeHttpMessageHandler(HttpStatusCode statusCode)

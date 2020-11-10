@@ -129,12 +129,28 @@ namespace Kros.AspNetCore.Authorization
                 {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
                 }
+                if(_jwtAuthorizationOptions.ForwardedHeaders.Any())
+                {
+                    AddForwardedHeaders(client, httpContext.Request.Headers);
+                }
 
                 string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
                     new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
                 SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
 
                 return jwtToken;
+            }
+        }
+
+        private void AddForwardedHeaders(HttpClient client, IHeaderDictionary headers)
+        {
+            StringValues value;
+            foreach(string headerName in _jwtAuthorizationOptions.ForwardedHeaders)
+            {
+                if(headers.TryGetValue(headerName, out value))
+                {
+                    client.DefaultRequestHeaders.Add(headerName, value.ToString());
+                }
             }
         }
 
