@@ -58,7 +58,7 @@ namespace Kros.AspNetCore.Authorization
         public List<string> IgnoredPathForCache { get; private set; } = new List<string>();
 
         /// <summary>
-        /// Headers wich if are in request, will be forwarded to client.
+        /// Headers which if are in request, will be forwarded to client.
         /// </summary>
         public List<string> ForwardedHeaders { get; private set; } = new List<string>();
     }
