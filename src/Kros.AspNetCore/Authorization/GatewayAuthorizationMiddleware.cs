@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -144,12 +145,11 @@ namespace Kros.AspNetCore.Authorization
 
         private void AddForwardedHeaders(HttpClient client, IHeaderDictionary headers)
         {
-            StringValues value;
             foreach(string headerName in _jwtAuthorizationOptions.ForwardedHeaders)
             {
-                if(headers.TryGetValue(headerName, out value))
+                if(headers.TryGetValue(headerName, out StringValues value))
                 {
-                    client.DefaultRequestHeaders.Add(headerName, value.ToString());
+                    client.DefaultRequestHeaders.Add(headerName, (IEnumerable<string>) value);
                 }
             }
         }
