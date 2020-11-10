@@ -130,7 +130,7 @@ namespace Kros.AspNetCore.Authorization
                 {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
                 }
-                if(_jwtAuthorizationOptions.ForwardedHeaders.Any())
+                if (_jwtAuthorizationOptions.ForwardedHeaders.Any())
                 {
                     AddForwardedHeaders(client, httpContext.Request.Headers);
                 }
@@ -145,11 +145,11 @@ namespace Kros.AspNetCore.Authorization
 
         private void AddForwardedHeaders(HttpClient client, IHeaderDictionary headers)
         {
-            foreach(string headerName in _jwtAuthorizationOptions.ForwardedHeaders)
+            foreach (string headerName in _jwtAuthorizationOptions.ForwardedHeaders)
             {
-                if(headers.TryGetValue(headerName, out StringValues value))
+                if (headers.TryGetValue(headerName, out StringValues value))
                 {
-                    client.DefaultRequestHeaders.Add(headerName, (IEnumerable<string>) value);
+                    client.DefaultRequestHeaders.Add(headerName, (IEnumerable<string>)value);
                 }
             }
         }
