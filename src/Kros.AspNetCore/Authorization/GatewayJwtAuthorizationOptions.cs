@@ -53,6 +53,14 @@ namespace Kros.AspNetCore.Authorization
         public TimeSpan CacheSlidingExpirationOffset { get; set; } = TimeSpan.Zero;
 
         /// <summary>
+        /// Cache absolute expiration.
+        /// </summary>
+        /// <remarks>
+        /// Default is <see cref="TimeSpan.Zero"/>.
+        /// </remarks>
+        public TimeSpan CacheAbsoluteExpiration { get; set; } = TimeSpan.Zero;
+
+        /// <summary>
         /// Paths that do not use JWT authorization caching.
         /// </summary>
         public List<string> IgnoredPathForCache { get; private set; } = new List<string>();
