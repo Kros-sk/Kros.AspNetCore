@@ -78,7 +78,7 @@ namespace Kros.AspNetCore.Authorization
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    var authUrl =
+                    string authUrl =
                         _jwtAuthorizationOptions.GetAuthorizationUrl(serviceDiscoveryProvider) + httpContext.Request.Path.Value;
                     jwtToken = await GetUserAuthorizationJwtAsync(
                         httpContext,
@@ -156,15 +156,30 @@ namespace Kros.AspNetCore.Authorization
 
         private void SetTokenToCache(IMemoryCache memoryCache, int key, string jwtToken, HttpRequest request)
         {
-            if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero &&
-                !_jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase))
+            if (IsCacheAllowed() && !IsRequestPathAllowedForCache(request))
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
+                var cacheEntryOptions = new MemoryCacheEntryOptions();
+
+                if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
+                {
+                    cacheEntryOptions.SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
+                }
+                if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
+                {
+                    cacheEntryOptions.SetAbsoluteExpiration(_jwtAuthorizationOptions.CacheAbsoluteExpiration);
+                }
 
                 memoryCache.Set(key, jwtToken, cacheEntryOptions);
             }
         }
+
+        private bool IsRequestPathAllowedForCache(HttpRequest request)
+            => _jwtAuthorizationOptions.IgnoredPathForCache
+            .Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase);
+
+        private bool IsCacheAllowed()
+            => _jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero
+                || _jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero;
 
         private static int GetKey(HttpContext httpContext, StringValues value)
             => HashCode.Combine(value, httpContext.Request.Path);

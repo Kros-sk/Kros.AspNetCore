@@ -7,9 +7,9 @@
   - [Middlewares](#middlewares)
   - [Extensions](#extensions)
     - [Configuration](#configuration)
-      - [Príklad](#pr%c3%adklad)
+      - [Príklad](#príklad)
     - [ConfigurationBuilderExtensions](#configurationbuilderextensions)
-      - [Príklad](#pr%c3%adklad-1)
+      - [Príklad](#príklad-1)
     - [DistributedCacheExtensions](#distributedcacheextensions)
     - [CorsExtensions](#corsextensions)
   - [BaseStartup](#basestartup)
@@ -296,7 +296,8 @@ Už aj `GatewayAuthorizationMiddleware` podporuje `IServiceDiscoveryProvider`
       "ServiceName": "authorization",
       "PathName": "jwt"
     },
-    "CacheSlidingExpirationOffset": "00:00:00",
+    "CacheSlidingExpirationOffset": "00:01:00",
+    "CacheAbsoluteExpiration": "00:04:00",
     "IgnoredPathForCache": [
       "/organizations"
     ]
