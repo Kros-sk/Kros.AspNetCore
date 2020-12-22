@@ -19,7 +19,8 @@ namespace Kros.MassTransit.AzureServiceBus
         #region Attributes
 
         private readonly string _connectionString;
-        private TimeSpan _tokenTimeToLive;
+        private readonly TimeSpan _tokenTimeToLive;
+        private readonly IRegistrationContext<IServiceProvider> _registrationContext;
         private readonly IServiceProvider _provider;
         private readonly string _topicNamePrefix;
         private Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> _busConfigurator;
@@ -70,6 +71,16 @@ namespace Kros.MassTransit.AzureServiceBus
                 : ConfigDefaults.TokenTimeToLive;
             _provider = provider;
             _topicNamePrefix = options.TopicNamePrefix;
+        }
+
+        /// <summary>
+        /// Ctor.
+        /// </summary>
+        /// <param name="registrationContext">MassTransit registration context.</param>
+        public MassTransitForAzureBuilder(IRegistrationContext<IServiceProvider> registrationContext)
+            : this(registrationContext.Container)
+        {
+            _registrationContext = registrationContext;
         }
 
         /// <summary>
@@ -172,9 +183,9 @@ namespace Kros.MassTransit.AzureServiceBus
                 AddMessageTypePrefix(busCfg);
                 AddEndpoints(busCfg);
 
-                if (_provider != null)
+                if (_registrationContext != null)
                 {
-                    busCfg.UseHealthCheck(_provider);
+                    busCfg.UseHealthCheck(_registrationContext);
                 }
             });
 

@@ -7,9 +7,9 @@
   - [Middlewares](#middlewares)
   - [Extensions](#extensions)
     - [Configuration](#configuration)
-      - [Príklad](#pr%c3%adklad)
+      - [Príklad](#príklad)
     - [ConfigurationBuilderExtensions](#configurationbuilderextensions)
-      - [Príklad](#pr%c3%adklad-1)
+      - [Príklad](#príklad-1)
     - [DistributedCacheExtensions](#distributedcacheextensions)
     - [CorsExtensions](#corsextensions)
   - [BaseStartup](#basestartup)
@@ -156,6 +156,9 @@ and then register `app.UseGatewayJwtAuthorization()` to the pipeline.
 
 You can use `JwtAuthorizationHelper` to generate a Jwt token.
 
+If you need to use claims from credential token right away, adding `JwtBearerClaimsMiddleware` after `GatewayAuthorizationMiddleware` will add claims from cretential token to httpContext claims.
+To add `JwtBearerClaimsMiddleware` register it's dependencies with `services.AddJwtBearerClaims` and register `app.UseJwtBearerClaims` to the pipeline. 
+
 ## JsonPatchDocumentExtensions
 
 This package contains extension for mapping JSON patch operations paths from `JsonPatchDocument<TModel>` class to database columns names.
@@ -293,7 +296,8 @@ Už aj `GatewayAuthorizationMiddleware` podporuje `IServiceDiscoveryProvider`
       "ServiceName": "authorization",
       "PathName": "jwt"
     },
-    "CacheSlidingExpirationOffset": "00:00:00",
+    "CacheSlidingExpirationOffset": "00:01:00",
+    "CacheAbsoluteExpiration": "00:04:00",
     "IgnoredPathForCache": [
       "/organizations"
     ]
