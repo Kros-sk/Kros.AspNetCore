@@ -1,4 +1,5 @@
-﻿using Kros.MassTransit.AzureServiceBus.Endpoints;
+﻿using GreenPipes.Configurators;
+using Kros.MassTransit.AzureServiceBus.Endpoints;
 using Kros.Utils;
 using MassTransit;
 using MassTransit.Azure.ServiceBus.Core;
@@ -26,6 +27,7 @@ namespace Kros.MassTransit.AzureServiceBus
         private Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> _busConfigurator;
         private readonly List<Endpoint> _endpoints = new List<Endpoint>();
         private Endpoint _currentEndpoint;
+        private Action<IRetryConfigurator> _retryConfigurator;
 
         #endregion
 
@@ -170,6 +172,21 @@ namespace Kros.MassTransit.AzureServiceBus
 
         #endregion
 
+        #region Retrying
+
+        /// <summary>
+        /// Configures message retry using the retry configuration specified.
+        /// </summary>
+        /// <param name="configure">The retry configuration.</param>
+        /// <returns></returns>
+        public IBusConsumerBuilder UseMessageRetry(Action<IRetryConfigurator> configure)
+        {
+            _retryConfigurator = configure;
+            return this;
+        }
+
+        #endregion
+
         #region Build
 
         /// <inheritdoc />
@@ -182,6 +199,11 @@ namespace Kros.MassTransit.AzureServiceBus
                 ConfigureServiceBus(busCfg, host);
                 AddMessageTypePrefix(busCfg);
                 AddEndpoints(busCfg);
+
+                if (_retryConfigurator != null)
+                {
+                    busCfg.UseMessageRetry(_retryConfigurator);
+                }
 
                 if (_registrationContext != null)
                 {
