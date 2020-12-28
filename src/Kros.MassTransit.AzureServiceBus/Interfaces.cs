@@ -81,7 +81,6 @@ namespace Kros.MassTransit.AzureServiceBus
             string subscriptionName,
             Action<IServiceBusSubscriptionEndpointConfigurator> configurator) where T : class;
 
-
         /// <summary>
         /// Configures message retry using the retry configuration specified.
         /// </summary>
