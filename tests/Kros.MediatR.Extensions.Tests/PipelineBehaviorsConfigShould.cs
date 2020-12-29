@@ -8,12 +8,12 @@ namespace Kros.MediatR.Extensions.Tests
     public class PipelineBehaviorsConfigShould
     {
         [Fact]
-        public void ReturnPipelineBehaviourAssembly()
+        public void ReturnPipelineBehaviorAssembly()
         {
             var config = new PipelineBehaviorsConfig();
             config.PipelineBehaviorsAssembly = typeof(string).Assembly;
 
-            IEnumerable<Assembly> assemblies = config.GetPipelineBehaviourAssemblies();
+            IEnumerable<Assembly> assemblies = config.GetPipelineBehaviorAssemblies();
 
             assemblies.Should().HaveCount(1);
         }

@@ -4,7 +4,7 @@ using System.Reflection;
 namespace Kros.MediatR.Extensions
 {
     /// <summary>
-    /// Config for pipeline behaviours.
+    /// Config for pipeline behaviors.
     /// </summary>
     public class PipelineBehaviorsConfig
     {
@@ -12,7 +12,7 @@ namespace Kros.MediatR.Extensions
         private readonly List<Assembly> _requestAssemblies = new List<Assembly>();
 
         /// <summary>
-        /// Assembly with pipeline behaviours.
+        /// Assembly with pipeline behaviors.
         /// </summary>
         public Assembly PipelineBehaviorsAssembly { get; set; }
 
@@ -22,10 +22,10 @@ namespace Kros.MediatR.Extensions
         public Assembly RequestsAssembly { get; set; }
 
         /// <summary>
-        /// Adds the assembly with pipeline behaviours.
+        /// Adds the assembly with pipeline behaviors.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
-        public PipelineBehaviorsConfig AddPipelineBehaviourAssembly(Assembly assembly)
+        public PipelineBehaviorsConfig AddPipelineBehaviorAssembly(Assembly assembly)
         {
             _pipelineBahviourAssemblies.Add(assembly);
             return this;
@@ -42,9 +42,9 @@ namespace Kros.MediatR.Extensions
         }
 
         /// <summary>
-        /// Gets assemblies with pipeline behaviours.
+        /// Gets assemblies with pipeline behaviors.
         /// </summary>
-        public IEnumerable<Assembly> GetPipelineBehaviourAssemblies()
+        public IEnumerable<Assembly> GetPipelineBehaviorAssemblies()
             => UnionAssemblies(_pipelineBahviourAssemblies, PipelineBehaviorsAssembly);
 
         /// <summary>

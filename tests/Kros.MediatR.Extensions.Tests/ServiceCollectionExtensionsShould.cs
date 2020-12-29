@@ -193,7 +193,7 @@ namespace Kros.MediatR.Extensions.Tests
         {
             Assembly myAssembly = GetType().Assembly;
             Services.AddPipelineBehaviorsForRequest<IFooRequest>(cfg =>
-                cfg.AddPipelineBehaviourAssembly(myAssembly)
+                cfg.AddPipelineBehaviorAssembly(myAssembly)
                     .AddRequestAssembly(myAssembly)
                     .AddRequestAssembly(typeof(string).Assembly));
 

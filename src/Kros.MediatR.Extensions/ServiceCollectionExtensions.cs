@@ -33,7 +33,7 @@ namespace Kros.MediatR.Extensions
             string requestInterfaceName = typeof(IRequest<>).Name;
 
             IList<Type> requests = GetTypes(requestType, config.GetRequestAssemblies());
-            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType, config.GetPipelineBehaviourAssemblies());
+            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType, config.GetPipelineBehaviorAssemblies());
 
             foreach (Type behavior in pipelineBehaviors)
             {
@@ -66,17 +66,17 @@ namespace Kros.MediatR.Extensions
         private static IEnumerable<Type> GetPipelineBehaviors(
             Type requestType,
             Type pipeLineType,
-            IEnumerable<Assembly> behavioursAssemblies)
+            IEnumerable<Assembly> behaviorsAssemblies)
         {
-            if (behavioursAssemblies is null || !behavioursAssemblies.Any())
+            if (behaviorsAssemblies is null || !behaviorsAssemblies.Any())
             {
                 return GetPipelineBehaviors(requestType, pipeLineType, Assembly.GetAssembly(requestType)).ToList();
             }
-            return behavioursAssemblies.SelectMany(a => GetPipelineBehaviors(requestType, pipeLineType, a));
+            return behaviorsAssemblies.SelectMany(a => GetPipelineBehaviors(requestType, pipeLineType, a));
         }
 
-        private static IEnumerable<Type> GetPipelineBehaviors(Type requestType, Type pipeLineType, Assembly behavioursAssembly)
-            => behavioursAssembly
+        private static IEnumerable<Type> GetPipelineBehaviors(Type requestType, Type pipeLineType, Assembly behaviorsAssembly)
+            => behaviorsAssembly
             .GetTypes()
             .Where(t
                 => t.GetInterface(pipeLineType.Name) != null
