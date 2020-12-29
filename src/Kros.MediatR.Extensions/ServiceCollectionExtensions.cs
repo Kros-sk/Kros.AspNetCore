@@ -32,8 +32,8 @@ namespace Kros.MediatR.Extensions
             Type pipeLineType = typeof(IPipelineBehavior<,>);
             string requestInterfaceName = typeof(IRequest<>).Name;
 
-            IList<Type> requests = GetTypes(requestType, config.RequestsAssembly);
-            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType, config.PipelineBehaviorsAssembly);
+            IList<Type> requests = GetTypes(requestType, config.GetRequestAssemblies());
+            IEnumerable<Type> pipelineBehaviors = GetPipelineBehaviors(requestType, pipeLineType, config.GetPipelineBehaviourAssemblies());
 
             foreach (Type behavior in pipelineBehaviors)
             {
@@ -63,18 +63,38 @@ namespace Kros.MediatR.Extensions
             return services;
         }
 
+        private static IEnumerable<Type> GetPipelineBehaviors(
+            Type requestType,
+            Type pipeLineType,
+            IEnumerable<Assembly> behavioursAssemblies)
+        {
+            if (behavioursAssemblies is null || !behavioursAssemblies.Any())
+            {
+                return GetPipelineBehaviors(requestType, pipeLineType, Assembly.GetAssembly(requestType)).ToList();
+            }
+            return behavioursAssemblies.SelectMany(a => GetPipelineBehaviors(requestType, pipeLineType, a));
+        }
+
         private static IEnumerable<Type> GetPipelineBehaviors(Type requestType, Type pipeLineType, Assembly behavioursAssembly)
-            => (behavioursAssembly ?? Assembly.GetAssembly(requestType))
+            => behavioursAssembly
             .GetTypes()
             .Where(t
                 => t.GetInterface(pipeLineType.Name) != null
                 && t.GetGenericArguments()[0].GetInterface(requestType.Name) != null);
 
-        private static IList<Type> GetTypes(Type type, Assembly assembly)
-            => (assembly ?? Assembly.GetAssembly(type))
+        private static IList<Type> GetTypes(Type type, IEnumerable<Assembly> assemblies)
+        {
+            if (assemblies is null || !assemblies.Any())
+            {
+                return GetTypes(type, Assembly.GetAssembly(type)).ToList();
+            }
+            return assemblies.SelectMany(a => GetTypes(type, a)).ToList();
+        }
+
+        private static IEnumerable<Type> GetTypes(Type type, Assembly assembly)
+            => assembly
             .GetTypes()
-            .Where(t => !t.IsInterface && !t.IsAbstract & type.IsAssignableFrom(t))
-            .ToList();
+            .Where(t => !t.IsInterface && !t.IsAbstract & type.IsAssignableFrom(t));
 
         /// <summary>
         /// Add <see cref="NullCheckPostProcessor{TRequest, TResponse}"/> for MediatR.

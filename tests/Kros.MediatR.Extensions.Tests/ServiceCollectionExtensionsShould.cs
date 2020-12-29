@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using MediatR.Pipeline;
 using Kros.MediatR.PostProcessors;
 using Kros.AspNetCore.Exceptions;
 using System;
+using System.Reflection;
 
 namespace Kros.MediatR.Extensions.Tests
 {
@@ -185,6 +186,20 @@ namespace Kros.MediatR.Extensions.Tests
 
             var behavior = Provider.GetRequiredService<IPipelineBehavior<TestCommand, Unit>>();
             behavior.Should().BeAssignableTo<CommandPipelineBehavior<TestCommand>>();
+        }
+
+        [Fact]
+        public void RegisterPipelineBehaviorsForRequestTypeFromConfiguredAssemblies()
+        {
+            Assembly myAssembly = GetType().Assembly;
+            Services.AddPipelineBehaviorsForRequest<IFooRequest>(cfg =>
+                cfg.AddPipelineBehaviourAssembly(myAssembly)
+                    .AddRequestAssembly(myAssembly)
+                    .AddRequestAssembly(typeof(string).Assembly));
+
+            var behavior = Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
+
+            behavior.Should().BeAssignableTo<FooPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
         }
     }
 }
