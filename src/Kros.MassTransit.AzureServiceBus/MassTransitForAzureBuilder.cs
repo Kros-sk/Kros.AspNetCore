@@ -174,11 +174,7 @@ namespace Kros.MassTransit.AzureServiceBus
 
         #region Retrying
 
-        /// <summary>
-        /// Configures message retry using the retry configuration specified.
-        /// </summary>
-        /// <param name="configure">The retry configuration.</param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IBusConsumerBuilder UseMessageRetry(Action<IRetryConfigurator> configure)
         {
             _retryConfigurator = configure;
