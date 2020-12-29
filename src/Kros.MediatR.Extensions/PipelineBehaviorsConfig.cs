@@ -8,7 +8,7 @@ namespace Kros.MediatR.Extensions
     /// </summary>
     public class PipelineBehaviorsConfig
     {
-        private readonly List<Assembly> _pipelineBahviourAssemblies = new List<Assembly>();
+        private readonly List<Assembly> _pipelineBehaviorAssemblies = new List<Assembly>();
         private readonly List<Assembly> _requestAssemblies = new List<Assembly>();
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Kros.MediatR.Extensions
         /// <param name="assembly">The assembly.</param>
         public PipelineBehaviorsConfig AddPipelineBehaviorAssembly(Assembly assembly)
         {
-            _pipelineBahviourAssemblies.Add(assembly);
+            _pipelineBehaviorAssemblies.Add(assembly);
             return this;
         }
 
@@ -45,7 +45,7 @@ namespace Kros.MediatR.Extensions
         /// Gets assemblies with pipeline behaviors.
         /// </summary>
         public IEnumerable<Assembly> GetPipelineBehaviorAssemblies()
-            => UnionAssemblies(_pipelineBahviourAssemblies, PipelineBehaviorsAssembly);
+            => UnionAssemblies(_pipelineBehaviorAssemblies, PipelineBehaviorsAssembly);
 
         /// <summary>
         /// Gets assemblies with requests.
