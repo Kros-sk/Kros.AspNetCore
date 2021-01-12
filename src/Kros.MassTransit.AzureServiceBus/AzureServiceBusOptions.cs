@@ -49,9 +49,9 @@ namespace Kros.MassTransit.AzureServiceBus
         public Dictionary<string, AzureServiceBusEndpoint> Endpoints { get; set; }
 
         /// <summary>
-        /// The retry options.
+        /// The interval retry options.
         /// </summary>
-        public AzureServiceBusRetryOptions Retry { get; set; }
+        public AzureServiceBusIntervalRetryOptions IntervalRetry { get; set; }
 
         /// <summary>
         /// Information about service bus endpoint.
@@ -71,9 +71,9 @@ namespace Kros.MassTransit.AzureServiceBus
         }
 
         /// <summary>
-        /// Service bus retry options.
+        /// Service bus interval retry options.
         /// </summary>
-        public class AzureServiceBusRetryOptions
+        public class AzureServiceBusIntervalRetryOptions
         {
             /// <summary>
             /// The retry attempts limit.
