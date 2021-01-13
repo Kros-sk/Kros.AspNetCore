@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Kros.MediatR.Extensions
@@ -8,18 +9,20 @@ namespace Kros.MediatR.Extensions
     /// </summary>
     public class PipelineBehaviorsConfig
     {
-        private readonly List<Assembly> _pipelineBehaviorAssemblies = new List<Assembly>();
-        private readonly List<Assembly> _requestAssemblies = new List<Assembly>();
+        private readonly HashSet<Assembly> _pipelineBehaviorAssemblies = new HashSet<Assembly>();
+        private readonly HashSet<Assembly> _requestAssemblies = new HashSet<Assembly>();
 
         /// <summary>
         /// Assembly with pipeline behaviors.
         /// </summary>
-        public Assembly PipelineBehaviorsAssembly { get; set; }
+        [Obsolete("Use AddPipelineBehaviorAssembly(Assembly assembly) method.")]
+        public Assembly PipelineBehaviorsAssembly { set { _pipelineBehaviorAssemblies.Add(value); } }
 
         /// <summary>
         /// Assembly with requests.
         /// </summary>
-        public Assembly RequestsAssembly { get; set; }
+        [Obsolete("Use AddRequestAssembly(Assembly assembly) method.")]
+        public Assembly RequestsAssembly { set { _requestAssemblies.Add(value); } }
 
         /// <summary>
         /// Adds the assembly with pipeline behaviors.
@@ -44,26 +47,12 @@ namespace Kros.MediatR.Extensions
         /// <summary>
         /// Gets assemblies with pipeline behaviors.
         /// </summary>
-        public IEnumerable<Assembly> GetPipelineBehaviorAssemblies()
-            => UnionAssemblies(_pipelineBehaviorAssemblies, PipelineBehaviorsAssembly);
+        public IEnumerable<Assembly> GetPipelineBehaviorAssemblies() => _pipelineBehaviorAssemblies;
 
         /// <summary>
         /// Gets assemblies with requests.
         /// </summary>
-        public IEnumerable<Assembly> GetRequestAssemblies()
-            => UnionAssemblies(_requestAssemblies, RequestsAssembly);
+        public IEnumerable<Assembly> GetRequestAssemblies() => _requestAssemblies;
 
-        private IEnumerable<Assembly> UnionAssemblies(IEnumerable<Assembly> assemblies, Assembly assembly)
-        {
-            if (assembly != null)
-            {
-                yield return assembly;
-            }
-
-            foreach (Assembly a in assemblies)
-            {
-                yield return a;
-            }
-        }
     }
 }
