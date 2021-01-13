@@ -53,6 +53,5 @@ namespace Kros.MediatR.Extensions
         /// Gets assemblies with requests.
         /// </summary>
         public IEnumerable<Assembly> GetRequestAssemblies() => _requestAssemblies;
-
     }
 }
