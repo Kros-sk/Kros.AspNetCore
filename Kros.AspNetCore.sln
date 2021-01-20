@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.ApplicationInsights.Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kros.MassTransit.Analyzers", "src\Kros.MassTransit.Analyzers\Kros.MassTransit.Analyzers.csproj", "{F437F912-2798-4EFA-89F2-B373453591A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kros.ProblemDetails.Extensions", "src\Kros.ProblemDetails.Extensions\Kros.ProblemDetails.Extensions.csproj", "{3D8B3ED1-9910-4A76-9C93-CC8B1D45EBEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{F437F912-2798-4EFA-89F2-B373453591A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F437F912-2798-4EFA-89F2-B373453591A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F437F912-2798-4EFA-89F2-B373453591A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D8B3ED1-9910-4A76-9C93-CC8B1D45EBEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D8B3ED1-9910-4A76-9C93-CC8B1D45EBEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D8B3ED1-9910-4A76-9C93-CC8B1D45EBEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D8B3ED1-9910-4A76-9C93-CC8B1D45EBEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{624CDE2A-410F-4EE3-BB0E-71B2F3D42AF2} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
 		{3D90E8DD-C871-4B50-B610-B854E65807F1} = {F2FE0B51-B10D-491C-AC69-1C9D08D4514E}
 		{F437F912-2798-4EFA-89F2-B373453591A4} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
+		{3D8B3ED1-9910-4A76-9C93-CC8B1D45EBEF} = {BECA5997-5362-4C3D-AEF9-C2C6E40CB616}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF06D895-E4AC-4374-95F5-89F47567F9F6}
