@@ -17,6 +17,4 @@ namespace Kros.ProblemDetails.Extensions
             Errors = errors.Adapt<IEnumerable<ValidationError>>();
         }
     }
-
-
 }
