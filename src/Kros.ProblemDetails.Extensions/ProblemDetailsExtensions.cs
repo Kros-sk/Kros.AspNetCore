@@ -15,7 +15,6 @@ namespace Kros.ProblemDetails.Extensions
     {
         /// <summary>
         /// Registers Hellang problem details to IoC container.
-        /// It creates problem details for fluent <see cref="ValidationException"/>.
         /// </summary>
         /// <param name="services">IoC container.</param>
         /// <param name="environment">Current environment.</param>
@@ -27,18 +26,22 @@ namespace Kros.ProblemDetails.Extensions
             =>  services.AddProblemDetails(p =>
             {
                 p.IncludeExceptionDetails = (context, ex) => IncludeExceptionDetails(environment, ex);
-                p.Map<ValidationException>(SetProblemDetailsForFluentValidationException);
+                p.SourceCodeLineCount = 0;
 
                 configAction?.Invoke(p);
             });
+
+        /// <summary>
+        /// Map <see cref="ValidationException"/> to <see cref="ValidationProblemDetails"/>
+        /// </summary>
+        /// <param name="options">Problem details options</param>
+        public static void MapFluentValidationException(this ProblemDetailsOptions options)
+            => options.Map<ValidationException>((ex) => new ValidationProblemDetails(ex.Errors, StatusCodes.Status400BadRequest));
 
         private static bool IncludeExceptionDetails(IWebHostEnvironment environment, Exception ex)
             => environment.IsTestOrDevelopment() && !IsExceptionWithoutExceptionDetails(ex) ? true : false;
 
         private static bool IsExceptionWithoutExceptionDetails(Exception ex)
             => ex.GetType() == typeof(ValidationException);
-
-        private static ValidationProblemDetails SetProblemDetailsForFluentValidationException(ValidationException ex)
-            => new ValidationProblemDetails(ex.Errors, StatusCodes.Status400BadRequest);
     }
 }
