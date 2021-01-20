@@ -15,7 +15,7 @@ namespace Kros.ProblemDetails.Extensions
     {
         /// <summary>
         /// Registers Hellang problem details to IoC container.
-        /// It creates custom problem details for fluent <see cref="ValidationException"/>.
+        /// It creates problem details for fluent <see cref="ValidationException"/>.
         /// </summary>
         /// <param name="services">IoC container.</param>
         /// <param name="environment">Current environment.</param>
@@ -26,7 +26,7 @@ namespace Kros.ProblemDetails.Extensions
             Action<ProblemDetailsOptions> configAction = null)
             =>  services.AddProblemDetails(p =>
             {
-                p.IncludeExceptionDetails = (ctx, ex) => IncludeExceptionDetails(environment, ex);
+                p.IncludeExceptionDetails = (context, ex) => IncludeExceptionDetails(environment, ex);
                 p.Map<ValidationException>(SetProblemDetailsForFluentValidationException);
 
                 configAction?.Invoke(p);
