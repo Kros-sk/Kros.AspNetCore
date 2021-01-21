@@ -8,7 +8,6 @@
     <PackageVersion Include="Hellang.Middleware.ProblemDetails" Version="5.1.1" />
     <PackageVersion Include="Kros.Identity.Extensions" Version="0.5.0" />
     <PackageVersion Include="Kros.Utils" Version="1.16.2" />
-    <PackageVersion Include="Mapster" Version="7.0.1" />
     <PackageVersion Include="MassTransit.AspNetCore" Version="6.3.2" />
     <PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="6.3.2" />
     <PackageVersion Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />

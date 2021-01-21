@@ -1,7 +1,7 @@
 ﻿using FluentValidation.Results;
 using Hellang.Middleware.ProblemDetails;
-using Mapster;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Kros.ProblemDetails.Extensions
 {
@@ -14,7 +14,12 @@ namespace Kros.ProblemDetails.Extensions
 
         public ValidationProblemDetails(IEnumerable<ValidationFailure> errors, int statusCode) : base(statusCode)
         {
-            Errors = errors.Adapt<IEnumerable<ValidationError>>();
+            Errors = errors.Select(error => new ValidationError
+            {
+                ErrorCode = error.ErrorCode,
+                ErrorMessage = error.ErrorMessage,
+                PropertyName = error.PropertyName
+            });
         }
     }
 }

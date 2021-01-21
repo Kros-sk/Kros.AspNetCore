@@ -11,7 +11,6 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" />
-    <PackageReference Include="Mapster" />
   </ItemGroup>
 
   <ItemGroup>
