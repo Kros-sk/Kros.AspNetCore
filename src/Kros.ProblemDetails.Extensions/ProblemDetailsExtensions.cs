@@ -28,16 +28,11 @@ namespace Kros.ProblemDetails.Extensions
                 p.IncludeExceptionDetails = (context, ex) => IncludeExceptionDetails(environment, ex);
                 p.SourceCodeLineCount = 0;
 
+                p.Map<ValidationException>((ex)
+                    => new ValidationProblemDetails(ex.Errors, StatusCodes.Status400BadRequest));
+
                 configAction?.Invoke(p);
             });
-
-        /// <summary>
-        /// Map <see cref="ValidationException"/> to <see cref="ValidationProblemDetails"/>
-        /// </summary>
-        /// <param name="options">Problem details options</param>
-        public static void MapFluentValidationException(this ProblemDetailsOptions options)
-            => options.Map<ValidationException>((ex)
-                => new ValidationProblemDetails(ex.Errors, StatusCodes.Status400BadRequest));
 
         private static bool IncludeExceptionDetails(IWebHostEnvironment environment, Exception ex)
             => environment.IsTestOrDevelopment() && !IsExceptionWithoutExceptionDetails(ex) ? true : false;
