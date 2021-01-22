@@ -6,13 +6,13 @@
 
 Menný priestor `Kros.ProblemDetails.Extensions` obsahuje rozšírenia pre ProblemDetails.
 
-Registrovaním `services.AddCustomProblemDetails()` pridáte do pipeline-y nastavenie ProblemDetails do HTTP response.
+Registrovaním `services.AddKrosProblemDetails()` pridáte do pipeline-y nastavenie ProblemDetails do HTTP response.
 Registrácia nastaví pre [validačnú chybu](https://github.com/FluentValidation/FluentValidation/blob/master/src/FluentValidation/ValidationException.cs) z fluent validácii response code 400 a podrobnejší ProblemDetail.
 
 ```CSharp
 public virtual void ConfigureServices(IServiceCollection services)
 {
-	services.AddCustomProblemDetails();
+	services.AddKrosProblemDetails();
 }
 ```
 
@@ -20,7 +20,7 @@ Je možné si dokonfigurovať vlastné nastavenia pre ProblemDetails. Napríklad
 ```CSharp
 public virtual void ConfigureServices(IServiceCollection services)
 {
-	services.AddCustomProblemDetails(p => p.Map<YourCustomException>(SetYourCustomProblemDetails));
+	services.AddKrosProblemDetails(p => p.Map<YourCustomException>(SetYourCustomProblemDetails));
 }
 ```
 
