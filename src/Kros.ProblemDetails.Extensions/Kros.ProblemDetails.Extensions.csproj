@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="..\..\packageIcon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Hellang.Middleware.ProblemDetails" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kros.AspNetCore\Kros.AspNetCore.csproj" />
+  </ItemGroup>
+    
+</Project>

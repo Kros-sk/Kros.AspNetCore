@@ -6,6 +6,10 @@
 
 [Kros.MediatR.Extensions](https://github.com/Kros-sk/Kros.AspNetCore/blob/master/src/Kros.MediatR.Extensions)
 
+# Kros.ProblemDetails.Extensions
+
+[Kros.ProblemDetails.Extensions](https://github.com/Kros-sk/Kros.AspNetCore/blob/master/src/Kros.ProblemDetails.Extensions)
+
 # Kros.Swagger.Extensions
 
 [Kros.Swagger.Extensions](https://github.com/Kros-sk/Kros.AspNetCore/blob/master/src/Kros.Swagger.Extensions)
