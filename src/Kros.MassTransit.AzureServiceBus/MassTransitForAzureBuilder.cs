@@ -1,4 +1,5 @@
-﻿using GreenPipes.Configurators;
+﻿using GreenPipes;
+using GreenPipes.Configurators;
 using Kros.MassTransit.AzureServiceBus.Endpoints;
 using Kros.Utils;
 using MassTransit;
@@ -73,6 +74,7 @@ namespace Kros.MassTransit.AzureServiceBus
                 : ConfigDefaults.TokenTimeToLive;
             _provider = provider;
             _topicNamePrefix = options.TopicNamePrefix;
+            _retryConfigurator = CreateDefaultRetryConfigurator(options);
         }
 
         /// <summary>
@@ -179,6 +181,19 @@ namespace Kros.MassTransit.AzureServiceBus
         {
             _retryConfigurator = configure;
             return this;
+        }
+
+        private Action<IRetryConfigurator> CreateDefaultRetryConfigurator(AzureServiceBusOptions options)
+        {
+            if (options.IntervalRetry?.Limit > 0)
+            {
+                int limit = options.IntervalRetry.Limit;
+                int interval = options.IntervalRetry.Interval;
+
+                return new Action<IRetryConfigurator>(retry =>
+                    retry.Interval(limit, interval));
+            }
+            return null;
         }
 
         #endregion
