@@ -16,7 +16,6 @@ resources:
       type: git
       name: DevShared/Templates
 
-
 steps:
   - task: DotNetCoreCLI@2
     displayName: 'Build'
