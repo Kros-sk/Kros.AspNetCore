@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading;
@@ -81,8 +80,6 @@ namespace Kros.AspNetCore.Authorization
             Check.NotNullOrWhiteSpace(token, nameof(token));
 
             OpenIdConnectConfiguration discoveryDocument = await configurationManager.GetConfigurationAsync(ct);
-            ICollection<SecurityKey> signingKeys = discoveryDocument.SigningKeys;
-
             var validationParameters = new TokenValidationParameters
             {
                 RequireExpirationTime = true,
@@ -90,7 +87,7 @@ namespace Kros.AspNetCore.Authorization
                 ValidateIssuer = true,
                 ValidIssuer = _authorizationOptions.AuthorityUrl,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKeys = signingKeys,
+                IssuerSigningKeys = discoveryDocument.SigningKeys,
                 ValidateLifetime = true,
                 ValidAudience = _authorizationOptions.Scope,
                 ClockSkew = _authorizationOptions.ClockSkew
