@@ -78,7 +78,6 @@ namespace Kros.AspNetCore.Authorization
                     tokenValue = tokenValue[(AuthTokenPrefix.Length + 1)..];
                 }
                 return true;
-
             }
             tokenValue = null;
             return false;
