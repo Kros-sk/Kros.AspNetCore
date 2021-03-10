@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Kros.AspNetCore.Options;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -27,7 +28,7 @@ namespace Kros.AspNetCore.Authorization
             if (option is null)
             {
                 throw new InvalidOperationException(
-                    string.Format(Properties.Resources.GatewayJwtAuthorizationMissingSection,
+                    string.Format(Properties.Resources.OptionMissingSection,
                     Helpers.GetSectionName<GatewayJwtAuthorizationOptions>()));
             }
 
@@ -53,5 +54,30 @@ namespace Kros.AspNetCore.Authorization
         public static IApplicationBuilder UseJwtBearerClaims(
             this IApplicationBuilder app)
             => app.UseMiddleware<JwtBearerClaimsMiddleware>();
+
+        /// <summary>
+        /// Add client credentials authorization middleware to request pipeline.
+        /// </summary>
+        /// <param name="app"><see cref="IApplicationBuilder"/> where middleware is added.</param>
+        /// <param name="configuration">Configuration from which the options are loaded.
+        /// Configuration must contains ClientCredentialsAuthorization section.</param>
+        /// <exception cref="InvalidOperationException">
+        /// When `ClientCredentialsAuthorization` section is missing in configuration.
+        /// </exception>
+        public static IApplicationBuilder UseClientCredentialsAuthorization(
+            this IApplicationBuilder app,
+            IConfiguration configuration)
+        {
+            ClientCredentialsAuthorizationOptions option = configuration.GetSection<ClientCredentialsAuthorizationOptions>();
+
+            if (option is null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(Properties.Resources.OptionMissingSection,
+                    Helpers.GetSectionName<ClientCredentialsAuthorizationOptions>()));
+            }
+
+            return app.UseMiddleware<ClientCredentialsAuthorizationMiddleware>(option);
+        }
     }
 }

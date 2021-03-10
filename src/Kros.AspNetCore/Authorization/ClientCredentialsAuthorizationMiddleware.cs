@@ -1,11 +1,9 @@
 ﻿using Kros.AspNetCore.Options;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,11 +13,12 @@ using System.Threading.Tasks;
 namespace Kros.AspNetCore.Authorization
 {
     /// <summary>
-    /// Middleware for identity server authorization.
+    /// Middleware for identity server authorization with client credentials..
     /// </summary>
     internal class ClientCredentialsAuthorizationMiddleware
     {
         private readonly RequestDelegate _next;
+
         private readonly ClientCredentialsAuthorizationOptions _authorizationOptions;
         /// <summary>
         /// Ctor.
@@ -47,18 +46,15 @@ namespace Kros.AspNetCore.Authorization
 
         private async Task ValidateJwtToken(HttpContext httpContext)
         {
-            if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues value))
+            if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string value, true))
             {
-                if (await IsAccessTokenValid(CleanToken(value)))
+                if (await IsAccessTokenValid(value))
                 {
                     return;
                 }
             }
             throw new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest);
         }
-
-        private string CleanToken(string token)
-            => token?.Replace("bearer", "", StringComparison.InvariantCultureIgnoreCase).Trim();
 
         private async Task<bool> IsAccessTokenValid(string accessToken)
         {
