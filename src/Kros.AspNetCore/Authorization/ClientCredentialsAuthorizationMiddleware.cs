@@ -18,8 +18,8 @@ namespace Kros.AspNetCore.Authorization
     internal class ClientCredentialsAuthorizationMiddleware
     {
         private readonly RequestDelegate _next;
-
         private readonly ClientCredentialsAuthorizationOptions _authorizationOptions;
+
         /// <summary>
         /// Ctor.
         /// </summary>
