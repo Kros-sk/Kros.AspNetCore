@@ -62,8 +62,8 @@ namespace Kros.AspNetCore.Authorization
         /// <summary>
         /// Gets the token from header associated with the specified key <see cref="HeaderNames.Authorization"/>.
         /// </summary>
-        /// <param name="httpContext">Http context.</param>
-        /// <param name="value">When this method returns, the value associated with the token,
+        /// <param name="headers">Http headers.</param>
+        /// <param name="tokenValue">When this method returns, the value associated with the token,
         /// if the key is found; otherwise null.</param>
         /// <param name="removePrefix">True if token prefix (Bearer) should be removed, oherwise false.</param>
         /// <returns>True if the header contains an element with the specified key<see cref="HeaderNames.Authorization"/>.
