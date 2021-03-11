@@ -72,7 +72,7 @@ namespace Kros.AspNetCore.Authorization
             IMemoryCache memoryCache,
             IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
-            if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues value))
+            if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string value))
             {
                 int key = GetKey(httpContext, value);
 
@@ -185,8 +185,6 @@ namespace Kros.AspNetCore.Authorization
             => HashCode.Combine(value, httpContext.Request.Path);
 
         private void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
-        {
-            httpContext.Request.Headers[HeaderNames.Authorization] = $"Bearer {userJwtToken}";
-        }
+            => httpContext.Request.Headers[HeaderNames.Authorization] = $"{JwtAuthorizationHelper.AuthTokenPrefix} {userJwtToken}";
     }
 }
