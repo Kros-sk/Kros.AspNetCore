@@ -34,7 +34,7 @@ namespace Kros.AspNetCore.Authorization
         /// <summary>
         /// Authorization token prefix.
         /// </summary>
-        public static string AuthTokenPrefix = "Bearer";
+        public const string AuthTokenPrefix = "Bearer";
 
         /// <summary>
         /// Create signed JWT token.

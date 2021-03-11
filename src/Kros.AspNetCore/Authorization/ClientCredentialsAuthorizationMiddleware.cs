@@ -30,8 +30,7 @@ namespace Kros.AspNetCore.Authorization
             _next = Check.NotNull(next, nameof(next));
             _authorizationOptions = Check.NotNull(options, nameof(options));
             Check.NotNullOrWhiteSpace(options.AuthorityUrl, nameof(options.AuthorityUrl));
-            Check.NotNullOrWhiteSpace(options.Scope, nameof(options.AuthorityUrl));
-            Check.NotNull(options.ClockSkew, nameof(options.ClockSkew));
+            Check.NotNullOrWhiteSpace(options.Scope, nameof(options.Scope));
         }
 
         /// <summary>
@@ -58,6 +57,8 @@ namespace Kros.AspNetCore.Authorization
 
         private async Task<bool> IsAccessTokenValid(string accessToken)
         {
+            Check.NotNullOrWhiteSpace(accessToken, nameof(accessToken));
+
             var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 _authorizationOptions.AuthorityUrl + "/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever(),
@@ -73,8 +74,6 @@ namespace Kros.AspNetCore.Authorization
             IConfigurationManager<OpenIdConnectConfiguration> configurationManager,
             CancellationToken ct = default)
         {
-            Check.NotNullOrWhiteSpace(token, nameof(token));
-
             OpenIdConnectConfiguration discoveryDocument = await configurationManager.GetConfigurationAsync(ct);
             var validationParameters = new TokenValidationParameters
             {
