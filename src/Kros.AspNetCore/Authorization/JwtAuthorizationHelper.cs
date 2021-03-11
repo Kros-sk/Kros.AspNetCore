@@ -60,7 +60,7 @@ namespace Kros.AspNetCore.Authorization
         }
 
         /// <summary>
-        ///  Gets the token feom header associated with the specified key <see cref="HeaderNames.Authorization"/>.
+        /// Gets the token from header associated with the specified key <see cref="HeaderNames.Authorization"/>.
         /// </summary>
         /// <param name="httpContext">Http context.</param>
         /// <param name="value">When this method returns, the value associated with the token,
