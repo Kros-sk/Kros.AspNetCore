@@ -67,7 +67,7 @@ namespace Kros.AspNetCore.Authorization
         /// if the key is found; otherwise null.</param>
         /// <param name="removePrefix">True if token prefix (Bearer) should be removed, oherwise false.</param>
         /// <returns>True if the header contains an element with the specified key<see cref="HeaderNames.Authorization"/>.
-        /// Otherwise false./returns>
+        /// Otherwise false.</returns>
         public static bool TryGetTokenValue(IHeaderDictionary headers, out string tokenValue, bool removePrefix = false)
         {
             if (headers.TryGetValue(HeaderNames.Authorization, out StringValues authHeader))

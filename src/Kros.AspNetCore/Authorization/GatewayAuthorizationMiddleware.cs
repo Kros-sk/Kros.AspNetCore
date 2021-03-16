@@ -74,7 +74,12 @@ namespace Kros.AspNetCore.Authorization
         {
             if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string value))
             {
-                int key = GetKey(httpContext, value);
+                int key = CacheHttpHeadersHelper.TryGetValue(
+                    httpContext.Request.Headers,
+                    _jwtAuthorizationOptions.CacheKeyHttpHeaders,
+                    out string cacheKeyPart)
+                    ? GetKey(httpContext, value, cacheKeyPart)
+                    : GetKey(httpContext, value);
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
@@ -181,8 +186,11 @@ namespace Kros.AspNetCore.Authorization
             => _jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero
                 || _jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero;
 
-        private static int GetKey(HttpContext httpContext, StringValues value)
+        internal static int GetKey(HttpContext httpContext, StringValues value)
             => HashCode.Combine(value, httpContext.Request.Path);
+
+        internal static int GetKey(HttpContext httpContext, StringValues value, string additionalKeyPart)
+            => HashCode.Combine(value, httpContext.Request.Path, additionalKeyPart);
 
         private void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
             => httpContext.Request.Headers[HeaderNames.Authorization] = $"{JwtAuthorizationHelper.AuthTokenPrefix} {userJwtToken}";
