@@ -1,5 +1,4 @@
 ﻿using Kros.AspNetCore.ServiceDiscovery;
-using Kros.Extensions;
 using System;
 using System.Collections.Generic;
 
