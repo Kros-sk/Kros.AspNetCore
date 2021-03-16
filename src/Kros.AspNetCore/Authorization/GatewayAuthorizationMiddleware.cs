@@ -76,20 +76,26 @@ namespace Kros.AspNetCore.Authorization
             {
                 int key = GetKey(httpContext, value);
 
-                if (!memoryCache.TryGetValue(key, out string jwtToken))
+                if (ConnectionIdHelper.TryGetConnectionId(httpContext.Request.Headers, out string connectionId))
+                {
+                    key = GetKey(httpContext, value, connectionId);
+                }
+
+                if (!memoryCache.TryGetValue(key, out string memoryValue))
                 {
                     string authUrl =
                         _jwtAuthorizationOptions.GetAuthorizationUrl(serviceDiscoveryProvider) + httpContext.Request.Path.Value;
-                    jwtToken = await GetUserAuthorizationJwtAsync(
+                    memoryValue = await GetUserAuthorizationJwtAsync(
                         httpContext,
                         httpClientFactory,
                         memoryCache,
                         value,
                         key,
-                        authUrl);
+                        authUrl,
+                        connectionId);
                 }
 
-                return jwtToken;
+                return GetJwtToken(memoryValue);
             }
             else if (!string.IsNullOrEmpty(_jwtAuthorizationOptions.HashParameterName)
                 && httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
@@ -107,7 +113,8 @@ namespace Kros.AspNetCore.Authorization
                         memoryCache,
                         StringValues.Empty,
                         key,
-                        uriBuilder.Uri.ToString());
+                        uriBuilder.Uri.ToString(),
+                        string.Empty);
                 }
 
                 return jwtToken;
@@ -122,7 +129,8 @@ namespace Kros.AspNetCore.Authorization
             IMemoryCache memoryCache,
             StringValues authHeader,
             int cacheKey,
-            string authorizationUrl)
+            string authorizationUrl,
+            string connectionId)
         {
             using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
             {
@@ -137,9 +145,35 @@ namespace Kros.AspNetCore.Authorization
 
                 string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
                     new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
-                SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
+                string memoryValue = GetMemoryValue(jwtToken, connectionId);
+                SetTokenToCache(memoryCache, cacheKey, memoryValue, httpContext.Request);
 
+                return memoryValue;
+            }
+        }
+
+        private string GetMemoryValue(string jwtToken, string connectionId)
+        {
+            if (string.IsNullOrWhiteSpace(connectionId))
+            {
                 return jwtToken;
+            }
+            else
+            {
+                return $"{jwtToken} {ConnectionIdHelper.ConnectionId}:{connectionId}";
+            }
+        }
+
+        private string GetJwtToken(string memoryValue)
+        {
+            int connectionIdStartIndex = memoryValue.IndexOf(ConnectionIdHelper.ConnectionId);
+            if (connectionIdStartIndex >= 0)
+            {
+                return memoryValue.Substring(0, connectionIdStartIndex - 1);
+            }
+            else
+            {
+                return memoryValue;
             }
         }
 
@@ -183,6 +217,9 @@ namespace Kros.AspNetCore.Authorization
 
         private static int GetKey(HttpContext httpContext, StringValues value)
             => HashCode.Combine(value, httpContext.Request.Path);
+
+        private static int GetKey(HttpContext httpContext, StringValues value, string connectionId)
+            => HashCode.Combine(value, httpContext.Request.Path, connectionId);
 
         private void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
             => httpContext.Request.Headers[HeaderNames.Authorization] = $"{JwtAuthorizationHelper.AuthTokenPrefix} {userJwtToken}";
