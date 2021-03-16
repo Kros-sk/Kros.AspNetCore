@@ -69,5 +69,10 @@ namespace Kros.AspNetCore.Authorization
         /// Headers which if are in request, will be forwarded to client.
         /// </summary>
         public List<string> ForwardedHeaders { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// Headers which if are in request, will be cached.
+        /// </summary>
+        public List<string> CacheHttpHeaders { get; set; } = new List<string>();
     }
 }

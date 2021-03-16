@@ -367,12 +367,14 @@ namespace Kros.AspNetCore.Tests.Authorization
                 new GatewayJwtAuthorizationOptions()
                 {
                     Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
-                    HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" }
+                    HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
+                    CacheHttpHeaders = new List<string>() { "Connection-Id" }
                 });
 
             var context = new DefaultHttpContext();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
-            context.Request.Headers.Add(ConnectionIdHelper.ConnectionId, connectionId);
+            context.Request.Headers.Add("Connection-Id", connectionId);
+            context.Request.Headers.Add("any-header", connectionId);
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             context.Request.Headers[HeaderNames.Authorization]
@@ -395,20 +397,21 @@ namespace Kros.AspNetCore.Tests.Authorization
                 new GatewayJwtAuthorizationOptions()
                 {
                     Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
-                    HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" }
+                    HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
+                    CacheHttpHeaders = new List<string>() { "Connection-Id"}
                 });
             const string accessToken = "access_token";
             var context = new DefaultHttpContext();
             context.Request.Headers.Add(HeaderNames.Authorization, accessToken);
-            context.Request.Headers.Add(ConnectionIdHelper.ConnectionId, connectionId);
+            context.Request.Headers.Add("Connection-Id", connectionId);
+            context.Request.Headers.Add("any-header", connectionId);
 
-            int key = GetKey(context, accessToken, connectionId);
-            if (connectionId == null)
-            {
-                key = GetKey(context, accessToken);
-            }
+            int key = connectionId == null
+                ? GatewayAuthorizationMiddleware.GetKey(context, accessToken)
+                : GatewayAuthorizationMiddleware.GetKey(context, accessToken, connectionId);
+
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
-            memoryCache.Set(key, $"{JwtToken} Kros-Connection-Id:{connectionId}");
+            memoryCache.Set(key, $"{JwtToken}");
             await middleware.Invoke(context, httpClientFactoryMock, memoryCache, CreateProvider());
 
             context.Request.Headers[HeaderNames.Authorization]
@@ -417,12 +420,6 @@ namespace Kros.AspNetCore.Tests.Authorization
                 .And
                 .Contain($"Bearer {JwtToken}");
         }
-
-        private static int GetKey(HttpContext httpContext, StringValues value)
-            => HashCode.Combine(value, httpContext.Request.Path);
-
-        private static int GetKey(HttpContext httpContext, StringValues value, string connectionId)
-            => HashCode.Combine(value, httpContext.Request.Path, connectionId);
 
         private static (IHttpClientFactory, GatewayAuthorizationMiddleware) CreateMiddleware(HttpStatusCode statusCode)
             => CreateMiddleware(statusCode, TimeSpan.Zero, new List<string>());
