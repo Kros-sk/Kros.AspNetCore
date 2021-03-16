@@ -71,8 +71,8 @@ namespace Kros.AspNetCore.Authorization
         public List<string> ForwardedHeaders { get; private set; } = new List<string>();
 
         /// <summary>
-        /// Headers which if are in request, will be cached.
+        /// Headers which will be used as cache key for authorization token.
         /// </summary>
-        public List<string> CacheHttpHeaders { get; set; } = new List<string>();
+        public List<string> CacheKeyHttpHeaders { get; set; } = new List<string>();
     }
 }

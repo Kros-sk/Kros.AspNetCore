@@ -368,7 +368,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 {
                     Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
                     HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
-                    CacheHttpHeaders = new List<string>() { "Connection-Id" }
+                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id" }
                 });
 
             var context = new DefaultHttpContext();
@@ -398,7 +398,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 {
                     Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
                     HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
-                    CacheHttpHeaders = new List<string>() { "Connection-Id"}
+                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id"}
                 });
             const string accessToken = "access_token";
             var context = new DefaultHttpContext();
