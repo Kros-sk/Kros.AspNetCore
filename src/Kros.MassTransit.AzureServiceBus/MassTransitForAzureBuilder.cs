@@ -22,7 +22,7 @@ namespace Kros.MassTransit.AzureServiceBus
 
         private readonly string _connectionString;
         private readonly TimeSpan _tokenTimeToLive;
-        private readonly IRegistrationContext<IServiceProvider> _registrationContext;
+        private readonly IBusRegistrationContext _registrationContext;
         private readonly IServiceProvider _provider;
         private readonly string _topicNamePrefix;
         private Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> _busConfigurator;
@@ -81,8 +81,8 @@ namespace Kros.MassTransit.AzureServiceBus
         /// Ctor.
         /// </summary>
         /// <param name="registrationContext">MassTransit registration context.</param>
-        public MassTransitForAzureBuilder(IRegistrationContext<IServiceProvider> registrationContext)
-            : this(registrationContext.Container)
+        public MassTransitForAzureBuilder(IBusRegistrationContext registrationContext)
+            : this((IServiceProvider)registrationContext)
         {
             _registrationContext = registrationContext;
         }
@@ -230,11 +230,12 @@ namespace Kros.MassTransit.AzureServiceBus
         /// </summary>
         /// <param name="busCfg">Service bus configuration.</param>
         /// <returns>Service bus host.</returns>
-        private IServiceBusHost CreateServiceHost(IServiceBusBusFactoryConfigurator busCfg)
+        private IServiceBusHost CreateServiceHost(
+            IServiceBusBusFactoryConfigurator busCfg
+            )
         {
             var cstrBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
-
-            return busCfg.Host(_connectionString, hostCfg =>
+            busCfg.Host(_connectionString, hostCfg =>
             {
                 hostCfg.SharedAccessSignature(sasCfg =>
                 {
