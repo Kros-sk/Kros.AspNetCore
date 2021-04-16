@@ -16,7 +16,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// </summary>
         /// <param name="configurator">Delegate to configure service bus.</param>
         /// <returns>Self for further configuring.</returns>
-        IMassTransitForAzureBuilder ConfigureServiceBusFactory(Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> configurator = null);
+        IMassTransitForAzureBuilder ConfigureServiceBusFactory(Action<IServiceBusBusFactoryConfigurator> configurator = null);
     }
 
     /// <summary>

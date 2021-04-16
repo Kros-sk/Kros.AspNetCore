@@ -24,6 +24,7 @@
     <PackageReference Include="Kros.Utils" />
     <PackageReference Include="MassTransit.AspNetCore" />
     <PackageReference Include="MassTransit.Azure.ServiceBus.Core" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
     <PackageReference Include="Scrutor" />
   </ItemGroup>
 
