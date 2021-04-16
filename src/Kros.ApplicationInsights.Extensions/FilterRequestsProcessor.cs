@@ -1,6 +1,7 @@
 ﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -11,14 +12,15 @@ namespace Kros.ApplicationInsights.Extensions
     /// <summary>
     /// Telemetry Processor to filter out requests for specific endpoints (/health).
     /// </summary>
-    /// <seealso cref="Microsoft.ApplicationInsights.Extensibility.ITelemetryProcessor" />
+    /// <seealso cref="ITelemetryProcessor" />
     internal class FilterRequestsProcessor : ITelemetryProcessor
     {
         private ITelemetryProcessor Next { get; set; }
 
         private readonly string[] _skippedRequests =
         {
-            "/health"
+            "/health",
+            "/signalR"
         };
 
         private readonly string[] _skippedAgents =
@@ -41,18 +43,25 @@ namespace Kros.ApplicationInsights.Extensions
         /// <param name="item">ITelemetry instance.</param>
         public void Process(ITelemetry item)
         {
-            var request = item as RequestTelemetry;
-            if (request != null
-                && (_skippedRequests.Any(x => request.Name.Contains(x))
-                || _skippedAgents.Any(a => GetUserAgentName(request).Contains(a, StringComparison.InvariantCultureIgnoreCase))))
+            if (item is RequestTelemetry request)
             {
-                return;
+                string userAgent = GetUserAgentName(request);
+
+                if (IsHttpOptions(request)
+                    || _skippedRequests.Any(x => request.Name.Contains(x))
+                    || _skippedAgents.Any(a => userAgent.Contains(a, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    return;
+                }
             }
 
             Next.Process(item);
         }
 
+        private static bool IsHttpOptions(RequestTelemetry request)
+            => request.Name.StartsWith(HttpMethods.Options, StringComparison.OrdinalIgnoreCase);
+
         private string GetUserAgentName(RequestTelemetry request)
-         => request?.Context?.User?.Id ?? string.Empty;
+         => request.Context?.User?.Id ?? string.Empty;
     }
 }
