@@ -48,7 +48,7 @@ namespace Kros.ApplicationInsights.Extensions
                 string userAgent = GetUserAgentName(request);
 
                 if (IsHttpOptions(request)
-                    || _skippedRequests.Any(x => request.Name.Contains(x))
+                    || _skippedRequests.Any(x => request.Name.Contains(x, StringComparison.InvariantCultureIgnoreCase))
                     || _skippedAgents.Any(a => userAgent.Contains(a, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return;
