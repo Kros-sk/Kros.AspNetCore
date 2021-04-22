@@ -8,6 +8,11 @@ namespace Kros.ApplicationInsights.Extensions.Tests
     {
         [Theory]
         [InlineData("/health", "")]
+        [InlineData("/signalR", "")]
+        [InlineData("OPTIONS/", "")]
+        [InlineData("OPTIONS/someRequest", "")]
+        [InlineData("GET/someRequest", "TestPassed")]
+        [InlineData("GET/optionsrequest", "TestPassed")]
         [InlineData("someRequests", "TestPassed")]
         public void ReturnCorrectSequenceForRequestName(string name, string expectedSequence)
         {

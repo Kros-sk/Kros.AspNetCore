@@ -52,7 +52,7 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             var context = new DefaultHttpContext();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
-            context.Request.Headers.Add("ApplicationType" , "25");
+            context.Request.Headers.Add("ApplicationType", "25");
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             htttpClient.DefaultRequestHeaders.GetValues("ApplicationType").Should().Equal("25");
@@ -351,6 +351,73 @@ namespace Kros.AspNetCore.Tests.Authorization
                     httpClientFactoryMock,
                     new MemoryCache(new MemoryCacheOptions()),
                     CreateProvider()));
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("connection_id")]
+        public async void JwtTokenDoesNotContainConnectionId(string connectionId)
+        {
+            (var httpClientFactoryMock, var middleware) = CreateMiddleware(
+                HttpStatusCode.OK,
+                TimeSpan.Zero,
+                new List<string>(),
+                new GatewayJwtAuthorizationOptions()
+                {
+                    Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
+                    HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
+                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id" }
+                });
+
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers.Add("Connection-Id", connectionId);
+            context.Request.Headers.Add("any-header", connectionId);
+            await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
+
+            context.Request.Headers[HeaderNames.Authorization]
+                .Should()
+                .HaveCount(1)
+                .And
+                .Contain($"Bearer {JwtToken}");
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("connection_id")]
+        public async void CacheJwtTokenWithConnectionId(string connectionId)
+        {
+            (var httpClientFactoryMock, var middleware) = CreateMiddleware(
+                HttpStatusCode.OK,
+                TimeSpan.Zero,
+                new List<string>(),
+                new GatewayJwtAuthorizationOptions()
+                {
+                    Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
+                    HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
+                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id"}
+                });
+            const string accessToken = "access_token";
+            var context = new DefaultHttpContext();
+            context.Request.Headers.Add(HeaderNames.Authorization, accessToken);
+            context.Request.Headers.Add("Connection-Id", connectionId);
+            context.Request.Headers.Add("any-header", connectionId);
+
+            int key = connectionId == null
+                ? GatewayAuthorizationMiddleware.GetKey(context, accessToken)
+                : GatewayAuthorizationMiddleware.GetKey(context, accessToken, connectionId);
+
+            var memoryCache = new MemoryCache(new MemoryCacheOptions());
+            memoryCache.Set(key, $"{JwtToken}");
+            await middleware.Invoke(context, httpClientFactoryMock, memoryCache, CreateProvider());
+
+            context.Request.Headers[HeaderNames.Authorization]
+                .Should()
+                .HaveCount(1)
+                .And
+                .Contain($"Bearer {JwtToken}");
         }
 
         private static (IHttpClientFactory, GatewayAuthorizationMiddleware) CreateMiddleware(HttpStatusCode statusCode)
