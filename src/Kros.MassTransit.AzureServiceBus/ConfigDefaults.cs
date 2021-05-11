@@ -15,7 +15,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <summary>
         /// Default message time to live in the queue.
         /// </summary>
-        public static readonly TimeSpan MessageTimeToLive = TimeSpan.FromMinutes(3);
+        public static readonly TimeSpan MessageTimeToLive = TimeSpan.FromDays(14);
 
         /// <summary>
         /// Default setting for move messages to the dead letter queue on expiration (time to live exceeded).
@@ -25,12 +25,12 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <summary>
         /// Default lock duration for messages read from the queue.
         /// </summary>
-        public static readonly TimeSpan LockDuration = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan LockDuration = TimeSpan.FromMinutes(1);
 
         /// <summary>
         /// Default value for if the queue should be deleted if idle.
         /// </summary>
-        public static readonly TimeSpan AutoDeleteOnIdle = TimeSpan.FromMinutes(10);
+        public static readonly TimeSpan AutoDeleteOnIdle = TimeSpan.FromDays(14);
 
         /// <summary>
         /// Default maximum delivery count. A message is automatically deadlettered after this number of deliveries.

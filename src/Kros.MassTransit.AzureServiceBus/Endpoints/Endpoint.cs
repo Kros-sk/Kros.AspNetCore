@@ -55,5 +55,18 @@ namespace Kros.MassTransit.AzureServiceBus.Endpoints
         /// </summary>
         /// <param name="busCfg">Service bus configuration.</param>
         public abstract void SetEndpoint(IServiceBusBusFactoryConfigurator busCfg);
+
+        /// <summary>
+        /// Sets endpoint defaults.
+        /// </summary>
+        /// <param name="configurator">Endpoint configurator.</param>
+        protected void SetDefaults(IServiceBusEndpointConfigurator configurator)
+        {
+            configurator.DefaultMessageTimeToLive = ConfigDefaults.MessageTimeToLive;
+            configurator.EnableDeadLetteringOnMessageExpiration = ConfigDefaults.EnableDeadLetteringOnMessageExpiration;
+            configurator.LockDuration = ConfigDefaults.LockDuration;
+            configurator.AutoDeleteOnIdle = ConfigDefaults.AutoDeleteOnIdle;
+            configurator.MaxDeliveryCount = ConfigDefaults.MaxDeliveryCount;
+        }
     }
 }
