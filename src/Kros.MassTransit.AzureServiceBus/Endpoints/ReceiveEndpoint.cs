@@ -44,6 +44,9 @@ namespace Kros.MassTransit.AzureServiceBus.Endpoints
         public override void SetEndpoint(IServiceBusBusFactoryConfigurator busCfg)
             => busCfg.ReceiveEndpoint(Name, endpointConfig =>
             {
+                SetDefaults(endpointConfig);
+                endpointConfig.DuplicateDetectionHistoryTimeWindow = ConfigDefaults.DuplicateDetectionWindow;
+
                 _configurator?.Invoke(endpointConfig);
 
                 foreach (Action<IServiceBusReceiveEndpointConfigurator> consumerConfig in _consumers)

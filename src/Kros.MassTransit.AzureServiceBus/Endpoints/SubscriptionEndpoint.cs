@@ -44,6 +44,8 @@ namespace Kros.MassTransit.AzureServiceBus.Endpoints
         public override void SetEndpoint(IServiceBusBusFactoryConfigurator busCfg)
             => busCfg.SubscriptionEndpoint<TMessage>(Name, endpointConfig =>
             {
+                SetDefaults(endpointConfig);
+
                 _configurator?.Invoke(endpointConfig);
 
                 foreach (Action<IServiceBusSubscriptionEndpointConfigurator> consumerConfig in _consumers)
