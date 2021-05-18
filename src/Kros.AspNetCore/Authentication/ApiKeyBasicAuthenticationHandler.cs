@@ -13,7 +13,7 @@ namespace Kros.AspNetCore.Authentication
     /// <summary>
     /// Processes API key authentication using the request Basic auth header.
     /// </summary>
-    class ApiKeyBasicAuthenticationHandler : AuthenticationHandler<ApiKeyBasicAuthenticationOptions>
+    public class ApiKeyBasicAuthenticationHandler : AuthenticationHandler<ApiKeyBasicAuthenticationOptions>
     {
         private readonly string _apiKeyHeaderName = HeaderNames.Authorization;
         private const string ApiKeyPrefix = "Basic ";

@@ -5,7 +5,7 @@ namespace Kros.AspNetCore.Authentication
     /// <summary>
     /// Options to configure the ApiKeyBasicAuthenticationHandler.
     /// </summary>
-    class ApiKeyBasicAuthenticationOptions : AuthenticationSchemeOptions
+    public class ApiKeyBasicAuthenticationOptions : AuthenticationSchemeOptions
     {
         /// <summary>
         /// The API key, that will be checked during authentication.

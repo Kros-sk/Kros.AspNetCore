@@ -108,6 +108,10 @@ namespace Kros.AspNetCore.Authorization
             IConfiguration configuration)
         {
             ApiKeyBasicAuthenticationOptions configOptions = configuration.GetSection<ApiKeyBasicAuthenticationOptions>();
+            if (configOptions == null)
+            {
+                throw new ArgumentNullException(nameof(configuration), $"{nameof(ApiKeyBasicAuthenticationOptions)} not found in configuration");
+            }
             return builder.AddScheme<ApiKeyBasicAuthenticationOptions, ApiKeyBasicAuthenticationHandler>(configOptions.Scheme,
                 options =>
                 {
