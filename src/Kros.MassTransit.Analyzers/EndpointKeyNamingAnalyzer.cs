@@ -24,18 +24,25 @@ namespace Kros.MassTransit.Analyzers
         /// </summary>
         public const string NewNameProperty = "NewName";
 
+        private static readonly LocalizableString _title = new LocalizableResourceString(
+            nameof(Resources.EndpointKeyNamingAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString _message = new LocalizableResourceString(
+            nameof(Resources.EndpointKeyNamingAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString _description = new LocalizableResourceString(
+            nameof(Resources.EndpointKeyNamingAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
+
         private const string Category = "Naming";
         private const string MessagePrefix = "I";
         private const string MessageSufix = "Message";
         private const string ConfigureSubscrionMethodName = "ConfigureSubscription";
-        private static DiagnosticDescriptor _rule = new DiagnosticDescriptor(DiagnosticId,
-            new LocalizableResourceString(nameof(Resources.EndpointKeyNamingAnalyzerTitle),
-                Resources.ResourceManager, typeof(Resources)),
-            new LocalizableResourceString(nameof(Resources.EndpointKeyNamingAnalyzerMessageFormat),
-                Resources.ResourceManager, typeof(Resources)),
-            Category, DiagnosticSeverity.Warning, isEnabledByDefault: true,
-            description: new LocalizableResourceString(nameof(Resources.EndpointKeyNamingAnalyzerDescription),
-                Resources.ResourceManager, typeof(Resources)));
+        private static readonly DiagnosticDescriptor _rule = new DiagnosticDescriptor(
+            DiagnosticId,
+            _title,
+            _message,
+            Category,
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: _description);
 
         /// <inheritdoc />
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(_rule);
