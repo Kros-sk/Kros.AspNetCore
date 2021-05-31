@@ -16,12 +16,12 @@ namespace Kros.AspNetCore.Extensions
         /// Adds allow all origins Cors policy.
         /// </summary>
         /// <param name="services">IoC container.</param>
-        /// <param name="preflightMaxAge">Cache preflight requests in ticks. Default is <see cref="TimeSpan.TicksPerHour"/>.</param>
+        /// <param name="preflightMaxAgeInMinutes">Cache preflight requests in ticks. Default is 60 minutes.</param>
         public static IServiceCollection AddAllowAnyOriginCors(this IServiceCollection services,
-            long preflightMaxAge = TimeSpan.TicksPerHour)
+            long preflightMaxAgeInMinutes = 60)
             => services.AddCors(options =>
             {
-                if (preflightMaxAge <= 0)
+                if (preflightMaxAgeInMinutes <= 0)
                 {
                     options.AddPolicy(
                         AllowAnyOrigins,
@@ -40,7 +40,7 @@ namespace Kros.AspNetCore.Extensions
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials()
-                            .SetPreflightMaxAge(TimeSpan.FromTicks(preflightMaxAge)));
+                            .SetPreflightMaxAge(TimeSpan.FromMinutes(preflightMaxAgeInMinutes)));
                 }
             });
 
@@ -50,15 +50,15 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="services">IoC container.</param>
         /// <param name="allowedOrigins">List of allowed origins.</param>
         /// <param name="policyName">Name of custom cors policy.</param>
-        /// <param name="preflightMaxAge">Cache preflight requests in ticks. Default is <see cref="TimeSpan.TicksPerHour"/>.</param>
+        /// <param name="preflightMaxAgeInMinutes">Cache preflight requests in ticks. Default is 60 minutes.</param>
         public static IServiceCollection AddCustomOriginsCorsPolicy(
             this IServiceCollection services,
             string[] allowedOrigins,
             string policyName,
-            long preflightMaxAge = TimeSpan.TicksPerHour)
+            long preflightMaxAgeInMinutes = TimeSpan.TicksPerHour)
             => services.AddCors(options =>
             {
-                if (preflightMaxAge <= 0)
+                if (preflightMaxAgeInMinutes <= 0)
                 {
                     options.AddPolicy(
                     policyName,
@@ -75,7 +75,7 @@ namespace Kros.AspNetCore.Extensions
                         .WithOrigins(allowedOrigins)
                         .AllowAnyMethod()
                         .AllowAnyHeader()
-                        .SetPreflightMaxAge(TimeSpan.FromTicks(preflightMaxAge)));
+                        .SetPreflightMaxAge(TimeSpan.FromMinutes(preflightMaxAgeInMinutes)));
                 }
             });
 
