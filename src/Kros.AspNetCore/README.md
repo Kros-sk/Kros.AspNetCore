@@ -140,6 +140,7 @@ var toDo = await _cache.GetAndSetAsync(
 ### CorsExtensions
 
 Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto domény je potrebné vymenovať v `appsettings.json` v sekcii `AllowedHosts`.
+Obe metódy nastavujú cachovanie preflight requestov (OPTIONS) defaultne na 1 hodinu.
 
 ## BaseStartup
 
