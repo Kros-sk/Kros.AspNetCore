@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -21,27 +20,20 @@ namespace Kros.AspNetCore.Extensions
             long preflightMaxAgeInMinutes = 60)
             => services.AddCors(options =>
             {
-                if (preflightMaxAgeInMinutes <= 0)
-                {
-                    options.AddPolicy(
-                        AllowAnyOrigins,
-                        builder => builder
+                options.AddPolicy(
+                    AllowAnyOrigins,
+                    builder => {
+                        builder
                             .SetIsOriginAllowed(origin => true)
                             .AllowAnyMethod()
                             .AllowAnyHeader()
-                            .AllowCredentials());
-                }
-                else
-                {
-                    options.AddPolicy(
-                        AllowAnyOrigins,
-                        builder => builder
-                            .SetIsOriginAllowed(origin => true)
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials()
-                            .SetPreflightMaxAge(TimeSpan.FromMinutes(preflightMaxAgeInMinutes)));
-                }
+                            .AllowCredentials();
+
+                        if (preflightMaxAgeInMinutes <= 0)
+                        {
+                            builder.SetPreflightMaxAge(TimeSpan.FromMinutes(preflightMaxAgeInMinutes));
+                        }
+                    });
             });
 
         /// <summary>
@@ -55,28 +47,22 @@ namespace Kros.AspNetCore.Extensions
             this IServiceCollection services,
             string[] allowedOrigins,
             string policyName,
-            long preflightMaxAgeInMinutes = TimeSpan.TicksPerHour)
+            int preflightMaxAgeInMinutes = 60)
             => services.AddCors(options =>
             {
-                if (preflightMaxAgeInMinutes <= 0)
-                {
-                    options.AddPolicy(
+                options.AddPolicy(
                     policyName,
-                    builder => builder
-                        .WithOrigins(allowedOrigins)
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-                }
-                else
-                {
-                    options.AddPolicy(
-                    policyName,
-                    builder => builder
-                        .WithOrigins(allowedOrigins)
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .SetPreflightMaxAge(TimeSpan.FromMinutes(preflightMaxAgeInMinutes)));
-                }
+                    builder => {
+                        builder
+                            .WithOrigins(allowedOrigins)
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+
+                        if (preflightMaxAgeInMinutes <= 0)
+                        {
+                            builder.SetPreflightMaxAge(TimeSpan.FromMinutes(preflightMaxAgeInMinutes));
+                        }
+                    });
             });
 
         /// <summary>
