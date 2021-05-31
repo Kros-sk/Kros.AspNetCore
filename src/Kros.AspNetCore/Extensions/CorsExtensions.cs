@@ -12,12 +12,19 @@ namespace Kros.AspNetCore.Extensions
         private const string AllowAnyOrigins = "AllowAnyOrigins";
 
         /// <summary>
-        /// Adds allow all origins Cors policy.
+        /// Adds allow all origins Cors policy with caching preflights requests with default value (1 hour).
         /// </summary>
         /// <param name="services">IoC container.</param>
-        /// <param name="preflightMaxAgeInMinutes">Cache preflight requests in ticks. Default is 60 minutes.</param>
+        public static IServiceCollection AddAllowAnyOriginCors(this IServiceCollection services)
+            => AddAllowAnyOriginCors(services, 60);
+
+        /// <summary>
+        /// Adds allow all origins Cors policy with caching preflight requests with defined value.
+        /// </summary>
+        /// <param name="services">IoC container.</param>
+        /// <param name="preflightMaxAgeInMinutes">Cache preflight requests in minutes.</param>
         public static IServiceCollection AddAllowAnyOriginCors(this IServiceCollection services,
-            int preflightMaxAgeInMinutes = 60)
+            int preflightMaxAgeInMinutes)
             => services.AddCors(options =>
             {
                 options.AddPolicy(
@@ -37,17 +44,29 @@ namespace Kros.AspNetCore.Extensions
             });
 
         /// <summary>
-        /// Adds custom Cors policy.
+        /// Adds custom Cors policy with caching preflights requests with default value (1 hour).
         /// </summary>
         /// <param name="services">IoC container.</param>
         /// <param name="allowedOrigins">List of allowed origins.</param>
         /// <param name="policyName">Name of custom cors policy.</param>
-        /// <param name="preflightMaxAgeInMinutes">Cache preflight requests in ticks. Default is 60 minutes.</param>
+        public static IServiceCollection AddCustomOriginsCorsPolicy(
+            this IServiceCollection services,
+            string[] allowedOrigins,
+            string policyName)
+            => AddCustomOriginsCorsPolicy(services, allowedOrigins, policyName, 60);
+
+        /// <summary>
+        /// Adds custom Cors policy with caching preflight requests with defined value.
+        /// </summary>
+        /// <param name="services">IoC container.</param>
+        /// <param name="allowedOrigins">List of allowed origins.</param>
+        /// <param name="policyName">Name of custom cors policy.</param>
+        /// <param name="preflightMaxAgeInMinutes">Cache preflight requests in ticks.</param>
         public static IServiceCollection AddCustomOriginsCorsPolicy(
             this IServiceCollection services,
             string[] allowedOrigins,
             string policyName,
-            int preflightMaxAgeInMinutes = 60)
+            int preflightMaxAgeInMinutes)
             => services.AddCors(options =>
             {
                 options.AddPolicy(
