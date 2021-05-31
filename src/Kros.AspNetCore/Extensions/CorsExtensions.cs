@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Kros.AspNetCore.Extensions
 {
@@ -14,16 +16,32 @@ namespace Kros.AspNetCore.Extensions
         /// Adds allow all origins Cors policy.
         /// </summary>
         /// <param name="services">IoC container.</param>
-        public static IServiceCollection AddAllowAnyOriginCors(this IServiceCollection services)
+        /// <param name="preflightMaxAge">Cache preflight requests in ticks. Default is <see cref="TimeSpan.TicksPerHour"/>.</param>
+        public static IServiceCollection AddAllowAnyOriginCors(this IServiceCollection services,
+            long preflightMaxAge = TimeSpan.TicksPerHour)
             => services.AddCors(options =>
             {
-                options.AddPolicy(
-                    AllowAnyOrigins,
-                    builder => builder
-                        .SetIsOriginAllowed(origin => true)
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials());
+                if (preflightMaxAge <= 0)
+                {
+                    options.AddPolicy(
+                        AllowAnyOrigins,
+                        builder => builder
+                            .SetIsOriginAllowed(origin => true)
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials());
+                }
+                else
+                {
+                    options.AddPolicy(
+                        AllowAnyOrigins,
+                        builder => builder
+                            .SetIsOriginAllowed(origin => true)
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials()
+                            .SetPreflightMaxAge(TimeSpan.FromTicks(preflightMaxAge)));
+                }
             });
 
         /// <summary>
@@ -32,19 +50,33 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="services">IoC container.</param>
         /// <param name="allowedOrigins">List of allowed origins.</param>
         /// <param name="policyName">Name of custom cors policy.</param>
+        /// <param name="preflightMaxAge">Cache preflight requests in ticks. Default is <see cref="TimeSpan.TicksPerHour"/>.</param>
         public static IServiceCollection AddCustomOriginsCorsPolicy(
             this IServiceCollection services,
             string[] allowedOrigins,
-            string policyName)
+            string policyName,
+            long preflightMaxAge = TimeSpan.TicksPerHour)
             => services.AddCors(options =>
             {
-                options.AddPolicy(
+                if (preflightMaxAge <= 0)
+                {
+                    options.AddPolicy(
+                    policyName,
+                    builder => builder
+                        .WithOrigins(allowedOrigins)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+                }
+                else
+                {
+                    options.AddPolicy(
                     policyName,
                     builder => builder
                         .WithOrigins(allowedOrigins)
                         .AllowAnyMethod()
                         .AllowAnyHeader()
-                        .AllowCredentials());
+                        .SetPreflightMaxAge(TimeSpan.FromTicks(preflightMaxAge)));
+                }
             });
 
         /// <summary>
