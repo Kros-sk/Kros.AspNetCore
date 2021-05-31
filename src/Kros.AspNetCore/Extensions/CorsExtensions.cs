@@ -17,7 +17,7 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="services">IoC container.</param>
         /// <param name="preflightMaxAgeInMinutes">Cache preflight requests in ticks. Default is 60 minutes.</param>
         public static IServiceCollection AddAllowAnyOriginCors(this IServiceCollection services,
-            long preflightMaxAgeInMinutes = 60)
+            int preflightMaxAgeInMinutes = 60)
             => services.AddCors(options =>
             {
                 options.AddPolicy(
