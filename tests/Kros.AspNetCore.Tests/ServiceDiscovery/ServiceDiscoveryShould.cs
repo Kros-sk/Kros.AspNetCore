@@ -22,12 +22,16 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         }
 
         [Theory]
-        [InlineData("Users", "getAll", "http://localhost:9003/api/users")]
-        [InlineData("Users", "getById", "http://localhost:9003/api/users/{id}")]
-        [InlineData("Projects", "create", "http://localhost:9002/api/projects")]
-        public void FindPathUriByServiceAndPathName(string serviceName, string pathName, string expectedUri)
+        [InlineData("Users", "getAll", "http://localhost:9003/api/users", false)]
+        [InlineData("Users", "getById", "http://localhost:9003/api/users/{id}", false)]
+        [InlineData("Projects", "create", "http://localhost:9002/api/projects", false)]
+        [InlineData("Projects", "create", "http://localhost:9002/api/projects", true)]
+        public void FindPathUriByServiceAndPathName(string serviceName, string pathName, string expectedUri, bool allowHost)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(), new ServiceDiscoveryOptions()
+            {
+                AllowServiceNameAsHost = allowHost
+            });
 
             Uri uri = provider.GetPath(serviceName, pathName);
 
@@ -103,6 +107,24 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
             Action action = () => provider.GetService(TestServiceType.WithtoutParameter);
 
             action.Should().Throw<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData("test")]
+        [InlineData("nonexisting")]
+        public void AllowServiceNameAsHost(string serviceName)
+        {
+            var provider = new ServiceDiscoveryProvider(GetConfiguration(),
+                new ServiceDiscoveryOptions()
+                {
+                    AllowServiceNameAsHost = true
+                });
+
+            Uri uri = provider.GetService(serviceName);
+
+            uri.Scheme.Should().Be("http");
+            uri.Host.Should().Be(serviceName);
+            uri.Port.Should().Be(80);
         }
 
         private static IConfiguration GetConfiguration() =>
