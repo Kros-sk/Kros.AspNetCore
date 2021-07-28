@@ -17,7 +17,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="uri">Uri for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<HttpResponseMessage> GetAndCheckResponseAsync(
             this HttpClient client,
             Uri uri,
@@ -33,7 +33,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="url">Url for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<HttpResponseMessage> GetAndCheckResponseAsync(
             this HttpClient client,
             string url,
@@ -50,7 +50,7 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="client">Http client.</param>
         /// <param name="uri">Uri for request.</param>
         /// <param name="body">Request body.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<HttpResponseMessage> GetAndCheckResponseAsync(
             this HttpClient client,
             Uri uri,
@@ -75,7 +75,7 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="client">Http client.</param>
         /// <param name="url">Url for request.</param>
         /// <param name="body">Request body.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static Task<HttpResponseMessage> GetAndCheckResponseAsync(
             this HttpClient client,
             string url,
@@ -88,7 +88,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="uri">Uri for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<string> GetStringAndCheckResponseAsync(
             this HttpClient client,
             Uri uri,
@@ -100,7 +100,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="url">Url for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<string> GetStringAndCheckResponseAsync(
             this HttpClient client,
             string url,
@@ -112,7 +112,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="uri">Uri for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<Stream> GetStreamAndCheckResponseAsync(
             this HttpClient client,
             Uri uri,
@@ -124,7 +124,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="url">Url for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<Stream> GetStreamAndCheckResponseAsync(
             this HttpClient client,
             string url,
@@ -137,7 +137,7 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="client">Http client.</param>
         /// <param name="uri">Uri for request.</param>
         /// <param name="body">Request body.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<Stream> GetStreamAndCheckResponseAsync(
             this HttpClient client,
             Uri uri,
@@ -151,7 +151,7 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="client">Http client.</param>
         /// <param name="url">Url for request.</param>
         /// <param name="body">Request body.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<Stream> GetStreamAndCheckResponseAsync(
             this HttpClient client,
             string url,
@@ -164,7 +164,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="uri">Uri for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<byte[]> GetByteArrayAndCheckResponseAsync(
             this HttpClient client,
             Uri uri,
@@ -176,7 +176,7 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="client">Http client.</param>
         /// <param name="url">Url for request.</param>
-        /// <param name="defaultException">Default exception to by thrown, if failure result code is unsupported.</param>
+        /// <param name="defaultException">Default exception to be thrown, if failure result code is unsupported.</param>
         public static async Task<byte[]> GetByteArrayAndCheckResponseAsync(
             this HttpClient client,
             string url,
