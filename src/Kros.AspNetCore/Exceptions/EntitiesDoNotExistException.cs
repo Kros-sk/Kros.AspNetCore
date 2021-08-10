@@ -32,5 +32,4 @@ namespace Kros.AspNetCore.Exceptions
             ErrorCode = errorCode;
         }
     }
-
 }
