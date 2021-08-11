@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Kros.ProblemDetails.Extensions
 {
+
     internal class ProblemDetailsBase<TErrorType>: StatusCodeProblemDetails
         where TErrorType: ErrorBase
     {
