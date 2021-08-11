@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
-using Kros.AspNetCore.Exceptions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,9 +28,6 @@ namespace Kros.ProblemDetails.Extensions
                 p.Map<ValidationException>((ex)
                     => new ValidationProblemDetails(ex.Errors, StatusCodes.Status400BadRequest));
 
-                p.Map<EntitiesDoNotExistException>((ex)
-                    => new EntitiesDoNotExistProblemDetails(ex.Ids, ex.ErrorCode, ex.Message, StatusCodes.Status400BadRequest));
-
                 configAction?.Invoke(p);
             });
 
@@ -40,7 +36,6 @@ namespace Kros.ProblemDetails.Extensions
             && !IsExceptionWithoutExceptionDetails(ex) ? true : false;
 
         private static bool IsExceptionWithoutExceptionDetails(Exception ex)
-            => ex.GetType() == typeof(ValidationException)
-            || ex.GetType() == typeof(EntitiesDoNotExistException);
+            => ex.GetType() == typeof(ValidationException);
     }
 }
