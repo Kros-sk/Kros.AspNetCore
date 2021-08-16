@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
+using Kros.AspNetCore.Exceptions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,13 +22,19 @@ namespace Kros.ProblemDetails.Extensions
         public static IServiceCollection AddKrosProblemDetails(
             this IServiceCollection services,
             Action<ProblemDetailsOptions> configAction = null)
-            =>  services.AddProblemDetails(p =>
+            => services.AddProblemDetails(p =>
             {
                 p.IncludeExceptionDetails = (context, ex) => IncludeExceptionDetails(context, ex);
 
                 p.Map<ValidationException>((ex)
                     => new ValidationProblemDetails(ex.Errors, StatusCodes.Status400BadRequest));
 
+                p.Map<InvalidEntityReferencesException>((ex)
+                    => new InvalidEntityReferencesProblemDetails(ex.Ids, StatusCodes.Status400BadRequest)
+                    {
+                        Type = ex.Type,
+                        Detail = ex.Message
+                    });
                 configAction?.Invoke(p);
             });
 
@@ -36,6 +43,7 @@ namespace Kros.ProblemDetails.Extensions
             && !IsExceptionWithoutExceptionDetails(ex) ? true : false;
 
         private static bool IsExceptionWithoutExceptionDetails(Exception ex)
-            => ex.GetType() == typeof(ValidationException);
+            => ex.GetType() == typeof(ValidationException)
+            || ex.GetType() == typeof(InvalidEntityReferencesException);
     }
 }
