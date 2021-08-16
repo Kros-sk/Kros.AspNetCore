@@ -6,7 +6,7 @@ namespace Kros.AspNetCore.Exceptions
     /// <summary>
     /// Exception is thrown when entity references in user request are invalid.
     /// </summary>
-    public class InvalidEntityReferencesException: Exception
+    public class InvalidEntityReferencesException : Exception
     {
         /// <summary>
         /// Ids of invalid entities. Dictionary with key = entity name and value = enumerable of invalid entity ids.

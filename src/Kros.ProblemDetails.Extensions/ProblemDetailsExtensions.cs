@@ -22,7 +22,7 @@ namespace Kros.ProblemDetails.Extensions
         public static IServiceCollection AddKrosProblemDetails(
             this IServiceCollection services,
             Action<ProblemDetailsOptions> configAction = null)
-            =>  services.AddProblemDetails(p =>
+            => services.AddProblemDetails(p =>
             {
                 p.IncludeExceptionDetails = (context, ex) => IncludeExceptionDetails(context, ex);
 

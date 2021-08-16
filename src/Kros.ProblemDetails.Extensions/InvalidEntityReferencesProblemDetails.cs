@@ -13,7 +13,8 @@ namespace Kros.ProblemDetails.Extensions
         /// </summary>
         public IDictionary<string, IEnumerable<long>> Ids { get; set; }
 
-        public InvalidEntityReferencesProblemDetails(IDictionary<string, IEnumerable<long>> ids, int statusCode) : base(statusCode)
+        public InvalidEntityReferencesProblemDetails(IDictionary<string, IEnumerable<long>> ids, int statusCode)
+            : base(statusCode)
         {
             Ids = ids;
         }
