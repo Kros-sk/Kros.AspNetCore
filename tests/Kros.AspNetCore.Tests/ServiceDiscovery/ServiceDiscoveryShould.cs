@@ -26,6 +26,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("Users", "getById", "http://localhost:9003/api/users/{id}", false)]
         [InlineData("Projects", "create", "http://localhost:9002/api/projects", false)]
         [InlineData("Projects", "create", "http://projects/api/projects", true)]
+        [InlineData("Catalog", "create", "http://localhost:9004/api/catalog", true)]
         public void FindPathUriByServiceAndPathName(string serviceName, string pathName, string expectedUri, bool allowHost)
         {
             var provider = new ServiceDiscoveryProvider(GetConfiguration(), new ServiceDiscoveryOptions()
