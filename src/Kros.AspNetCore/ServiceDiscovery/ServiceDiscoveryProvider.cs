@@ -53,13 +53,13 @@ namespace Kros.AspNetCore.ServiceDiscovery
         {
             string uri = _configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:DownstreamPath");
 
-            if (!uri.IsNullOrEmpty())
-            {
-                return new Uri(uri);
-            }
-            else if (_option.AllowServiceNameAsHost)
+            if (_option.AllowServiceNameAsHost)
             {
                 return new UriBuilder(_option.Scheme, serviceName, _option.Port).Uri;
+            }
+            else if (!uri.IsNullOrEmpty())
+            {
+                return new Uri(uri);
             }
             else
             {
