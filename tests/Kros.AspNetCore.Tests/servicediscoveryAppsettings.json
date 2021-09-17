@@ -15,7 +15,7 @@
     },
     "catalog": {
       "DownstreamPath": "http://localhost:9004",
-      "force": true,
+      "ForceDownstreamPath": true,
       "paths": {
         "create": "/api/catalog"
       }

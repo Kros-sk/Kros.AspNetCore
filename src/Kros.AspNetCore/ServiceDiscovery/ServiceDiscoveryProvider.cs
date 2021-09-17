@@ -53,7 +53,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         {
             string GetSectionKey(string propertyName) => $"{_option.SectionName}:{serviceName}:{propertyName}";
             string uri = _configuration.GetValue<string>(GetSectionKey("DownstreamPath"));
-            bool force = _configuration.GetValue<bool>(GetSectionKey("Force"));
+            bool force = _configuration.GetValue<bool>(GetSectionKey("ForceDownstreamPath"));
 
             if (_option.AllowServiceNameAsHost && !force)
             {

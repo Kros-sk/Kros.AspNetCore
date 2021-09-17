@@ -308,12 +308,12 @@ services.AddServiceDiscovery((o) =>
 
 > Pokiaľ ich nešpecifikujeme tak sa použije `80` a `http`.
 
-V prípade, že chcete niektorú adresu vynútiť *(nechcete sa aby sa použil názov služby ako host, ale aby sa použila zadaná `DownstreamPath`, tak je potebné zadať vlastnostnosť `Force:true`)*.
+V prípade, že chcete niektorú adresu vynútiť *(nechcete sa aby sa použil názov služby ako host, ale aby sa použila zadaná `DownstreamPath`, tak je potebné zadať vlastnostnosť `ForceDownstreamPath:true`)*.
 
 ```json
 "catalog": {
     "DownstreamPath": "http://localhost:9004",
-    "force": true,
+    "ForceDownstreamPath": true,
     "paths": {
         "create": "/api/catalog"
     }
