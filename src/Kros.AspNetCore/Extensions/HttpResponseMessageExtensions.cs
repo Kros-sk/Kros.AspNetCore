@@ -15,7 +15,8 @@ namespace Kros.AspNetCore.Extensions
         /// Throws exception, depends on status code in http response, if HTTP response was not successful.
         /// </summary>
         /// <param name="response">Http response message.</param>
-        /// <param name="defaultException">Optional default exception to be returned on unsupported http code. Default is <see cref="UnknownStatusCodeException"/></param>
+        /// <param name="defaultException">Optional default exception to be returned on unsupported http code.
+        /// Default is <see cref="UnknownStatusCodeException"/></param>
         public static void ThrowIfNotSuccessStatusCode(this HttpResponseMessage response, Exception defaultException = null)
         {
             if (!response.IsSuccessStatusCode)
@@ -52,8 +53,11 @@ namespace Kros.AspNetCore.Extensions
         /// Persists response payload in exception.
         /// </summary>
         /// <param name="response">Http response message.</param>
-        /// <param name="defaultException">Optional default exception to be returned on unsupported http code. Default is <see cref="UnknownStatusCodeException"/></param>
-        public static async Task ThrowIfNotSuccessStatusCodeAndKeepPayload(this HttpResponseMessage response, Exception defaultException = null)
+        /// <param name="defaultException">Optional default exception to be returned on unsupported http code.
+        /// Default is <see cref="UnknownStatusCodeException"/></param>
+        public static async Task ThrowIfNotSuccessStatusCodeAndKeepPayload(
+            this HttpResponseMessage response,
+            Exception defaultException = null)
         {
             if (!response.IsSuccessStatusCode)
             {

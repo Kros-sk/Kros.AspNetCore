@@ -5,20 +5,10 @@ using System.Net.Mime;
 namespace Kros.AspNetCore.Exceptions
 {
     /// <summary>
-    ///  The exception thrown when request was not successful.
+    /// The exception thrown when request was not successful.
     /// </summary>
     public class RequestUnsuccessfulException : Exception
     {
-        /// <summary>
-        /// Response payload content type.
-        /// </summary>
-        public MediaTypeHeaderValue ResponseContentType { get; private set; }
-
-        /// <summary>
-        /// Serialized response content.
-        /// </summary>
-        public string ResponseContent { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of <see cref="RequestUnsuccessfulException"/> class.
         /// </summary>
@@ -57,6 +47,16 @@ namespace Kros.AspNetCore.Exceptions
         {
             AddPayload(responseContent, responseContentType);
         }
+
+        /// <summary>
+        /// Response payload content type.
+        /// </summary>
+        public MediaTypeHeaderValue ResponseContentType { get; private set; }
+
+        /// <summary>
+        /// Serialized response content.
+        /// </summary>
+        public string ResponseContent { get; private set; }
 
         /// <summary>
         /// Adds payload to exception.
