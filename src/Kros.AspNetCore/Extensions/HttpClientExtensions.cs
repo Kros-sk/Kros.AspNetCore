@@ -24,7 +24,8 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null)
         {
             HttpResponseMessage response = await client.GetAsync(uri);
-            response.ThrowIfNotSuccessStatusCode(defaultException);
+            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException);
+
             return response;
         }
 
@@ -40,7 +41,8 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null)
         {
             HttpResponseMessage response = await client.GetAsync(url);
-            response.ThrowIfNotSuccessStatusCode(defaultException);
+            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException);
+
             return response;
         }
 
@@ -65,7 +67,8 @@ namespace Kros.AspNetCore.Extensions
                 Content = new StringContent(jsonBody, Encoding.UTF8, "application/json")
             };
             HttpResponseMessage response = await client.SendAsync(request);
-            response.ThrowIfNotSuccessStatusCode(defaultException);
+            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException);
+
             return response;
         }
 
