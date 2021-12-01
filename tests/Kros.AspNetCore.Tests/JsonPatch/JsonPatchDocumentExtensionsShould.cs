@@ -132,6 +132,30 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                 .BeEquivalentTo("SupplierAddressCountry");
         }
 
+        [Fact]
+        public void UseCaseSensitiveCaching()
+        {
+            var jsonPatch = new JsonPatchDocument();
+            jsonPatch.Replace("pRoperty1", "Value");
+
+            var serialized = JsonConvert.SerializeObject(jsonPatch);
+            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
+
+            var columns = deserialized.GetColumnsNames();
+            columns.Should()
+                .BeEquivalentTo("PRoperty1");
+
+            var jsonPatch2 = new JsonPatchDocument();
+            jsonPatch2.Replace("property1", "Value");
+
+            var serialized2 = JsonConvert.SerializeObject(jsonPatch2);
+            var deserialized2 = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized2);
+
+            var columns2 = deserialized2.GetColumnsNames();
+            columns2.Should()
+                .BeEquivalentTo("Property1");
+        }
+
         #region Nested classes
 
         public class Document

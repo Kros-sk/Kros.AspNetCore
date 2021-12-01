@@ -14,7 +14,7 @@ namespace Kros.AspNetCore.JsonPatch
     {
         private Func<string, string> _pathMapping;
         private ConcurrentDictionary<string, string> _mapping =
-            new ConcurrentDictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+            new ConcurrentDictionary<string, string>(StringComparer.CurrentCulture);
 
         /// <summary>
         /// Creates new config for <typeparamref name="TSource"/> and store it for non parametric  extension
