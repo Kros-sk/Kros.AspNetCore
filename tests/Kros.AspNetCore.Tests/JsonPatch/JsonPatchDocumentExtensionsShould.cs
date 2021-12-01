@@ -137,21 +137,19 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         {
             var jsonPatch = new JsonPatchDocument();
             jsonPatch.Replace("pRoperty1", "Value");
-
             var serialized = JsonConvert.SerializeObject(jsonPatch);
             var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
 
-            var columns = deserialized.GetColumnsNames();
-            columns.Should()
-                .BeEquivalentTo("PRoperty1");
-
             var jsonPatch2 = new JsonPatchDocument();
             jsonPatch2.Replace("property1", "Value");
-
             var serialized2 = JsonConvert.SerializeObject(jsonPatch2);
             var deserialized2 = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized2);
 
+            var columns = deserialized.GetColumnsNames();
             var columns2 = deserialized2.GetColumnsNames();
+
+            columns.Should()
+                .BeEquivalentTo("PRoperty1");
             columns2.Should()
                 .BeEquivalentTo("Property1");
         }
