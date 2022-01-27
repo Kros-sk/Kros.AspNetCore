@@ -59,8 +59,7 @@ namespace Kros.AspNetCore.Extensions
                     {
                         config.Register(settings["AppConfig:SentinelKey"], true);
                     }
-                    if (!string.IsNullOrWhiteSpace(settings["AppConfig:RefreshInterval"]) &&
-                        TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
+                    if (TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
                     {
                         config.SetCacheExpiration(refreshInterval);
                     }
