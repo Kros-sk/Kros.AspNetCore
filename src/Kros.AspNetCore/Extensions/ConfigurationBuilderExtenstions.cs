@@ -53,19 +53,19 @@ namespace Kros.AspNetCore.Extensions
                     .Connect(new Uri(settings["AppConfig:Endpoint"]), credential)
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
 
-                options.ConfigureRefresh(config =>
+                if (!string.IsNullOrWhiteSpace(settings["AppConfig:SentinelKey"]))
                 {
-                    if (!string.IsNullOrWhiteSpace(settings["AppConfig:SentinelKey"]))
+                    options.ConfigureRefresh(config =>
                     {
                         config.Register(settings["AppConfig:SentinelKey"], true);
-                    }
-                    if (TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
-                    {
-                        config.SetCacheExpiration(refreshInterval);
-                    }
+                        if (TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
+                        {
+                            config.SetCacheExpiration(refreshInterval);
+                        }
 
-                    refreshConfiguration?.Invoke(config);
-                });
+                        refreshConfiguration?.Invoke(config);
+                    });
+                }
 
                 IEnumerable<string> services = settings
                     .GetSection("AppConfig:Settings")
