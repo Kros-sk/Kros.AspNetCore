@@ -53,19 +53,7 @@ namespace Kros.AspNetCore.Extensions
                     .Connect(new Uri(settings["AppConfig:Endpoint"]), credential)
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
 
-                if (!string.IsNullOrWhiteSpace(settings["AppConfig:SentinelKey"]))
-                {
-                    options.ConfigureRefresh(config =>
-                    {
-                        config.Register(settings["AppConfig:SentinelKey"], true);
-                        if (TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
-                        {
-                            config.SetCacheExpiration(refreshInterval);
-                        }
-
-                        refreshConfiguration?.Invoke(config);
-                    });
-                }
+                ConfigureCacheRefresh(options, settings, refreshConfiguration);
 
                 IEnumerable<string> services = settings
                     .GetSection("AppConfig:Settings")
@@ -109,5 +97,30 @@ namespace Kros.AspNetCore.Extensions
             HostBuilderContext hostingContext,
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
             => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration);
+
+        private static void ConfigureCacheRefresh(
+            AzureAppConfigurationOptions options,
+            IConfigurationRoot settings,
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration)
+        {
+            bool sentinelKeySet = !string.IsNullOrWhiteSpace(settings["AppConfig:SentinelKey"]);
+            if (sentinelKeySet || refreshConfiguration != null)
+            {
+                options.ConfigureRefresh(config =>
+                {
+                    if (sentinelKeySet)
+                    {
+                        config.Register(settings["AppConfig:SentinelKey"], true);
+                    }
+
+                    if (TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
+                    {
+                        config.SetCacheExpiration(refreshInterval);
+                    }
+
+                    refreshConfiguration?.Invoke(config);
+                });
+            }
+        }
     }
 }
