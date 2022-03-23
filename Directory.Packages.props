@@ -11,7 +11,7 @@
     <PackageVersion Include="MassTransit.AspNetCore" Version="7.1.8" />
     <PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="7.1.8" />
     <PackageVersion Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
+    <PackageVersion Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
     <PackageVersion Include="Microsoft.AspNetCore.JsonPatch" Version="3.1.14" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.8" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
