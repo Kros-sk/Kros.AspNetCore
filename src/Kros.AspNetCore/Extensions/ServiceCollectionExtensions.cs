@@ -75,7 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// value is required.</param>
         public static IServiceCollection SetProxy(this IServiceCollection services, IConfiguration configuration)
         {
-            var section = configuration.GetSection("Proxy");
+            IConfigurationSection section = configuration.GetSection("Proxy");
             if (section.Exists())
             {
                 WebProxy proxy = section.Get<WebProxy>();

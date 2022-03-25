@@ -28,7 +28,7 @@ namespace Kros.MediatR.Extensions.Tests
         }
 
         public class FooPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-            where TRequest : IFooRequest
+            where TRequest : IFooRequest, IRequest<TResponse>
             where TResponse : IFooResponse
         {
             public async Task<TResponse> Handle(
@@ -36,7 +36,7 @@ namespace Kros.MediatR.Extensions.Tests
                 CancellationToken cancellationToken,
                 RequestHandlerDelegate<TResponse> next)
             {
-                var result = await next();
+                TResponse result = await next();
                 return result;
             }
         }
@@ -60,7 +60,7 @@ namespace Kros.MediatR.Extensions.Tests
         }
 
         public class BarPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-            where TRequest : IBarRequest
+            where TRequest : IBarRequest, IRequest<TResponse>
             where TResponse : IBarResponse
         {
             public async Task<TResponse> Handle(
@@ -68,7 +68,7 @@ namespace Kros.MediatR.Extensions.Tests
                 CancellationToken cancellationToken,
                 RequestHandlerDelegate<TResponse> next)
             {
-                var result = await next();
+                TResponse result = await next();
                 return result;
             }
         }
@@ -85,7 +85,7 @@ namespace Kros.MediatR.Extensions.Tests
         }
 
         public class TestPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-            where TRequest : ITestRequest
+            where TRequest : ITestRequest, IRequest<TResponse>
             where TResponse : ITestResponse
         {
             public async Task<TResponse> Handle(
@@ -93,7 +93,7 @@ namespace Kros.MediatR.Extensions.Tests
                 CancellationToken cancellationToken,
                 RequestHandlerDelegate<TResponse> next)
             {
-                var result = await next();
+                TResponse result = await next();
                 return result;
             }
         }
@@ -105,14 +105,14 @@ namespace Kros.MediatR.Extensions.Tests
         }
 
         public class CommandPipelineBehavior<TRequest> : IPipelineBehavior<TRequest, Unit>
-            where TRequest : ICommandRequest
+            where TRequest : ICommandRequest, IRequest<Unit>
         {
             public async Task<Unit> Handle(
                 TRequest request,
                 CancellationToken cancellationToken,
                 RequestHandlerDelegate<Unit> next)
             {
-                var result = await next();
+                Unit result = await next();
                 return result;
             }
         }
@@ -141,7 +141,8 @@ namespace Kros.MediatR.Extensions.Tests
         {
             Services.AddPipelineBehaviorsForRequest<IFooRequest>();
 
-            var behavior = Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
+            IPipelineBehavior<FooRequest, FooRequest.FooResponse> behavior =
+                Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
 
             behavior.Should().BeAssignableTo<FooPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
         }
@@ -151,10 +152,12 @@ namespace Kros.MediatR.Extensions.Tests
         {
             Services.AddPipelineBehaviorsForRequest<IBarRequest>();
 
-            var behavior = Provider.GetRequiredService<IPipelineBehavior<BarRequest, BarRequest.BarResponse>>();
+            IPipelineBehavior<BarRequest, BarRequest.BarResponse> behavior =
+                Provider.GetRequiredService<IPipelineBehavior<BarRequest, BarRequest.BarResponse>>();
             behavior.Should().BeAssignableTo<BarPipelineBehavior<BarRequest, BarRequest.BarResponse>>();
 
-            var behaviorBar1 = Provider.GetRequiredService<IPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>();
+            IPipelineBehavior<Bar1Request, Bar1Request.BarResponse> behaviorBar1 =
+                Provider.GetRequiredService<IPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>();
             behaviorBar1.Should().BeAssignableTo<BarPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>();
         }
 
@@ -163,7 +166,8 @@ namespace Kros.MediatR.Extensions.Tests
         {
             Services.AddMediatRNullCheckPostProcessor();
 
-            var behavior = Provider.GetRequiredService<IRequestPostProcessor<BarRequest, BarRequest.BarResponse>>();
+            IRequestPostProcessor<BarRequest, BarRequest.BarResponse> behavior =
+                Provider.GetRequiredService<IRequestPostProcessor<BarRequest, BarRequest.BarResponse>>();
 
             behavior.Should().BeAssignableTo<NullCheckPostProcessor<BarRequest, BarRequest.BarResponse>>();
         }
@@ -171,10 +175,11 @@ namespace Kros.MediatR.Extensions.Tests
         [Fact]
         public void RegisterNullCheckPostProcessWithIgnoringType()
         {
-            Services.AddMediatRNullCheckPostProcessor((o)=> o.IgnoreRequest<string>());
-            var behavior = Provider.GetRequiredService<IRequestPostProcessor<string, string>>();
+            Services.AddMediatRNullCheckPostProcessor((o) => o.IgnoreRequest<IRequest<string>>());
+            IRequestPostProcessor<IRequest<string>, string> behavior =
+                Provider.GetRequiredService<IRequestPostProcessor<IRequest<string>, string>>();
 
-            Action action = () => behavior.Process("", null, CancellationToken.None);
+            Action action = () => behavior.Process(null, null, CancellationToken.None);
 
             action.Should().NotThrow<NotFoundException>();
         }
@@ -184,7 +189,7 @@ namespace Kros.MediatR.Extensions.Tests
         {
             Services.AddPipelineBehaviorsForRequest<ICommandRequest>();
 
-            var behavior = Provider.GetRequiredService<IPipelineBehavior<TestCommand, Unit>>();
+            IPipelineBehavior<TestCommand, Unit> behavior = Provider.GetRequiredService<IPipelineBehavior<TestCommand, Unit>>();
             behavior.Should().BeAssignableTo<CommandPipelineBehavior<TestCommand>>();
         }
 
@@ -197,7 +202,8 @@ namespace Kros.MediatR.Extensions.Tests
                     .AddRequestAssembly(myAssembly)
                     .AddRequestAssembly(typeof(string).Assembly));
 
-            var behavior = Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
+            IPipelineBehavior<FooRequest, FooRequest.FooResponse> behavior =
+                Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
 
             behavior.Should().BeAssignableTo<FooPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
         }

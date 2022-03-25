@@ -25,7 +25,7 @@ Nastaví názov pre service v AI. Pod týmto názvom môžeme service vidieť na
 
 ## UserIdFromUserAgentInitializer
 
-Ak je v requeste header `User-Agent`,  jeho hodnota sa nastaví v telemetry do `Context.User.Id`.
+Ak je v requeste header `User-Agent`, jeho hodnota sa nastaví v telemetry do `Context.User.Id`.
 
 
 ## FilterRequestsProcessor

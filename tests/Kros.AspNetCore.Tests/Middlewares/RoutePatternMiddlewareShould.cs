@@ -15,12 +15,12 @@ namespace Kros.AspNetCore.Tests.Middlewares
     public class RoutePatternMiddlewareShould
     {
         [Fact]
-        public void AddRoutePatternToClaims()
+        public async Task AddRoutePatternToClaims()
         {
             var context = new DefaultHttpContext();
             context.Request.Method = "POST";
-            var endpointFeature = Substitute.For<IEndpointFeature>();
-            var routePattern = RoutePatternFactory.Pattern("weather/{town}");
+            IEndpointFeature endpointFeature = Substitute.For<IEndpointFeature>();
+            RoutePattern routePattern = RoutePatternFactory.Pattern("weather/{town}");
             var routeEndpoint = new RouteEndpoint(_ => null, routePattern, default, default, string.Empty);
             endpointFeature.Endpoint.Returns(routeEndpoint);
             var middleware = new RoutePatternMiddleware(innerHttpContext =>
@@ -31,7 +31,7 @@ namespace Kros.AspNetCore.Tests.Middlewares
 
             Func<Task> action = async () => await middleware.InvokeAsync(context);
 
-            action.Should().Throw<NullReferenceException>();
+            await action.Should().ThrowAsync<NullReferenceException>();
             context.
                 User.
                 Claims.
@@ -42,7 +42,7 @@ namespace Kros.AspNetCore.Tests.Middlewares
         }
 
         [Fact]
-        public void AddEmptyRoutePatternToClaims()
+        public async Task AddEmptyRoutePatternToClaims()
         {
             var context = new DefaultHttpContext();
             context.Request.Method = "POST";
@@ -53,7 +53,7 @@ namespace Kros.AspNetCore.Tests.Middlewares
 
             Func<Task> action = async () => await middleware.InvokeAsync(context);
 
-            action.Should().Throw<NullReferenceException>();
+            await action.Should().ThrowAsync<NullReferenceException>();
             context.
                 User.
                 Claims.

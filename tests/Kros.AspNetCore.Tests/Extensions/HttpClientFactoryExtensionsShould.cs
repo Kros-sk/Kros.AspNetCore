@@ -23,7 +23,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             using (HttpClient clientAuth = httpClientFactory.CreateClientWithAuthorization(httpContextAccessor))
             {
-                clientAuth.DefaultRequestHeaders.Authorization.Should().Equals(httpContext.Request.Headers["Authorization"]);
+                clientAuth.DefaultRequestHeaders.Authorization.ToString().Should().Be(httpContext.Request.Headers["Authorization"].ToString());
             }
         }
     }
