@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
-using System;
-using System.Linq;
+﻿using Azure.Identity;
 using Kros.Extensions;
-using Azure.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.Extensions.Hosting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Kros.AspNetCore.Extensions
 {
@@ -27,11 +27,15 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="environmentName">Environment name.</param>
+        /// <param name="refreshConfiguration">A callback used to configure Azure App Configuration refresh options.</param>
+        /// <returns>The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.</returns>
         /// <remarks>
         /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
         /// </remarks>
         public static IConfigurationBuilder AddAzureAppConfig(
-            this IConfigurationBuilder config, string environmentName)
+            this IConfigurationBuilder config,
+            string environmentName,
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
         {
             var settings = config.Build();
 
@@ -48,6 +52,8 @@ namespace Kros.AspNetCore.Extensions
                 options
                     .Connect(new Uri(settings["AppConfig:Endpoint"]), credential)
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
+
+                ConfigureCacheRefresh(options, settings, refreshConfiguration);
 
                 IEnumerable<string> services = settings
                     .GetSection("AppConfig:Settings")
@@ -81,11 +87,40 @@ namespace Kros.AspNetCore.Extensions
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="hostingContext">The hosting context.</param>
+        /// <param name="refreshConfiguration">A callback used to configure Azure App Configuration refresh options.</param>
+        /// <returns>The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.</returns>
         /// <remarks>
         /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
         /// </remarks>
         public static IConfigurationBuilder AddAzureAppConfiguration(
             this IConfigurationBuilder config,
-            HostBuilderContext hostingContext) => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName);
+            HostBuilderContext hostingContext,
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
+            => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration);
+
+        private static void ConfigureCacheRefresh(
+            AzureAppConfigurationOptions options,
+            IConfigurationRoot settings,
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration)
+        {
+            bool sentinelKeySet = !string.IsNullOrWhiteSpace(settings["AppConfig:SentinelKey"]);
+            if (sentinelKeySet || refreshConfiguration != null)
+            {
+                options.ConfigureRefresh(config =>
+                {
+                    if (sentinelKeySet)
+                    {
+                        config.Register(settings["AppConfig:SentinelKey"], true);
+                    }
+
+                    if (TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
+                    {
+                        config.SetCacheExpiration(refreshInterval);
+                    }
+
+                    refreshConfiguration?.Invoke(config);
+                });
+            }
+        }
     }
 }
