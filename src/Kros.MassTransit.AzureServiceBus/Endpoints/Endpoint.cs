@@ -60,7 +60,7 @@ namespace Kros.MassTransit.AzureServiceBus.Endpoints
         /// Sets endpoint defaults.
         /// </summary>
         /// <param name="configurator">Endpoint configurator.</param>
-        protected void SetDefaults(IServiceBusEndpointConfigurator configurator)
+        protected static void SetDefaults(IServiceBusEndpointConfigurator configurator)
         {
             configurator.DefaultMessageTimeToLive = ConfigDefaults.MessageTimeToLive;
             configurator.EnableDeadLetteringOnMessageExpiration = ConfigDefaults.EnableDeadLetteringOnMessageExpiration;

@@ -10,7 +10,8 @@ namespace Kros.AspNetCore.Configuration
     /// <summary>
     /// An <see cref="IStartupFilter"/> that validates all <see cref="IValidatable"/> objects in DI container during
     /// application startup.
-    /// Turn on validation by using <see cref="ServiceCollectionExtensions.UseConfigurationValidation(IServiceCollection)"/>
+    /// Turn on validation by using
+    /// <see cref="Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.UseConfigurationValidation(IServiceCollection)"/>
     /// extension method in your <c>ConfigureServices</c> method.
     /// </summary>
     public class SettingsValidationStartupFilter : IStartupFilter

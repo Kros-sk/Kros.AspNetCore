@@ -22,14 +22,14 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void ConfigureOptionsWithDefaultName()
         {
-            var configuration = GetConfiguration();
+            IConfiguration configuration = GetConfiguration();
             var serviceCollection = new ServiceCollection();
 
             serviceCollection.ConfigureOptions<TestOptions>(configuration);
 
-            var provider = serviceCollection.BuildServiceProvider();
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
-            var options = provider.GetService<IOptions<TestOptions>>();
+            IOptions<TestOptions> options = provider.GetService<IOptions<TestOptions>>();
 
             options.Value.Value.Should().Be(1);
         }
@@ -37,7 +37,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void AddProxyAddressForHttpClient()
         {
-            var configuration = GetConfiguration();
+            IConfiguration configuration = GetConfiguration();
             var serviceCollection = new ServiceCollection();
 
             serviceCollection.SetProxy(configuration);
@@ -48,7 +48,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void AddBypassProxyOnLocalForHttpClient()
         {
-            var configuration = GetConfiguration();
+            IConfiguration configuration = GetConfiguration();
             var serviceCollection = new ServiceCollection();
 
             serviceCollection.SetProxy(configuration);

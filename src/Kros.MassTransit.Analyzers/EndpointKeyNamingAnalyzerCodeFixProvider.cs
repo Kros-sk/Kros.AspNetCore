@@ -29,7 +29,7 @@ namespace Kros.MassTransit.Analyzers
         /// <inheritdoc />
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
             var diagnostic = context.Diagnostics.First();
             string newName = diagnostic.Properties[EndpointKeyNamingAnalyzer.NewNameProperty];

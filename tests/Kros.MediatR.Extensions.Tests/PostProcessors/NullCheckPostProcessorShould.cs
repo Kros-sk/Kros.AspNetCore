@@ -13,9 +13,9 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         [Fact]
         public void ThrowExceptionWhenResponseIsNull()
         {
-            var postProcessor = new NullCheckPostProcessor<string, string>(NullCheckPostProcessorOptions.Default);
+            var postProcessor = new NullCheckPostProcessor<IRequest<string>, string>(NullCheckPostProcessorOptions.Default);
 
-            Action action = () => postProcessor.Process("", null, CancellationToken.None);
+            Action action = () => postProcessor.Process(null, null, CancellationToken.None);
 
             action.Should().Throw<NotFoundException>();
         }
@@ -23,9 +23,9 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         [Fact]
         public void DoNotThrowExceptionWhenResponseIsNotNull()
         {
-            var postProcessor = new NullCheckPostProcessor<string, string>(NullCheckPostProcessorOptions.Default);
+            var postProcessor = new NullCheckPostProcessor<IRequest<string>, string>(NullCheckPostProcessorOptions.Default);
 
-            Action action = () => postProcessor.Process("request", "response", CancellationToken.None);
+            Action action = () => postProcessor.Process(null, "response", CancellationToken.None);
 
             action.Should().NotThrow<NotFoundException>();
         }
