@@ -13,18 +13,6 @@ namespace Kros.MediatR.Extensions
         private readonly HashSet<Assembly> _requestAssemblies = new HashSet<Assembly>();
 
         /// <summary>
-        /// Assembly with pipeline behaviors.
-        /// </summary>
-        [Obsolete("Use AddPipelineBehaviorAssembly(Assembly assembly) method.")]
-        public Assembly PipelineBehaviorsAssembly { set { _pipelineBehaviorAssemblies.Add(value); } }
-
-        /// <summary>
-        /// Assembly with requests.
-        /// </summary>
-        [Obsolete("Use AddRequestAssembly(Assembly assembly) method.")]
-        public Assembly RequestsAssembly { set { _requestAssemblies.Add(value); } }
-
-        /// <summary>
         /// Adds the assembly with pipeline behaviors.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
