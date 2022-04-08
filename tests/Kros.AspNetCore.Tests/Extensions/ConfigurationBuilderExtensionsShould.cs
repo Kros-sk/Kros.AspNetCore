@@ -20,7 +20,7 @@ namespace Kros.AspNetCore.Tests.Extensions
                     new KeyValuePair<string, string>("AppConfig:Endpoint", "endpoint")
                 });
 
-            config.AddAzureAppConfiguration(builderContext);
+            config.AddAzureAppConfig(builderContext);
 
             config.Sources.Count.Should().Be(2);
         }
@@ -31,7 +31,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             IConfigurationBuilder config = new ConfigurationBuilder();
             HostBuilderContext builderContext = CreateHostBuilderContext();
 
-            config.AddAzureAppConfiguration(builderContext);
+            config.AddAzureAppConfig(builderContext);
 
             config.Sources.Count.Should().Be(0);
         }

@@ -92,11 +92,20 @@ namespace Kros.AspNetCore.Extensions
         /// <remarks>
         /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
         /// </remarks>
-        public static IConfigurationBuilder AddAzureAppConfiguration(
+        public static IConfigurationBuilder AddAzureAppConfig(
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext,
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
             => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration);
+
+
+        /// <inheritdoc cref="AddAzureAppConfig(IConfigurationBuilder, HostBuilderContext, Action{AzureAppConfigurationRefreshOptions})"/>
+        [Obsolete("Use AddAzureAppConfiguration(...) method.")]
+        public static IConfigurationBuilder AddAzureAppConfiguration(
+            this IConfigurationBuilder config,
+            HostBuilderContext hostingContext,
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
+            => AddAzureAppConfig(config, hostingContext, refreshConfiguration);
 
         private static void ConfigureCacheRefresh(
             AzureAppConfigurationOptions options,
