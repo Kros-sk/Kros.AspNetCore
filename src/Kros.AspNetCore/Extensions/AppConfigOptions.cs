@@ -20,7 +20,7 @@ namespace Kros.AspNetCore.Extensions
         public string IdentityClientId { get; set; } = "";
 
         /// <summary>
-        ///
+        /// List of prefixes that specifies shich values will be loaded from App Configuration.
         /// </summary>
         public List<string> Settings { get; } = new List<string>();
 
