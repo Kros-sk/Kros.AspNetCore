@@ -30,47 +30,46 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="refreshConfiguration">A callback used to configure Azure App Configuration refresh options.</param>
         /// <returns>The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.</returns>
         /// <remarks>
-        /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
+        /// Configuration should contain <b>AppConfig</b> section, which is mapped to <see cref="AppConfigOptions "/> class.
         /// </remarks>
         public static IConfigurationBuilder AddAzureAppConfig(
             this IConfigurationBuilder config,
             string environmentName,
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
         {
-            var settings = config.Build();
+            IConfigurationRoot settings = config.Build();
+            AppConfigOptions appConfig = new();
+            settings.Bind("AppConfig", appConfig);
 
-            string appConfigEndpoint = settings["AppConfig:Endpoint"];
-            if (string.IsNullOrWhiteSpace(appConfigEndpoint))
+            if (string.IsNullOrWhiteSpace(appConfig.Endpoint))
             {
                 return config;
             }
 
             config.AddAzureAppConfiguration(options =>
             {
-                var credential = new DefaultAzureCredential();
+                DefaultAzureCredentialOptions credentialOptions = new()
+                {
+                    ManagedIdentityClientId = appConfig.IdentityClientId
+                };
+                var credential = new DefaultAzureCredential(credentialOptions);
 
                 options
-                    .Connect(new Uri(settings["AppConfig:Endpoint"]), credential)
+                    .Connect(new Uri(appConfig.Endpoint), credential)
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
 
-                ConfigureCacheRefresh(options, settings, refreshConfiguration);
+                ConfigureCacheRefresh(options, appConfig, refreshConfiguration);
 
-                IEnumerable<string> services = settings
-                    .GetSection("AppConfig:Settings")
-                    .AsEnumerable()
-                    .Where(p => !p.Value.IsNullOrWhiteSpace())
-                    .Select(p => p.Value);
-
-                foreach (string service in services)
+                IEnumerable<string> prefixes = appConfig.Settings.Where(prefix => !prefix.IsNullOrWhiteSpace());
+                foreach (string prefix in prefixes)
                 {
                     options
-                        .Select($"{service}:*", LabelFilter.Null)
-                        .Select($"{service}:*", environmentName)
-                        .TrimKeyPrefix($"{service}:");
+                        .Select($"{prefix}:*", LabelFilter.Null)
+                        .Select($"{prefix}:*", environmentName)
+                        .TrimKeyPrefix($"{prefix}:");
                 }
 
-                string useFeatureFlagsSetting = settings["AppConfig:UseFeatureFlags"];
-                if (bool.TryParse(useFeatureFlagsSetting, out bool useFeatureFlags) && useFeatureFlags)
+                if (appConfig.UseFeatureFlags)
                 {
                     options
                         .Select("_", LabelFilter.Null)
@@ -90,34 +89,40 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="refreshConfiguration">A callback used to configure Azure App Configuration refresh options.</param>
         /// <returns>The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.</returns>
         /// <remarks>
-        /// Configuration should contain attributes AppConfig:Endpoint and AppConfig:Settings.
+        /// Configuration should contain <b>AppConfig</b> section, which is mapped to <see cref="AppConfigOptions "/> class.
         /// </remarks>
-        public static IConfigurationBuilder AddAzureAppConfiguration(
+        public static IConfigurationBuilder AddAzureAppConfig(
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext,
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
             => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration);
 
+        /// <inheritdoc cref="AddAzureAppConfig(IConfigurationBuilder, HostBuilderContext, Action{AzureAppConfigurationRefreshOptions})"/>
+        [Obsolete("Use AddAzureAppConfiguration(...) method.")]
+        public static IConfigurationBuilder AddAzureAppConfiguration(
+            this IConfigurationBuilder config,
+            HostBuilderContext hostingContext,
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
+            => AddAzureAppConfig(config, hostingContext, refreshConfiguration);
+
         private static void ConfigureCacheRefresh(
             AzureAppConfigurationOptions options,
-            IConfigurationRoot settings,
+            AppConfigOptions appConfig,
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration)
         {
-            bool sentinelKeySet = !string.IsNullOrWhiteSpace(settings["AppConfig:SentinelKey"]);
+            bool sentinelKeySet = !string.IsNullOrWhiteSpace(appConfig.SentinelKey);
             if (sentinelKeySet || refreshConfiguration != null)
             {
                 options.ConfigureRefresh(config =>
                 {
                     if (sentinelKeySet)
                     {
-                        config.Register(settings["AppConfig:SentinelKey"], true);
+                        config.Register(appConfig.SentinelKey, true);
                     }
-
-                    if (TimeSpan.TryParse(settings["AppConfig:RefreshInterval"], out TimeSpan refreshInterval))
+                    if (appConfig.RefreshInterval > TimeSpan.Zero)
                     {
-                        config.SetCacheExpiration(refreshInterval);
+                        config.SetCacheExpiration(appConfig.RefreshInterval);
                     }
-
                     refreshConfiguration?.Invoke(config);
                 });
             }
