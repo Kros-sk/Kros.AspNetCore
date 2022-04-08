@@ -1,15 +1,56 @@
-﻿using Xunit;
+﻿using FluentAssertions;
 using Kros.AspNetCore.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
-using FluentAssertions;
 using NSubstitute;
+using System;
+using System.Collections.Generic;
+using Xunit;
 
 namespace Kros.AspNetCore.Tests.Extensions
 {
     public class ConfigurationBuilderExtensionsShould
     {
+        [Fact]
+        public void LoadAppConfigOptions()
+        {
+            IConfiguration cfg = GetConfiguration();
+            AppConfigOptions actualAppConfig = new();
+            cfg.Bind("AppConfig", actualAppConfig);
+
+            var expectedAppConfig = new AppConfigOptions
+            {
+                Endpoint = "https://example.azconfig.io",
+                IdentityClientId = "Ipsum",
+                UseFeatureFlags = true,
+                RefreshInterval = TimeSpan.FromSeconds(75),
+                SentinelKey = "Lorem"
+            };
+            expectedAppConfig.Settings.AddRange(new[] { "Example1", "Example2" });
+
+            actualAppConfig.Should().BeEquivalentTo(expectedAppConfig);
+        }
+
+        [Fact]
+        public void LoadEmptyAppConfigOptions()
+        {
+            IConfiguration cfg = new ConfigurationBuilder().Build(); ;
+            AppConfigOptions actualAppConfig = new();
+            cfg.Bind("AppConfig", actualAppConfig);
+
+            var expectedAppConfig = new AppConfigOptions
+            {
+                Endpoint = "",
+                IdentityClientId = "",
+                UseFeatureFlags = false,
+                RefreshInterval = TimeSpan.Zero,
+                SentinelKey = ""
+            };
+
+            actualAppConfig.Should().BeEquivalentTo(expectedAppConfig);
+        }
+
         [Fact]
         public void AddAzureAppConfigurationSourceIfEndpointDefined1()
         {
