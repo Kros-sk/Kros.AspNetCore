@@ -35,7 +35,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void LoadEmptyAppConfigOptions()
         {
-            IConfiguration cfg = new ConfigurationBuilder().Build(); ;
+            IConfiguration cfg = new ConfigurationBuilder().Build();
             AppConfigOptions actualAppConfig = new();
             cfg.Bind("AppConfig", actualAppConfig);
 

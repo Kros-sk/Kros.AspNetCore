@@ -97,7 +97,6 @@ namespace Kros.AspNetCore.Extensions
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
             => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration);
 
-
         /// <inheritdoc cref="AddAzureAppConfig(IConfigurationBuilder, HostBuilderContext, Action{AzureAppConfigurationRefreshOptions})"/>
         [Obsolete("Use AddAzureAppConfiguration(...) method.")]
         public static IConfigurationBuilder AddAzureAppConfiguration(
