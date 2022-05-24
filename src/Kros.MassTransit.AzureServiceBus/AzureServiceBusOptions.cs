@@ -44,6 +44,12 @@ namespace Kros.MassTransit.AzureServiceBus
         public string TopicNamePrefix { get; set; }
 
         /// <summary>
+        /// Endpoint name prefix.
+        /// </summary>
+        /// <remarks>Used by MassTransit for creating endpoint names(queues, subscriptions).</remarks>
+        public string EndpointNamePrefix { get; set; }
+
+        /// <summary>
         /// Dictionary of supported service bus endpoints.
         /// </summary>
         public Dictionary<string, AzureServiceBusEndpoint> Endpoints { get; set; }

@@ -25,6 +25,7 @@ namespace Kros.MassTransit.AzureServiceBus
         private readonly IBusRegistrationContext _registrationContext;
         private readonly IServiceProvider _provider;
         private readonly string _topicNamePrefix;
+        private readonly string _endpointNamePrefix;
         private Action<IServiceBusBusFactoryConfigurator> _busConfigurator;
         private readonly List<Endpoint> _endpoints = new List<Endpoint>();
         private Endpoint _currentEndpoint;
@@ -74,6 +75,7 @@ namespace Kros.MassTransit.AzureServiceBus
                 : ConfigDefaults.TokenTimeToLive;
             _provider = provider;
             _topicNamePrefix = options.TopicNamePrefix;
+            _endpointNamePrefix = options.EndpointNamePrefix;
             _retryConfigurator = CreateDefaultRetryConfigurator(options);
         }
 
@@ -119,7 +121,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <inheritdoc />
         public IBusConsumerBuilder ConfigureQueue(string queueName, Action<IServiceBusReceiveEndpointConfigurator> configurator)
         {
-            _currentEndpoint = new ReceiveEndpoint(queueName, configurator);
+            _currentEndpoint = new ReceiveEndpoint(PrefixEndpointName(queueName), configurator);
             _endpoints.Add(_currentEndpoint);
 
             return this;
@@ -130,7 +132,7 @@ namespace Kros.MassTransit.AzureServiceBus
             string subscriptionName,
             Action<IServiceBusSubscriptionEndpointConfigurator> configurator) where T : class
         {
-            _currentEndpoint = new SubscriptionEndpoint<T>(subscriptionName, configurator);
+            _currentEndpoint = new SubscriptionEndpoint<T>(PrefixEndpointName(subscriptionName), configurator);
             _endpoints.Add(_currentEndpoint);
 
             return this;
@@ -281,6 +283,9 @@ namespace Kros.MassTransit.AzureServiceBus
                     new PrefixEntityNameFormatter(configurator.MessageTopology.EntityNameFormatter, _topicNamePrefix));
             }
         }
+
+        private string PrefixEndpointName(string queueName) =>
+            string.IsNullOrEmpty(_endpointNamePrefix) ? queueName : $"{_endpointNamePrefix}{queueName}";
 
         #endregion
     }
