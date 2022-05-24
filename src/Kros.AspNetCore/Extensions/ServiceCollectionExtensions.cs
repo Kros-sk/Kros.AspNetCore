@@ -58,16 +58,6 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds the minimum essential MVC services to the DI container for web API services.
-        /// (MVC Core, JSON Formatters, CORS, API Explorer, Authorization)
-        /// Additional services must be added separately using the <see cref="IMvcBuilder"/> returned from this method.
-        /// </summary>
-        /// <param name="services">MVC builder.</param>
-        [Obsolete("AddWebApi() is deprecated, please use AddControllers() instead.")]
-        public static IMvcBuilder AddWebApi(this IServiceCollection services)
-            => services.AddControllers();
-
-        /// <summary>
         /// Attempts to set proxy to HttpClient.
         /// </summary>
         /// <param name="services">DI container.</param>
@@ -75,7 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// value is required.</param>
         public static IServiceCollection SetProxy(this IServiceCollection services, IConfiguration configuration)
         {
-            var section = configuration.GetSection("Proxy");
+            IConfigurationSection section = configuration.GetSection("Proxy");
             if (section.Exists())
             {
                 WebProxy proxy = section.Get<WebProxy>();

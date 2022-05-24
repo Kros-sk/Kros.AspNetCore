@@ -1,5 +1,6 @@
 ﻿using Kros.AspNetCore.Exceptions;
 using Kros.Utils;
+using MediatR;
 using MediatR.Pipeline;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Kros.MediatR.PostProcessors
     /// <typeparam name="TRequest">Request type.</typeparam>
     /// <typeparam name="TResponse">Response type.</typeparam>
     /// <exception cref="NotFoundException">If response is <see langword="null"/>.</exception>
-    public class NullCheckPostProcessor<TRequest, TResponse> : IRequestPostProcessor<TRequest, TResponse>
+    public class NullCheckPostProcessor<TRequest, TResponse> : IRequestPostProcessor<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly NullCheckPostProcessorOptions _options;
 

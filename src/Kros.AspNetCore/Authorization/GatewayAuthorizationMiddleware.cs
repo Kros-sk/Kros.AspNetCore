@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -71,13 +72,18 @@ namespace Kros.AspNetCore.Authorization
             IMemoryCache memoryCache,
             IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
-            if (httpContext.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues value))
+            if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string value))
             {
-                int key = GetKey(httpContext, value);
+                int key = CacheHttpHeadersHelper.TryGetValue(
+                    httpContext.Request.Headers,
+                    _jwtAuthorizationOptions.CacheKeyHttpHeaders,
+                    out string cacheKeyPart)
+                    ? GetKey(httpContext, value, cacheKeyPart)
+                    : GetKey(httpContext, value);
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    var authUrl =
+                    string authUrl =
                         _jwtAuthorizationOptions.GetAuthorizationUrl(serviceDiscoveryProvider) + httpContext.Request.Path.Value;
                     jwtToken = await GetUserAuthorizationJwtAsync(
                         httpContext,
@@ -129,6 +135,10 @@ namespace Kros.AspNetCore.Authorization
                 {
                     client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
                 }
+                if (_jwtAuthorizationOptions.ForwardedHeaders.Any())
+                {
+                    AddForwardedHeaders(client, httpContext.Request.Headers);
+                }
 
                 string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
                     new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
@@ -138,24 +148,51 @@ namespace Kros.AspNetCore.Authorization
             }
         }
 
+        private void AddForwardedHeaders(HttpClient client, IHeaderDictionary headers)
+        {
+            foreach (string headerName in _jwtAuthorizationOptions.ForwardedHeaders)
+            {
+                if (headers.TryGetValue(headerName, out StringValues value))
+                {
+                    client.DefaultRequestHeaders.Add(headerName, (IEnumerable<string>)value);
+                }
+            }
+        }
+
         private void SetTokenToCache(IMemoryCache memoryCache, int key, string jwtToken, HttpRequest request)
         {
-            if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero &&
-                !_jwtAuthorizationOptions.IgnoredPathForCache.Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase))
+            if (IsCacheAllowed() && !IsRequestPathAllowedForCache(request))
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
+                var cacheEntryOptions = new MemoryCacheEntryOptions();
+
+                if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
+                {
+                    cacheEntryOptions.SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
+                }
+                if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
+                {
+                    cacheEntryOptions.SetAbsoluteExpiration(_jwtAuthorizationOptions.CacheAbsoluteExpiration);
+                }
 
                 memoryCache.Set(key, jwtToken, cacheEntryOptions);
             }
         }
 
-        private static int GetKey(HttpContext httpContext, StringValues value)
+        private bool IsRequestPathAllowedForCache(HttpRequest request)
+            => _jwtAuthorizationOptions.IgnoredPathForCache
+            .Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase);
+
+        private bool IsCacheAllowed()
+            => _jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero
+                || _jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero;
+
+        internal static int GetKey(HttpContext httpContext, StringValues value)
             => HashCode.Combine(value, httpContext.Request.Path);
 
+        internal static int GetKey(HttpContext httpContext, StringValues value, string additionalKeyPart)
+            => HashCode.Combine(value, httpContext.Request.Path, additionalKeyPart);
+
         private void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
-        {
-            httpContext.Request.Headers[HeaderNames.Authorization] = $"Bearer {userJwtToken}";
-        }
+            => httpContext.Request.Headers[HeaderNames.Authorization] = $"{JwtAuthorizationHelper.AuthTokenPrefix} {userJwtToken}";
     }
 }

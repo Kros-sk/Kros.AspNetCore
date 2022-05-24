@@ -1,6 +1,12 @@
 trigger:
   tags:
-    include: [ 'appinsights-v*', 'aspnetcore-v*', 'masstransitaz-v*', 'mediatr-v*', 'swagger-v*' ]
+    include:
+      - 'appinsights-v*'
+      - 'aspnetcore-v*'
+      - 'masstransitaz-v*'
+      - 'mediatr-v*'
+      - 'problemdetails-v*'
+      - 'swagger-v*'
 
 pool: Default
 
@@ -25,6 +31,8 @@ variables:
     value: 'Kros.MassTransit.AzureServiceBus'
   - name: project.MediatR
     value: 'Kros.MediatR.Extensions'
+  - name: project.ProblemDetails
+    value: 'Kros.ProblemDetails.Extensions'
   - name: project.Swagger
     value: 'Kros.Swagger.Extensions'
   - name: 'project.Current'
@@ -49,6 +57,10 @@ steps:
     displayName: 'Set project: $(project.MediatR)'
     condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/mediatr-v')
 
+  - powershell: echo '##vso[task.setvariable variable=project.Current]$(project.ProblemDetails)'
+    displayName: 'Set project: $(project.ProblemDetails)'
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/problemdetails-v')
+
   - powershell: echo '##vso[task.setvariable variable=project.Current]$(project.Swagger)'
     displayName: 'Set project: $(project.Swagger)'
     condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/swagger-v')
@@ -61,6 +73,7 @@ steps:
       echo   - aspnetcore-v* - Kros.AspNetCore
       echo   - masstransitaz-v* - Kros.MassTransit.AzureServiceBus
       echo   - mediatr-v* - Kros.MediatR.Extensions
+      echo   - problemdetails-v* - Kros.ProblemDetails.Extensions
       echo   - swagger-v* - Kros.Swagger.Extensions
       exit 1
     displayName: 'Check project name'
@@ -88,16 +101,12 @@ steps:
     parameters:
       buildConfiguration: '$(BuildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Pack'
-    inputs:
-      command: pack
-      projects: '**/$(project.current).csproj'
-
   - task: CopyFiles@2
     displayName: 'Copy package files to staging directory'
     inputs:
-      Contents: '**/$(project.current)*.nupkg'
+      Contents: |
+        **/$(project.current)*.nupkg
+        **/$(project.current)*.snupkg
       TargetFolder: '$(build.artifactStagingDirectory)'
       FlattenFolders: true
 

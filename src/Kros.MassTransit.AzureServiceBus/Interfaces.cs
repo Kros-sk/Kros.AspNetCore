@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using GreenPipes.Configurators;
+using MassTransit;
 using MassTransit.Azure.ServiceBus.Core;
 using MassTransit.ConsumeConfigurators;
 using System;
@@ -15,7 +16,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// </summary>
         /// <param name="configurator">Delegate to configure service bus.</param>
         /// <returns>Self for further configuring.</returns>
-        IMassTransitForAzureBuilder ConfigureServiceBusFactory(Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> configurator = null);
+        IMassTransitForAzureBuilder ConfigureServiceBusFactory(Action<IServiceBusBusFactoryConfigurator> configurator = null);
     }
 
     /// <summary>
@@ -79,6 +80,13 @@ namespace Kros.MassTransit.AzureServiceBus
         IBusConsumerBuilder ConfigureSubscription<T>(
             string subscriptionName,
             Action<IServiceBusSubscriptionEndpointConfigurator> configurator) where T : class;
+
+        /// <summary>
+        /// Configures message retry using the retry configuration specified.
+        /// </summary>
+        /// <param name="configure">The retry configuration.</param>
+        /// <returns>Self for further configuring of endpoints and its consumers.</returns>
+        public IBusConsumerBuilder UseMessageRetry(Action<IRetryConfigurator> configure);
     }
 
     /// <summary>

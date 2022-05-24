@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Kros.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 
@@ -32,7 +34,7 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="scheme">Scheme name for authentication.</param>
         /// <param name="configuration">Configuration from which the options are loaded.</param>
         /// <param name="configureOptions">Configuration.</param>
-        public static IServiceCollection AddApiJwtAuthentication(
+        public static AuthenticationBuilder AddApiJwtAuthentication(
             this IServiceCollection services,
             string scheme,
             IConfiguration configuration,
@@ -48,7 +50,7 @@ namespace Kros.AspNetCore.Authorization
         /// <param name="schemeNames">Scheme names for authentication.</param>
         /// <param name="configuration">Configuration from which the options are loaded.</param>
         /// <param name="configureOptions">Configuration.</param>
-        public static IServiceCollection AddApiJwtAuthentication(
+        public static AuthenticationBuilder AddApiJwtAuthentication(
             this IServiceCollection services,
             IEnumerable<string> schemeNames,
             IConfiguration configuration,
@@ -93,7 +95,36 @@ namespace Kros.AspNetCore.Authorization
                 });
             }
 
-            return services;
+            return builder;
         }
+
+        /// <summary>
+        /// Configure API key Basic authentication.
+        /// </summary>
+        /// <param name="builder">Authentication builder.</param>
+        /// <param name="configuration">Configuration.</param>
+        public static AuthenticationBuilder AddApiKeyBasicAuthentication(
+            this AuthenticationBuilder builder,
+            IConfiguration configuration)
+        {
+            ApiKeyBasicAuthenticationOptions configOptions = configuration.GetSection<ApiKeyBasicAuthenticationOptions>();
+            if (configOptions == null)
+            {
+                throw new ArgumentNullException(nameof(configuration), $"{nameof(ApiKeyBasicAuthenticationOptions)} not found in configuration");
+            }
+            return builder.AddScheme<ApiKeyBasicAuthenticationOptions, ApiKeyBasicAuthenticationHandler>(configOptions.Scheme,
+                options =>
+                {
+                    options.ApiKey = configOptions.ApiKey;
+                    options.Scheme = configOptions.Scheme;
+                });
+        }
+
+        /// <summary>
+        /// Adds jwt bearer claims middleware dependencies.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        public static IServiceCollection AddJwtBearerClaims(this IServiceCollection services)
+            => services.AddSingleton<JwtSecurityTokenHandler>();
     }
 }

@@ -19,6 +19,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             (new JsonPatchException(), StatusCodes.Status400BadRequest),
             (new BadRequestException(), StatusCodes.Status400BadRequest),
             (new UnauthorizedAccessException(), StatusCodes.Status401Unauthorized),
+            (new PaymentRequiredException(), StatusCodes.Status402PaymentRequired),
             (new ResourceIsForbiddenException(), StatusCodes.Status403Forbidden),
             (new NotFoundException(), StatusCodes.Status404NotFound),
             (new TimeoutException(), StatusCodes.Status408RequestTimeout),
@@ -30,7 +31,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
         [InlineData(StatusCodes.Status201Created, StatusCodes.Status500InternalServerError)]
         [InlineData(StatusCodes.Status204NoContent, StatusCodes.Status500InternalServerError)]
         [InlineData(StatusCodes.Status401Unauthorized, StatusCodes.Status401Unauthorized)]
-        public void ChangeSuccessStatusCodeTo500AndRethrowException(int requestStatusCode, int responseStatusCode)
+        public async Task ChangeSuccessStatusCodeTo500AndRethrowException(int requestStatusCode, int responseStatusCode)
         {
             var context = new DefaultHttpContext();
             var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
@@ -41,7 +42,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
 
             Func<Task> action = async () => await middleware.Invoke(context);
 
-            action.Should().Throw<Exception>().WithMessage("Exception");
+            await action.Should().ThrowAsync<Exception>().WithMessage("Exception");
             context.Response.StatusCode.Should().Be(responseStatusCode);
         }
 
@@ -50,7 +51,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
         [InlineData(StatusCodes.Status201Created)]
         [InlineData(StatusCodes.Status204NoContent)]
         [InlineData(StatusCodes.Status401Unauthorized)]
-        public void NotChangeSuccessStatusCodeIfResponseHasStartedAndRethrowException(int responseStatusCode)
+        public async Task NotChangeSuccessStatusCodeIfResponseHasStartedAndRethrowException(int responseStatusCode)
         {
             HttpResponse response = Substitute.For<HttpResponse>();
             response.HasStarted.Returns(true);
@@ -65,7 +66,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
 
             Func<Task> action = async () => await middleware.Invoke(context);
-            action.Should().Throw<Exception>();
+            await action.Should().ThrowAsync<Exception>();
 
             context.Response.StatusCode.Should().Be(responseStatusCode);
         }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch.Exceptions;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.Middlewares
@@ -51,6 +52,10 @@ namespace Kros.AspNetCore.Middlewares
             {
                 SetResponseType(context, ex, StatusCodes.Status401Unauthorized);
             }
+            catch (PaymentRequiredException ex)
+            {
+                SetResponse(context, ex, StatusCodes.Status402PaymentRequired);
+            }
             catch (ResourceIsForbiddenException ex)
             {
                 SetResponseType(context, ex, StatusCodes.Status403Forbidden);
@@ -81,6 +86,31 @@ namespace Kros.AspNetCore.Middlewares
             {
                 context.Response.ClearExceptCorsHeaders();
                 context.Response.StatusCode = statusCode;
+                context.Response.WriteAsync(ex.Message).Wait();
+                LogStatusCodeChange(ex, statusCode);
+            }
+            _logger.LogError(ex, ex.Message);
+        }
+
+        private void SetResponse(HttpContext context, RequestUnsuccessfulException ex, int statusCode)
+        {
+            if (!context.Response.HasStarted)
+            {
+                context.Response.ClearExceptCorsHeaders();
+                context.Response.StatusCode = statusCode;
+
+                if (!string.IsNullOrEmpty(ex.ResponseContent))
+                {
+                    context.Response.ContentType = ex.ResponseContentType == null
+                        ? MediaTypeNames.Text.Plain
+                        : ex.ResponseContentType.ToString();
+                    context.Response.WriteAsync(ex.ResponseContent).Wait();
+                }
+                else
+                {
+                    context.Response.WriteAsync(ex.Message).Wait();
+                }
+
                 LogStatusCodeChange(ex, statusCode);
             }
             _logger.LogError(ex, ex.Message);

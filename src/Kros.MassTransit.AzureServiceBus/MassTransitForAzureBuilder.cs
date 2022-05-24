@@ -1,4 +1,6 @@
-﻿using Kros.MassTransit.AzureServiceBus.Endpoints;
+﻿using GreenPipes;
+using GreenPipes.Configurators;
+using Kros.MassTransit.AzureServiceBus.Endpoints;
 using Kros.Utils;
 using MassTransit;
 using MassTransit.Azure.ServiceBus.Core;
@@ -19,12 +21,14 @@ namespace Kros.MassTransit.AzureServiceBus
         #region Attributes
 
         private readonly string _connectionString;
-        private TimeSpan _tokenTimeToLive;
+        private readonly TimeSpan _tokenTimeToLive;
+        private readonly IBusRegistrationContext _registrationContext;
         private readonly IServiceProvider _provider;
         private readonly string _topicNamePrefix;
-        private Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> _busConfigurator;
+        private Action<IServiceBusBusFactoryConfigurator> _busConfigurator;
         private readonly List<Endpoint> _endpoints = new List<Endpoint>();
         private Endpoint _currentEndpoint;
+        private Action<IRetryConfigurator> _retryConfigurator;
 
         #endregion
 
@@ -70,6 +74,17 @@ namespace Kros.MassTransit.AzureServiceBus
                 : ConfigDefaults.TokenTimeToLive;
             _provider = provider;
             _topicNamePrefix = options.TopicNamePrefix;
+            _retryConfigurator = CreateDefaultRetryConfigurator(options);
+        }
+
+        /// <summary>
+        /// Ctor.
+        /// </summary>
+        /// <param name="registrationContext">MassTransit registration context.</param>
+        public MassTransitForAzureBuilder(IBusRegistrationContext registrationContext)
+            : this((IServiceProvider)registrationContext)
+        {
+            _registrationContext = registrationContext;
         }
 
         /// <summary>
@@ -91,7 +106,7 @@ namespace Kros.MassTransit.AzureServiceBus
 
         /// <inheritdoc />
         public IMassTransitForAzureBuilder ConfigureServiceBusFactory(
-            Action<IServiceBusBusFactoryConfigurator, IServiceBusHost> configurator = null)
+            Action<IServiceBusBusFactoryConfigurator> configurator = null)
         {
             _busConfigurator = configurator;
             return this;
@@ -159,6 +174,30 @@ namespace Kros.MassTransit.AzureServiceBus
 
         #endregion
 
+        #region Retrying
+
+        /// <inheritdoc/>
+        public IBusConsumerBuilder UseMessageRetry(Action<IRetryConfigurator> configure)
+        {
+            _retryConfigurator = configure;
+            return this;
+        }
+
+        private Action<IRetryConfigurator> CreateDefaultRetryConfigurator(AzureServiceBusOptions options)
+        {
+            if (options.IntervalRetry?.Limit > 0)
+            {
+                int limit = options.IntervalRetry.Limit;
+                int interval = options.IntervalRetry.Interval;
+
+                return new Action<IRetryConfigurator>(retry =>
+                    retry.Interval(limit, interval));
+            }
+            return null;
+        }
+
+        #endregion
+
         #region Build
 
         /// <inheritdoc />
@@ -166,15 +205,20 @@ namespace Kros.MassTransit.AzureServiceBus
         {
             IBusControl bus = Bus.Factory.CreateUsingAzureServiceBus(busCfg =>
             {
-                IServiceBusHost host = CreateServiceHost(busCfg);
+                CreateServiceHost(busCfg);
 
-                ConfigureServiceBus(busCfg, host);
+                ConfigureServiceBus(busCfg);
                 AddMessageTypePrefix(busCfg);
                 AddEndpoints(busCfg);
 
-                if (_provider != null)
+                if (_retryConfigurator != null)
                 {
-                    busCfg.UseHealthCheck(_provider);
+                    busCfg.UseMessageRetry(_retryConfigurator);
+                }
+
+                if (_registrationContext != null)
+                {
+                    busCfg.UseHealthCheck(_registrationContext);
                 }
             });
 
@@ -186,11 +230,10 @@ namespace Kros.MassTransit.AzureServiceBus
         /// </summary>
         /// <param name="busCfg">Service bus configuration.</param>
         /// <returns>Service bus host.</returns>
-        private IServiceBusHost CreateServiceHost(IServiceBusBusFactoryConfigurator busCfg)
+        private void CreateServiceHost(IServiceBusBusFactoryConfigurator busCfg)
         {
             var cstrBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
-
-            return busCfg.Host(_connectionString, hostCfg =>
+            busCfg.Host(_connectionString, hostCfg =>
             {
                 hostCfg.SharedAccessSignature(sasCfg =>
                 {
@@ -205,8 +248,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// Configures service bus.
         /// </summary>
         /// <param name="busCfg">Service bus configuration.</param>
-        /// <param name="host">Service bus host.</param>
-        private void ConfigureServiceBus(IServiceBusBusFactoryConfigurator busCfg, IServiceBusHost host)
+        private void ConfigureServiceBus(IServiceBusBusFactoryConfigurator busCfg)
         {
             busCfg.UseJsonSerializer();
             busCfg.DefaultMessageTimeToLive = ConfigDefaults.MessageTimeToLive;
@@ -216,7 +258,7 @@ namespace Kros.MassTransit.AzureServiceBus
             busCfg.MaxDeliveryCount = ConfigDefaults.MaxDeliveryCount;
             busCfg.EnableDuplicateDetection(ConfigDefaults.DuplicateDetectionWindow);
 
-            _busConfigurator?.Invoke(busCfg, host);
+            _busConfigurator?.Invoke(busCfg);
         }
 
         /// <summary>

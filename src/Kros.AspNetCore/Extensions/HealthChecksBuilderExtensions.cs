@@ -1,5 +1,4 @@
-﻿using Kros.Identity.Extensions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -11,6 +10,8 @@ namespace Kros.AspNetCore.Extensions
     /// </summary>
     public static class HealthChecksBuilderExtensions
     {
+        private const string HealthEndpointUri = "health";
+
         /// <summary>
         /// Adds identity server health check.
         /// </summary>
@@ -23,12 +24,19 @@ namespace Kros.AspNetCore.Extensions
             foreach (IdentityServerOptions option in identityServerOptions)
             {
                 healthChecksBuilder.AddUrlGroup(
-                    new Uri(option.AuthorityUrl),
+                    GetHealthEndpointUri(option.AuthorityUrl),
                     name: string.Format(Properties.Resources.IdentityHealthCheckBuilderName, option.AuthenticationScheme),
                     tags: new string[] { "url" });
             }
 
             return healthChecksBuilder;
+        }
+
+        private static Uri GetHealthEndpointUri(string authorityUrl)
+        {
+            var uriBuilder = new UriBuilder(authorityUrl);
+            uriBuilder.Path = HealthEndpointUri;
+            return uriBuilder.Uri;
         }
     }
 }

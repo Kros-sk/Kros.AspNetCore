@@ -51,15 +51,23 @@ namespace Kros.AspNetCore.ServiceDiscovery
         /// <inheritdoc />
         public Uri GetService(string serviceName)
         {
-            string uri = _configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:DownstreamPath");
+            string GetSectionKey(string propertyName) => $"{_option.SectionName}:{serviceName}:{propertyName}";
+            string uri = _configuration.GetValue<string>(GetSectionKey("DownstreamPath"));
+            bool force = _configuration.GetValue<bool>(GetSectionKey("ForceDownstreamPath"));
 
-            if (uri.IsNullOrEmpty())
+            if (_option.AllowServiceNameAsHost && !force)
+            {
+                return new UriBuilder(_option.Scheme, serviceName, _option.Port).Uri;
+            }
+            else if (!uri.IsNullOrEmpty())
+            {
+                return new Uri(uri);
+            }
+            else
             {
                 throw new ArgumentException(
                     string.Format(Resources.ServiceDefinitionDoesntExist, serviceName, _option.SectionName));
             }
-
-            return new Uri(uri);
         }
 
         /// <inheritdoc />

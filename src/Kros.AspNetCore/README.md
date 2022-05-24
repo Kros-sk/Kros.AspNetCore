@@ -7,9 +7,9 @@
   - [Middlewares](#middlewares)
   - [Extensions](#extensions)
     - [Configuration](#configuration)
-      - [Príklad](#pr%c3%adklad)
+      - [Príklad](#príklad)
     - [ConfigurationBuilderExtensions](#configurationbuilderextensions)
-      - [Príklad](#pr%c3%adklad-1)
+      - [Príklad](#príklad-1)
     - [DistributedCacheExtensions](#distributedcacheextensions)
     - [CorsExtensions](#corsextensions)
   - [BaseStartup](#basestartup)
@@ -19,6 +19,7 @@
     - [Custom mapping](#custom-mapping)
   - [Service Discovery Provider](#service-discovery-provider)
     - [Get started](#get-started)
+      - [Allow service name as host](#allow-service-name-as-host)
     - [GatewayAuthorizationMiddleware](#gatewayauthorizationmiddleware)
 
 ## Exceptions
@@ -140,6 +141,7 @@ var toDo = await _cache.GetAndSetAsync(
 ### CorsExtensions
 
 Obsahuje nastavenie `CORS` policy. Je možné povoliť všetky domény pomocou `AddAllowAnyOriginCors`, alebo povoliť iba vymenované domény pomocou metódy `AddCustomOriginsCorsPolicy`. Tieto domény je potrebné vymenovať v `appsettings.json` v sekcii `AllowedHosts`.
+Obe metódy nastavujú cachovanie preflight requestov (OPTIONS) defaultne na 1 hodinu.
 
 ## BaseStartup
 
@@ -155,6 +157,9 @@ To add middleware, you must first register the related services `services.AddGat
 and then register `app.UseGatewayJwtAuthorization()` to the pipeline.
 
 You can use `JwtAuthorizationHelper` to generate a Jwt token.
+
+If you need to use claims from credential token right away, adding `JwtBearerClaimsMiddleware` after `GatewayAuthorizationMiddleware` will add claims from cretential token to httpContext claims.
+To add `JwtBearerClaimsMiddleware` register it's dependencies with `services.AddJwtBearerClaims` and register `app.UseJwtBearerClaims` to the pipeline. 
 
 ## JsonPatchDocumentExtensions
 
@@ -279,6 +284,42 @@ alebo
 provider.GetService(ServiceType.Organizations);
 ```
 
+#### Allow service name as host
+
+V prípade Docker prostredia je možné využiť situáciu, že služby bežia pod rovnakým portom a názov hostu je znodný s názvom služby. V tomto prípade je potrebné nastaviť vlastnosť `AllowServiceNameAsHost` na `true`.
+
+```csharp
+services.AddServiceDiscovery((o) =>
+{
+    o.AllowServiceNameAsHost = true;
+});
+```
+
+Je možné explicitne definovať `Port` a `Scheme`.
+
+```csharp
+services.AddServiceDiscovery((o) =>
+{
+    o.AllowServiceNameAsHost = true;
+    o.Port = 443;
+    o.Scheme = "https";
+});
+```
+
+> Pokiaľ ich nešpecifikujeme tak sa použije `80` a `http`.
+
+V prípade, že chcete niektorú adresu vynútiť *(nechcete sa aby sa použil názov služby ako host, ale aby sa použila zadaná `DownstreamPath`, tak je potebné zadať vlastnostnosť `ForceDownstreamPath:true`)*.
+
+```json
+"catalog": {
+    "DownstreamPath": "http://localhost:9004",
+    "ForceDownstreamPath": true,
+    "paths": {
+        "create": "/api/catalog"
+    }
+},
+```
+
 ### GatewayAuthorizationMiddleware
 
 Už aj `GatewayAuthorizationMiddleware` podporuje `IServiceDiscoveryProvider`
@@ -293,7 +334,8 @@ Už aj `GatewayAuthorizationMiddleware` podporuje `IServiceDiscoveryProvider`
       "ServiceName": "authorization",
       "PathName": "jwt"
     },
-    "CacheSlidingExpirationOffset": "00:00:00",
+    "CacheSlidingExpirationOffset": "00:01:00",
+    "CacheAbsoluteExpiration": "00:04:00",
     "IgnoredPathForCache": [
       "/organizations"
     ]

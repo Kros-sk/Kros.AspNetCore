@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
+    <Version>2.0.0</Version>
+    <Description>Simple extensions for ProblemDetails.</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageProjectUrl>https://github.com/Kros-sk/Kros.AspNetCore</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
+    <PackageTags>ProblemDetails;Utils;Utility;Helpers;Extensions;</PackageTags>
+    <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\packageIcon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Hellang.Middleware.ProblemDetails" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kros.AspNetCore\Kros.AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>
