@@ -12,6 +12,8 @@ namespace Kros.AspNetCore.Tests.Extensions
 {
     public class ConfigurationBuilderExtensionsShould
     {
+        #region App configuration
+
         [Fact]
         public void LoadAppConfigOptions()
         {
@@ -101,6 +103,48 @@ namespace Kros.AspNetCore.Tests.Extensions
             config.Sources.Count.Should().Be(0);
         }
 
+        #endregion
+
+        #region Key vault
+
+        [Fact]
+        public void LoadKeyVaultOptions()
+        {
+            IConfiguration cfg = GetConfiguration();
+            KeyVaultOptions actualKv = new();
+            cfg.Bind("KeyVault", actualKv);
+
+            var expectedKv = new KeyVaultOptions
+            {
+                Name = "example-kv",
+                IdentityClientId = "Lorem",
+                ReloadInterval = TimeSpan.FromSeconds(2 * 60 + 15)
+            };
+            expectedKv.Prefixes.AddRange(new[] { "Example1", "Example2" });
+
+            actualKv.Should().BeEquivalentTo(expectedKv);
+        }
+
+        [Fact]
+        public void LoadEmptyKeyVaultOptions()
+        {
+            IConfiguration cfg = new ConfigurationBuilder().Build();
+            KeyVaultOptions actualKv = new();
+            cfg.Bind("KeyVault", actualKv);
+
+            var expectedKv = new KeyVaultOptions
+            {
+                Name = string.Empty,
+                IdentityClientId = string.Empty
+            };
+
+            actualKv.Should().BeEquivalentTo(expectedKv);
+        }
+
+        #endregion
+
+        #region Helpers
+
         private HostBuilderContext CreateHostBuilderContext()
         {
             var context = new HostBuilderContext(new Dictionary<object, object>());
@@ -112,5 +156,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
         private static IConfiguration GetConfiguration()
            => new ConfigurationBuilder().AddJsonFile("Extensions\\appsettings.configuration-test.json").Build();
+
+        #endregion
     }
 }
