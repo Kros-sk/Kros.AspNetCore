@@ -36,17 +36,14 @@ namespace Kros.AspNetCore.Extensions
                 return configBuilder;
             }
 
-            DefaultAzureCredentialOptions credentialOptions = new()
+            DefaultAzureCredential credential = CreateAzureCredential(kvOptions.IdentityClientId);
+            AzureKeyVaultConfigurationOptions kvConfigOptions = new()
             {
-                ManagedIdentityClientId = kvOptions.IdentityClientId
+                Manager = kvOptions.Prefixes.Count == 0
+                    ? new KeyVaultSecretManager()
+                    : new PrefixKeyVaultSecretManager(kvOptions.Prefixes),
+                ReloadInterval = kvOptions.ReloadInterval > default(TimeSpan) ? kvOptions.ReloadInterval : null
             };
-            DefaultAzureCredential credential = new(credentialOptions);
-
-            AzureKeyVaultConfigurationOptions kvConfigOptions = new();
-            kvConfigOptions.Manager = kvOptions.Prefixes.Count == 0
-                ? new KeyVaultSecretManager()
-                : new PrefixKeyVaultSecretManager(kvOptions.Prefixes);
-            kvConfigOptions.ReloadInterval = kvOptions.ReloadInterval > default(TimeSpan) ? kvOptions.ReloadInterval : null;
 
             configBuilder.AddAzureKeyVault(new Uri($"https://{kvOptions.Name}.vault.azure.net/"), credential, kvConfigOptions);
 
@@ -87,12 +84,7 @@ namespace Kros.AspNetCore.Extensions
 
             config.AddAzureAppConfiguration(options =>
             {
-                DefaultAzureCredentialOptions credentialOptions = new()
-                {
-                    ManagedIdentityClientId = appConfig.IdentityClientId
-                };
-                var credential = new DefaultAzureCredential(credentialOptions);
-
+                DefaultAzureCredential credential = CreateAzureCredential(appConfig.IdentityClientId);
                 options
                     .Connect(new Uri(appConfig.Endpoint), credential)
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
@@ -165,6 +157,15 @@ namespace Kros.AspNetCore.Extensions
                     refreshConfiguration?.Invoke(config);
                 });
             }
+        }
+
+        private static DefaultAzureCredential CreateAzureCredential(string managedIdentityClientId)
+        {
+            DefaultAzureCredentialOptions credentialOptions = new()
+            {
+                ManagedIdentityClientId = managedIdentityClientId
+            };
+            return new DefaultAzureCredential(credentialOptions);
         }
     }
 }
