@@ -118,7 +118,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             {
                 Name = "example-kv",
                 IdentityClientId = "Lorem",
-                ReloadInterval = TimeSpan.FromSeconds(2 * 60 + 15)
+                ReloadInterval = TimeSpan.FromSeconds((2 * 60) + 15)
             };
             expectedKv.Prefixes.AddRange(new[] { "Example1", "Example2" });
 
