@@ -141,6 +141,42 @@ namespace Kros.AspNetCore.Tests.Extensions
             actualKv.Should().BeEquivalentTo(expectedKv);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("lorem")]
+        public void ShouldAddKeyVaultSourceIfNameIsPresent(string prefix)
+        {
+            IConfigurationBuilder cfgBuilder = new ConfigurationBuilder();
+            cfgBuilder.AddAzureKeyVault(options =>
+            {
+                options.Name = "example-kv";
+                if (prefix is not null)
+                {
+                    options.Prefixes.Add(prefix);
+                }
+            });
+
+            cfgBuilder.Sources.Should().HaveCount(1);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("lorem")]
+        public void ShouldNotAddKeyVaultSourceIfNameIsNotPresent(string prefix)
+        {
+            IConfigurationBuilder cfgBuilder = new ConfigurationBuilder();
+            cfgBuilder.AddAzureKeyVault(options =>
+            {
+                options.Name = "";
+                if (prefix is not null)
+                {
+                    options.Prefixes.Add(prefix);
+                }
+            });
+
+            cfgBuilder.Sources.Should().HaveCount(0);
+        }
+
         #endregion
 
         #region Helpers
