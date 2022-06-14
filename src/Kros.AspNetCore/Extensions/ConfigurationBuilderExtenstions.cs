@@ -1,4 +1,5 @@
-﻿using Azure.Identity;
+﻿using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
 using Kros.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
@@ -14,6 +15,41 @@ namespace Kros.AspNetCore.Extensions
     /// </summary>
     public static class ConfigurationBuilderExtenstions
     {
+        /// <summary>
+        /// Adds an <see cref="IConfigurationProvider"/> that reads configuration values from the Azure KeyVault.
+        /// </summary>
+        /// <param name="configBuilder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+        /// <param name="options">Delegate to configure key vault options. The options are preconfigured with values
+        /// from section <c>KeyVault</c> in <c>appsettings.json</c> configuration.</param>
+        /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
+        public static IConfigurationBuilder AddAzureKeyVault(
+            this IConfigurationBuilder configBuilder,
+            Action<KeyVaultOptions> options = null)
+        {
+            IConfigurationRoot settings = configBuilder.Build();
+            KeyVaultOptions kvOptions = new();
+            settings.Bind("KeyVault", kvOptions);
+            options?.Invoke(kvOptions);
+
+            if (string.IsNullOrWhiteSpace(kvOptions.Name))
+            {
+                return configBuilder;
+            }
+
+            DefaultAzureCredential credential = CreateAzureCredential(kvOptions.IdentityClientId);
+            AzureKeyVaultConfigurationOptions kvConfigOptions = new()
+            {
+                Manager = kvOptions.Prefixes.Count == 0
+                    ? new KeyVaultSecretManager()
+                    : new PrefixKeyVaultSecretManager(kvOptions.Prefixes),
+                ReloadInterval = kvOptions.ReloadInterval > default(TimeSpan) ? kvOptions.ReloadInterval : null
+            };
+
+            configBuilder.AddAzureKeyVault(new Uri($"https://{kvOptions.Name}.vault.azure.net/"), credential, kvConfigOptions);
+
+            return configBuilder;
+        }
+
         /// <summary>
         /// Add local.json configuration.
         /// </summary>
@@ -48,12 +84,7 @@ namespace Kros.AspNetCore.Extensions
 
             config.AddAzureAppConfiguration(options =>
             {
-                DefaultAzureCredentialOptions credentialOptions = new()
-                {
-                    ManagedIdentityClientId = appConfig.IdentityClientId
-                };
-                var credential = new DefaultAzureCredential(credentialOptions);
-
+                DefaultAzureCredential credential = CreateAzureCredential(appConfig.IdentityClientId);
                 options
                     .Connect(new Uri(appConfig.Endpoint), credential)
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
@@ -98,7 +129,7 @@ namespace Kros.AspNetCore.Extensions
             => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration);
 
         /// <inheritdoc cref="AddAzureAppConfig(IConfigurationBuilder, HostBuilderContext, Action{AzureAppConfigurationRefreshOptions})"/>
-        [Obsolete("Use AddAzureAppConfiguration(...) method.")]
+        [Obsolete("Use AddAzureAppConfig(...) method.")]
         public static IConfigurationBuilder AddAzureAppConfiguration(
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext,
@@ -126,6 +157,15 @@ namespace Kros.AspNetCore.Extensions
                     refreshConfiguration?.Invoke(config);
                 });
             }
+        }
+
+        private static DefaultAzureCredential CreateAzureCredential(string managedIdentityClientId)
+        {
+            DefaultAzureCredentialOptions credentialOptions = new()
+            {
+                ManagedIdentityClientId = managedIdentityClientId
+            };
+            return new DefaultAzureCredential(credentialOptions);
         }
     }
 }

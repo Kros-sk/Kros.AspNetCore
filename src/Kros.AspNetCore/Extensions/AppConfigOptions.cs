@@ -20,7 +20,9 @@ namespace Kros.AspNetCore.Extensions
         public string IdentityClientId { get; set; } = "";
 
         /// <summary>
-        /// List of prefixes that specifies shich values will be loaded from App Configuration.
+        /// List of prefixes that specifies which values will be loaded from App Configuration. Prefix is separated
+        /// from the rest of the configuration name with colon <c>:</c>. So prefix itself, cannot contain colon.
+        /// In this list, prefixes are set without trailing colon (<c>:</c>).
         /// </summary>
         public List<string> Settings { get; } = new List<string>();
 
