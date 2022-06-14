@@ -30,6 +30,7 @@ namespace Kros.AspNetCore.Extensions
         public PrefixKeyVaultSecretManager(string prefix)
         {
             Check.NotNullOrWhiteSpace(prefix, nameof(prefix));
+            CheckPrefix(prefix, nameof(prefix));
             AddPrefix(prefix);
         }
 
@@ -50,6 +51,7 @@ namespace Kros.AspNetCore.Extensions
             {
                 if (!string.IsNullOrWhiteSpace(prefix))
                 {
+                    CheckPrefix(prefix, nameof(prefixes));
                     AddPrefix(prefix);
                 }
             }
@@ -57,6 +59,14 @@ namespace Kros.AspNetCore.Extensions
             {
                 throw new ArgumentException("At least one valid prefix must be supplied. Prefix cannot be an empty string " +
                     "or consists only of white-space characters.", nameof(prefixes));
+            }
+        }
+
+        private static void CheckPrefix(string prefix, string paramName)
+        {
+            if (prefix.Contains('-'))
+            {
+                throw new ArgumentException($"Prefix cannot contain dash '-'. Invalid prefix: '{prefix}'", paramName);
             }
         }
 

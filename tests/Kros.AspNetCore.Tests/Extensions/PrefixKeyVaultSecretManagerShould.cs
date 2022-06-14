@@ -69,6 +69,23 @@ namespace Kros.AspNetCore.Tests.Extensions
             manager.GetKey(secret).Should().Be(configKey);
         }
 
+        [Fact]
+        public void ThrowWhenPrefixIsInvalid()
+        {
+            Func<PrefixKeyVaultSecretManager> action = () => new PrefixKeyVaultSecretManager("invalid-prefix");
+            action.Should().Throw<ArgumentException>()
+                .WithMessage("*invalid-prefix*");
+        }
+
+        [Fact]
+        public void ThrowWhenSomeOfPrefixesIsInvalid()
+        {
+            Func<PrefixKeyVaultSecretManager> action = () => new PrefixKeyVaultSecretManager(
+                new[] { "validPrefix1", "validPrefix2", "invalid-prefix", "validPrefix3" });
+            action.Should().Throw<ArgumentException>()
+                .WithMessage("*invalid-prefix*");
+        }
+
         private static PrefixKeyVaultSecretManager CreateManager() => new(new[] { "Lorem", "DOLOR" });
     }
 }
