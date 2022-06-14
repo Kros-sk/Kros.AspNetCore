@@ -40,7 +40,7 @@ namespace Kros.AspNetCore.Extensions
         /// <exception cref="ArgumentNullException">
         /// The value of <paramref name="prefixes"/> is <see langword="null"/>.
         /// </exception>
-        /// <exception cref="ArgumentException"><paramref name="prefixes"/> is an ampty list, or does not contain any valid
+        /// <exception cref="ArgumentException"><paramref name="prefixes"/> is an empty list, or does not contain any valid
         /// prefix. Prefix must not be an empty string or a string containing only white-space characters.
         /// </exception>
         public PrefixKeyVaultSecretManager(IEnumerable<string> prefixes)

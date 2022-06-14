@@ -20,8 +20,9 @@ namespace Kros.AspNetCore.Extensions
         public string IdentityClientId { get; set; } = string.Empty;
 
         /// <summary>
-        /// List of prefixes that specifies which secrets will be loaded from key vault.
-        /// Prefixes are set without trailing dash (<c>-</c>).
+        /// List of prefixes that specifies which secrets will be loaded from key vault. Prefix is separated
+        /// from the rest of the secret name with dash <c>-</c>. So prefix itself, cannot contain dash.
+        /// In this list, prefixes are set without trailing dash (<c>-</c>).
         /// </summary>
         public List<string> Prefixes { get; } = new();
 
