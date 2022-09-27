@@ -72,14 +72,14 @@ namespace Kros.AspNetCore.Authorization
             IMemoryCache memoryCache,
             IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
-            if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string value))
+            if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string token))
             {
                 int key = CacheHttpHeadersHelper.TryGetValue(
                     httpContext.Request.Headers,
                     _jwtAuthorizationOptions.CacheKeyHttpHeaders,
                     out string cacheKeyPart)
-                    ? GetKey(httpContext, value, cacheKeyPart)
-                    : GetKey(httpContext, value);
+                    ? GetKey(token, cacheKeyPart)
+                    : GetKey(token);
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
@@ -89,7 +89,7 @@ namespace Kros.AspNetCore.Authorization
                         httpContext,
                         httpClientFactory,
                         memoryCache,
-                        value,
+                        token,
                         key,
                         authUrl);
                 }
@@ -99,7 +99,7 @@ namespace Kros.AspNetCore.Authorization
             else if (!string.IsNullOrEmpty(_jwtAuthorizationOptions.HashParameterName)
                 && httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
             {
-                int key = GetKey(httpContext, hashValue.ToString());
+                int key = GetKey(hashValue.ToString());
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
                     var uriBuilder = new UriBuilder(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
@@ -186,11 +186,8 @@ namespace Kros.AspNetCore.Authorization
             => _jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero
                 || _jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero;
 
-        internal static int GetKey(HttpContext httpContext, StringValues value)
-            => HashCode.Combine(value, httpContext.Request.Path);
-
-        internal static int GetKey(HttpContext httpContext, StringValues value, string additionalKeyPart)
-            => HashCode.Combine(value, httpContext.Request.Path, additionalKeyPart);
+        internal static int GetKey(StringValues value, string additionalKeyPart = null)
+            => (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
 
         private void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
             => httpContext.Request.Headers[HeaderNames.Authorization] = $"{JwtAuthorizationHelper.AuthTokenPrefix} {userJwtToken}";
