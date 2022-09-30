@@ -13,7 +13,7 @@ namespace Kros.Swagger.Extensions
     public static class SwaggerGenOptionsExtensions
     {
         /// <summary>
-        /// Add <see cref="StringEnumSchemaFilter"/> to Swagger generator options.
+        /// Add <see cref="EnumSchemaFilter"/> to Swagger generator options.
         /// </summary>
         /// <param name="opt">Swagger generator options.</param>
         /// <param name="enumTypes">Enum types to extend. All types must be of Enum type, or <see cref="ArgumentException"/>
@@ -23,9 +23,18 @@ namespace Kros.Swagger.Extensions
         public static SwaggerGenOptions AddStringEnumSchemaFilter(
             this SwaggerGenOptions opt,
             IEnumerable<Type> enumTypes,
-            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null)
+            IEnumerable<string> xmlDocPaths = null,
+            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null,
+            Action<OpenApiParameter, ParameterFilterContext> parameterAction = null)
         {
-            opt.SchemaFilter<StringEnumSchemaFilter>(enumTypes, schemaAction ?? StringEnumSchemaFilter.DummySchemaAction);
+            opt.SchemaFilter<EnumSchemaFilter>(
+                enumTypes,
+                xmlDocPaths ?? EnumHelpers.DummyXmlDocPaths,
+                schemaAction ?? EnumHelpers.DummySchemaAction);
+            opt.ParameterFilter<EnumParameterFilter>(
+                enumTypes,
+                xmlDocPaths ?? EnumHelpers.DummyXmlDocPaths,
+                parameterAction ?? EnumHelpers.DummyParameterAction);
             return opt;
         }
 
