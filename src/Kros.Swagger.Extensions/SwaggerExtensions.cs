@@ -45,19 +45,10 @@ namespace Kros.Swagger.Extensions
                 options.CustomSchemaIds(x => x.FullName); // https://wegotcode.com/microsoft/swagger-fix-for-dotnetcore/
             });
 
-            string assemblyName = AppDomain.CurrentDomain.FriendlyName;
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
-
-                string documentationFilePath = GetXmlDocumentationFilePath(assemblyName);
-                if (File.Exists(documentationFilePath))
-                {
-                    c.IncludeXmlComments(documentationFilePath);
-                }
-
-                c.DocumentFilter<EnumDocumentFilter>();
+                c.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory();
                 AddSwaggerSecurity(c, swaggerDocumentationSettings);
 
                 setupAction?.Invoke(c);
@@ -105,9 +96,6 @@ namespace Kros.Swagger.Extensions
 
             return configurationSection.Exists() ? configurationSection.Get<OpenApiInfo>() : null;
         }
-
-        private static string GetXmlDocumentationFilePath(string assemblyName)
-            => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".xml");
 
         /// <summary>
         /// Adds Swagger documentation generator middleware.
