@@ -49,7 +49,6 @@ namespace Kros.Swagger.Extensions
             {
                 c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
                 c.IncludeXmlCommentsFromCurrentDomainAssembly();
-                c.DocumentFilter<EnumDocumentFilter>();
                 AddSwaggerSecurity(c, swaggerDocumentationSettings);
 
                 setupAction?.Invoke(c);
