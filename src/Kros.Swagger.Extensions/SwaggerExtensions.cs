@@ -48,7 +48,7 @@ namespace Kros.Swagger.Extensions
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
-                c.IncludeXmlCommentsFromCurrentDomainAssembly();
+                c.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory();
                 AddSwaggerSecurity(c, swaggerDocumentationSettings);
 
                 setupAction?.Invoke(c);

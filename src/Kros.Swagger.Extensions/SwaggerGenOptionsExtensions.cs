@@ -189,16 +189,5 @@ namespace Kros.Swagger.Extensions
         public static List<string> IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory(
             this SwaggerGenOptions opt)
             => IncludeXmlCommentsFromAllFiles(opt, AppDomain.CurrentDomain.BaseDirectory);
-
-        internal static SwaggerGenOptions IncludeXmlCommentsFromCurrentDomainAssembly(this SwaggerGenOptions opt)
-        {
-            string assemblyName = AppDomain.CurrentDomain.FriendlyName;
-            string documentationFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".xml");
-            if (File.Exists(documentationFilePath))
-            {
-                opt.IncludeXmlComments(documentationFilePath);
-            }
-            return opt;
-        }
     }
 }
