@@ -260,7 +260,6 @@ namespace Kros.Swagger.Extensions
             return enumMemberSummary;
         }
 
-
         private static string CreateEnumMemberDescription(long enumValue, string enumMemberName, string enumXmlSummary)
             => string.IsNullOrEmpty(enumXmlSummary)
                 ? $"<li>{enumMemberName} ({enumValue})</li>"
