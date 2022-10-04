@@ -138,12 +138,13 @@ namespace Kros.Swagger.Extensions
         /// <inheritdoc/>
         void ISchemaFilter.Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            if (_enumTypeFilter(context.Type))
+            Type enumType = context.Type;
+            if ((enumType != null) && _enumTypeFilter(enumType))
             {
                 schema.Type = "string | integer";
-                schema.Format = Enum.GetUnderlyingType(context.Type).Name;
-                schema.Description = CreateEnumMembersDescription(context.Type, schema.Description);
-                schema.Enum = CreateStringEnumMembers(context.Type);
+                schema.Format = Enum.GetUnderlyingType(enumType).Name;
+                schema.Description = CreateEnumMembersDescription(enumType, schema.Description);
+                schema.Enum = CreateStringEnumMembers(enumType);
                 _schemaAction?.Invoke(schema, context);
             }
         }
@@ -151,8 +152,8 @@ namespace Kros.Swagger.Extensions
         /// <inheritdoc/>
         void IParameterFilter.Apply(OpenApiParameter parameter, ParameterFilterContext context)
         {
-            Type paramType = context.ParameterInfo.ParameterType;
-            if (_enumTypeFilter(paramType))
+            Type paramType = context.ParameterInfo?.ParameterType;
+            if ((paramType != null) && _enumTypeFilter(paramType))
             {
                 parameter.Description = CreateEnumMembersDescription(paramType, parameter.Description);
                 _parameterAction?.Invoke(parameter, context);
@@ -220,12 +221,11 @@ namespace Kros.Swagger.Extensions
 
         private void AppendEnumMembers(StringBuilder sb, Type enumType)
         {
-            sb.AppendLine("<p>Members:</p>");
+            sb.AppendLine("<p>Values:</p>");
             sb.AppendLine("<ul>");
             foreach (string enumMemberName in Enum.GetNames(enumType))
             {
-                // This may lead to errors (runtime or maybe just in documentation), if underlying type will be unsigned.
-                long enumValue = Convert.ToInt64(Enum.Parse(enumType, enumMemberName));
+                object enumValue = Convert.ChangeType(Enum.Parse(enumType, enumMemberName), enumType.GetEnumUnderlyingType());
                 string enumMemberSummary = GetXmlSummaryForEnumMember($"F:{enumType.FullName}.{enumMemberName}");
                 sb.AppendLine(CreateEnumMemberDescription(enumValue, enumMemberName, enumMemberSummary));
             }
@@ -260,7 +260,7 @@ namespace Kros.Swagger.Extensions
             return enumMemberSummary;
         }
 
-        private static string CreateEnumMemberDescription(long enumValue, string enumMemberName, string enumXmlSummary)
+        private static string CreateEnumMemberDescription(object enumValue, string enumMemberName, string enumXmlSummary)
             => string.IsNullOrEmpty(enumXmlSummary)
                 ? $"<li>{enumMemberName} ({enumValue})</li>"
                 : $"<li>{enumMemberName} ({enumValue}) — {enumXmlSummary}</li>";
