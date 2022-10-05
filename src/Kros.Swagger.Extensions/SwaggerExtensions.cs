@@ -25,14 +25,18 @@ namespace Kros.Swagger.Extensions
         /// </summary>
         /// <param name="services">IoC container.</param>
         /// <param name="configuration">Application configuration.</param>
+        /// <param name="includeXmlcomments">
+        /// If <c>true</c>, includes XML comments from all <c>.xml</c> files in current domain base directory
+        /// (<see cref="SwaggerGenOptionsExtensions.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory(SwaggerGenOptions)"/>).
+        /// </param>
         /// <param name="setupAction">Action for configuring swagger generating options.</param>
         public static IServiceCollection AddSwaggerDocumentation(
             this IServiceCollection services,
             IConfiguration configuration,
-            Action<SwaggerGenOptions> setupAction = null)
+            bool includeXmlcomments,
+            Action<SwaggerGenOptions>? setupAction = null)
         {
-            OpenApiInfo swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
-
+            OpenApiInfo? swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
             if (swaggerDocumentationSettings is null)
             {
                 throw new InvalidOperationException(
@@ -41,20 +45,37 @@ namespace Kros.Swagger.Extensions
 
             services.ConfigureSwaggerGen(options =>
             {
-                options.CustomSchemaIds(x => x.FullName); // https://wegotcode.com/microsoft/swagger-fix-for-dotnetcore/
+                // '+' (nested classes) is not valid character in OpenApi reference.
+                options.CustomSchemaIds(x => x.FullName.Replace("+", "-"));
             });
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
-                c.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory();
+                if (includeXmlcomments)
+                {
+                    c.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory();
+                }
                 AddSwaggerSecurity(c, swaggerDocumentationSettings);
-
+                c.UseClassNameAsTitle();
+                c.UseNullableSchemaFilter();
                 setupAction?.Invoke(c);
             });
 
             return services;
         }
+
+        /// <summary>
+        /// Registers Swagger documentation generator to IoC container. Does not add XML documentation files.
+        /// </summary>
+        /// <param name="services">IoC container.</param>
+        /// <param name="configuration">Application configuration.</param>
+        /// <param name="setupAction">Action for configuring swagger generating options.</param>
+        public static IServiceCollection AddSwaggerDocumentation(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            Action<SwaggerGenOptions>? setupAction = null)
+            => AddSwaggerDocumentation(services, configuration, false, setupAction);
 
         private static void AddSwaggerSecurity(SwaggerGenOptions swaggerOptions, OpenApiInfo swaggerDocumentationSettings)
         {
@@ -89,7 +110,7 @@ namespace Kros.Swagger.Extensions
             }
         }
 
-        private static OpenApiInfo GetSwaggerDocumentationSettings(IConfiguration configuration)
+        private static OpenApiInfo? GetSwaggerDocumentationSettings(IConfiguration configuration)
         {
             IConfigurationSection configurationSection = configuration.GetSection(SwaggerDocumentationSectionName);
 
@@ -106,11 +127,10 @@ namespace Kros.Swagger.Extensions
         public static IApplicationBuilder UseSwaggerDocumentation(
             this IApplicationBuilder app,
             IConfiguration configuration,
-            Action<SwaggerOptions> setupAction = null,
-            Action<SwaggerUIOptions> setupUiAction = null)
+            Action<SwaggerOptions>? setupAction = null,
+            Action<SwaggerUIOptions>? setupUiAction = null)
         {
-            OpenApiInfo swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
-
+            OpenApiInfo? swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
             if (swaggerDocumentationSettings is null)
             {
                 throw new InvalidOperationException(
@@ -141,7 +161,7 @@ namespace Kros.Swagger.Extensions
             return app;
         }
 
-        private static string GetOAuthClientId(OpenApiInfo swaggerDocumentationSettings)
+        private static string? GetOAuthClientId(OpenApiInfo swaggerDocumentationSettings)
         {
             if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out IOpenApiExtension c) &&
                 c is OpenApiString clientId)

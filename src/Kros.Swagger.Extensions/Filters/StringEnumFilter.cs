@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
-namespace Kros.Swagger.Extensions
+namespace Kros.Swagger.Extensions.Filters
 {
     /// <summary>
     /// Schema filter for extending enum types to support string values a data types. Enum values can be set
@@ -24,25 +24,57 @@ namespace Kros.Swagger.Extensions
         internal readonly static IEnumerable<string> DummyXmlDocPaths = Enumerable.Empty<string>();
 #pragma warning restore IDE1006 // Naming Styles
 
-        private static bool FilterAllEnums(Type type) => type.IsEnum;
-        private bool FilterSpecificEnums(Type type) => _enumTypes.Contains(type);
+        #region Filter functions
 
-        private bool FilterCustomEnums(Type type)
+        private static Type? FilterAllEnums(Type? type)
         {
-            bool result = _customEnumTypeFilter(type);
-            if (result && !type.IsEnum)
+            type = TryGetUnderlyingType(type);
+            if (type?.IsEnum == true)
             {
-                throw new InvalidOperationException(CreateNotEnumTypeMessage(type));
+                return type;
             }
-            return result;
+            return null;
         }
 
-        private readonly List<Type> _enumTypes;
-        private readonly Func<Type, bool> _customEnumTypeFilter;
-        private readonly Func<Type, bool> _enumTypeFilter;
+        private Type? FilterSpecificEnums(Type? type)
+        {
+            type = TryGetUnderlyingType(type);
+            if (type != null && _enumTypes!.Contains(type))
+            {
+                return type;
+            }
+            return null;
+        }
+
+        private Type? FilterCustomEnums(Type? type)
+        {
+            type = TryGetUnderlyingType(type);
+            if (type != null)
+            {
+                bool result = _customEnumTypeFilter!(type);
+                if (result)
+                {
+                    if (type.IsEnum)
+                    {
+                        return type;
+                    }
+                    throw new InvalidOperationException(CreateNotEnumTypeMessage(type));
+                }
+            }
+            return null;
+        }
+
+        private static Type? TryGetUnderlyingType(Type? input)
+            => Nullable.GetUnderlyingType(input) ?? input;
+
+        #endregion
+
+        private readonly List<Type>? _enumTypes;
+        private readonly Func<Type, bool>? _customEnumTypeFilter;
+        private readonly Func<Type?, Type?> _enumTypeFilter;
         private readonly List<XDocument> _xmlDocs;
-        private readonly Action<OpenApiSchema, SchemaFilterContext> _schemaAction;
-        private readonly Action<OpenApiParameter, ParameterFilterContext> _parameterAction;
+        private readonly Action<OpenApiSchema, SchemaFilterContext>? _schemaAction;
+        private readonly Action<OpenApiParameter, ParameterFilterContext>? _parameterAction;
 
         /// <summary>
         /// Creates schema and parameter filter for all enum types (types which <see cref="Type.IsEnum"/> flag is <c>true</c>).
@@ -53,8 +85,8 @@ namespace Kros.Swagger.Extensions
         /// <param name="parameterAction">Custom action to tweak parameter documentation.</param>
         public StringEnumFilter(
             IEnumerable<string> xmlDocPaths,
-            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null,
-            Action<OpenApiParameter, ParameterFilterContext> parameterAction = null)
+            Action<OpenApiSchema, SchemaFilterContext>? schemaAction = null,
+            Action<OpenApiParameter, ParameterFilterContext>? parameterAction = null)
         {
             _enumTypeFilter = FilterAllEnums;
             _xmlDocs = LoadXmlDocs(xmlDocPaths);
@@ -86,8 +118,8 @@ namespace Kros.Swagger.Extensions
         public StringEnumFilter(
             Func<Type, bool> enumTypeFilter,
             IEnumerable<string> xmlDocPaths,
-            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null,
-            Action<OpenApiParameter, ParameterFilterContext> parameterAction = null)
+            Action<OpenApiSchema, SchemaFilterContext>? schemaAction = null,
+            Action<OpenApiParameter, ParameterFilterContext>? parameterAction = null)
         {
             if (enumTypeFilter is null)
             {
@@ -125,8 +157,8 @@ namespace Kros.Swagger.Extensions
         public StringEnumFilter(
             IEnumerable<Type> enumTypes,
             IEnumerable<string> xmlDocPaths,
-            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null,
-            Action<OpenApiParameter, ParameterFilterContext> parameterAction = null)
+            Action<OpenApiSchema, SchemaFilterContext>? schemaAction = null,
+            Action<OpenApiParameter, ParameterFilterContext>? parameterAction = null)
         {
             _enumTypes = CheckTypes(enumTypes, nameof(enumTypes));
             _enumTypeFilter = FilterSpecificEnums;
@@ -138,8 +170,8 @@ namespace Kros.Swagger.Extensions
         /// <inheritdoc/>
         void ISchemaFilter.Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            Type enumType = context.Type;
-            if ((enumType != null) && _enumTypeFilter(enumType))
+            Type? enumType = _enumTypeFilter(context.Type);
+            if (enumType != null)
             {
                 schema.Type = "string | integer";
                 schema.Format = Enum.GetUnderlyingType(enumType).Name;
@@ -152,8 +184,8 @@ namespace Kros.Swagger.Extensions
         /// <inheritdoc/>
         void IParameterFilter.Apply(OpenApiParameter parameter, ParameterFilterContext context)
         {
-            Type paramType = context.ParameterInfo?.ParameterType;
-            if ((paramType != null) && _enumTypeFilter(paramType))
+            Type? paramType = _enumTypeFilter(context.ParameterInfo?.ParameterType);
+            if (paramType != null)
             {
                 parameter.Description = CreateEnumMembersDescription(paramType, parameter.Description);
                 _parameterAction?.Invoke(parameter, context);
@@ -165,7 +197,7 @@ namespace Kros.Swagger.Extensions
 
         private static List<Type> CheckTypes(IEnumerable<Type> sourceTypes, string paramName)
         {
-            List<Type> result = new List<Type>();
+            var result = new List<Type>();
             foreach (Type enumType in sourceTypes)
             {
                 if (!enumType.IsEnum)
@@ -187,7 +219,7 @@ namespace Kros.Swagger.Extensions
 
         private static List<XDocument> LoadXmlDocs(IEnumerable<string> xmlDocPaths)
         {
-            List<XDocument> result = new List<XDocument>();
+            var result = new List<XDocument>();
             if (xmlDocPaths != null)
             {
                 foreach (string xmlDocPath in xmlDocPaths)
@@ -203,7 +235,7 @@ namespace Kros.Swagger.Extensions
 
         private string CreateEnumMembersDescription(Type enumType, string defaultDescription)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             AppendDefaultDescription(sb, defaultDescription);
             AppendEnumMembers(sb, enumType);
             return sb.ToString();

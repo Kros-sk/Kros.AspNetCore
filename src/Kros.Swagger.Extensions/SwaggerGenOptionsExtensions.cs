@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Kros.Swagger.Extensions.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
@@ -12,6 +13,28 @@ namespace Kros.Swagger.Extensions
     /// </summary>
     public static class SwaggerGenOptionsExtensions
     {
+        /// <summary>
+        /// Sets correct <c>nullable</c> flag in schema for nullable reference types.
+        /// </summary>
+        /// <param name="opt">Swagger generator options.</param>
+        /// <returns>Input <paramref name="opt"/> value for fluent chaining.</returns>
+        public static SwaggerGenOptions UseNullableSchemaFilter(this SwaggerGenOptions opt)
+        {
+            opt.SchemaFilter<NullableSchemaFilter>();
+            return opt;
+        }
+
+        /// <summary>
+        /// Add schema filter which sets class name to schema title. This works for reference types only.
+        /// </summary>
+        /// <param name="opt">Swagger generator options.</param>
+        /// <returns>Input <paramref name="opt"/> value for fluent chaining.</returns>
+        public static SwaggerGenOptions UseClassNameAsTitle(this SwaggerGenOptions opt)
+        {
+            opt.SchemaFilter<ClassNameAsTitleSchemaFilter>();
+            return opt;
+        }
+
         /// <summary>
         /// Document all enum types with string enum values.
         /// </summary>
@@ -34,9 +57,9 @@ namespace Kros.Swagger.Extensions
         /// <returns>Input <paramref name="opt"/> value for fluent chaining.</returns>
         public static SwaggerGenOptions DocumentAllEnumsWithStrings(
             this SwaggerGenOptions opt,
-            IEnumerable<string> xmlDocPaths = null,
-            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null,
-            Action<OpenApiParameter, ParameterFilterContext> parameterAction = null)
+            IEnumerable<string>? xmlDocPaths = null,
+            Action<OpenApiSchema, SchemaFilterContext>? schemaAction = null,
+            Action<OpenApiParameter, ParameterFilterContext>? parameterAction = null)
         {
             opt.SchemaFilter<StringEnumFilter>(
                 xmlDocPaths ?? StringEnumFilter.DummyXmlDocPaths,
@@ -84,9 +107,9 @@ namespace Kros.Swagger.Extensions
         public static SwaggerGenOptions DocumentEnumsWithStrings(
             this SwaggerGenOptions opt,
             Func<Type, bool> enumTypeFilter,
-            IEnumerable<string> xmlDocPaths = null,
-            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null,
-            Action<OpenApiParameter, ParameterFilterContext> parameterAction = null)
+            IEnumerable<string>? xmlDocPaths = null,
+            Action<OpenApiSchema, SchemaFilterContext>? schemaAction = null,
+            Action<OpenApiParameter, ParameterFilterContext>? parameterAction = null)
         {
             opt.SchemaFilter<StringEnumFilter>(
                 enumTypeFilter,
@@ -135,9 +158,9 @@ namespace Kros.Swagger.Extensions
         public static SwaggerGenOptions DocumentEnumsWithStrings(
             this SwaggerGenOptions opt,
             IEnumerable<Type> enumTypes,
-            IEnumerable<string> xmlDocPaths = null,
-            Action<OpenApiSchema, SchemaFilterContext> schemaAction = null,
-            Action<OpenApiParameter, ParameterFilterContext> parameterAction = null)
+            IEnumerable<string>? xmlDocPaths = null,
+            Action<OpenApiSchema, SchemaFilterContext>? schemaAction = null,
+            Action<OpenApiParameter, ParameterFilterContext>? parameterAction = null)
         {
             opt.SchemaFilter<StringEnumFilter>(
                 enumTypes,
@@ -165,7 +188,7 @@ namespace Kros.Swagger.Extensions
         public static List<string> IncludeXmlCommentsFromAllFiles(
             this SwaggerGenOptions opt,
             string folderPath,
-            Func<string, bool> filePathFilter = null)
+            Func<string, bool>? filePathFilter = null)
         {
             List<string> usedXmlFiles = new List<string>();
             foreach (string filePath in Directory.EnumerateFiles(folderPath, "*.xml"))

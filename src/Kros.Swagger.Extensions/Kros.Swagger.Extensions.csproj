@@ -5,6 +5,7 @@
     <Version>2.1.1</Version>
     <Description>Extensions to facilitate work with Swagger documentation.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
