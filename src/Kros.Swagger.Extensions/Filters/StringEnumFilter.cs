@@ -65,7 +65,7 @@ namespace Kros.Swagger.Extensions.Filters
         }
 
         private static Type? TryGetUnderlyingType(Type? input)
-            => Nullable.GetUnderlyingType(input) ?? input;
+            => input is null ? null : Nullable.GetUnderlyingType(input);
 
         #endregion
 
