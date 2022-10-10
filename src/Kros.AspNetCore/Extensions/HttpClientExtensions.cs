@@ -27,7 +27,7 @@ namespace Kros.AspNetCore.Extensions
             CancellationToken cancellationToken = default)
         {
             HttpResponseMessage response = await client.GetAsync(uri, cancellationToken);
-            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException, cancellationToken);
+            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException);
 
             return response;
         }
@@ -46,7 +46,7 @@ namespace Kros.AspNetCore.Extensions
             CancellationToken cancellationToken = default)
         {
             HttpResponseMessage response = await client.GetAsync(url, cancellationToken);
-            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException, cancellationToken);
+            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException);
 
             return response;
         }
@@ -74,7 +74,7 @@ namespace Kros.AspNetCore.Extensions
                 Content = new StringContent(jsonBody, Encoding.UTF8, "application/json")
             };
             HttpResponseMessage response = await client.SendAsync(request, cancellationToken);
-            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException, cancellationToken);
+            await response.ThrowIfNotSuccessStatusCodeAndKeepPayload(defaultException);
 
             return response;
         }
@@ -108,7 +108,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, defaultException, cancellationToken))
-                .Content.ReadAsStringAsync(cancellationToken);
+                .Content.ReadAsStringAsync();
 
         /// <summary>
         /// Get string response from http request and throws exception if request is unsuccessful.
@@ -123,7 +123,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, defaultException, cancellationToken))
-                .Content.ReadAsStringAsync(cancellationToken);
+                .Content.ReadAsStringAsync();
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -138,7 +138,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, defaultException, cancellationToken))
-                .Content.ReadAsStreamAsync(cancellationToken);
+                .Content.ReadAsStreamAsync();
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -153,7 +153,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, defaultException, cancellationToken))
-                .Content.ReadAsStreamAsync(cancellationToken);
+                .Content.ReadAsStreamAsync();
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -170,7 +170,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, body, defaultException, cancellationToken))
-                .Content.ReadAsStreamAsync(cancellationToken);
+                .Content.ReadAsStreamAsync();
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -187,7 +187,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, body, defaultException, cancellationToken))
-                .Content.ReadAsStreamAsync(cancellationToken);
+                .Content.ReadAsStreamAsync();
 
         /// <summary>
         /// Get byte array response from http request and throws exception if request is unsuccessful.
@@ -202,7 +202,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, defaultException, cancellationToken))
-                .Content.ReadAsByteArrayAsync(cancellationToken);
+                .Content.ReadAsByteArrayAsync();
 
         /// <summary>
         /// Get byte array response from http request and throws exception if request is unsuccessful.
@@ -217,6 +217,6 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, defaultException, cancellationToken))
-                .Content.ReadAsByteArrayAsync(cancellationToken);
+                .Content.ReadAsByteArrayAsync();
     }
 }

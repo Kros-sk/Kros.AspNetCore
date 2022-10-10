@@ -59,15 +59,14 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="cancellationToken">Cancellation token.</param>
         public static async Task ThrowIfNotSuccessStatusCodeAndKeepPayload(
             this HttpResponseMessage response,
-            Exception defaultException = null,
-            CancellationToken cancellationToken = default)
+            Exception defaultException = null)
         {
             if (!response.IsSuccessStatusCode)
             {
                 switch (response.StatusCode)
                 {
                     case System.Net.HttpStatusCode.PaymentRequired:
-                        throw (await GetExceptionWithResponseContent<PaymentRequiredException>(response, cancellationToken));
+                        throw (await GetExceptionWithResponseContent<PaymentRequiredException>(response));
 
                     default:
                         ThrowIfNotSuccessStatusCode(response, defaultException);
@@ -76,13 +75,11 @@ namespace Kros.AspNetCore.Extensions
             }
         }
 
-        private static async Task<T> GetExceptionWithResponseContent<T>(
-            HttpResponseMessage response,
-            CancellationToken cancellationToken = default)
+        private static async Task<T> GetExceptionWithResponseContent<T>(HttpResponseMessage response)
             where T : RequestUnsuccessfulException, new()
         {
             MediaTypeHeaderValue contentType = response.Content?.Headers.ContentType;
-            string content = await response.Content?.ReadAsStringAsync(cancellationToken);
+            string content = await response.Content?.ReadAsStringAsync();
 
             var exception = new T();
             if (!string.IsNullOrEmpty(content))
