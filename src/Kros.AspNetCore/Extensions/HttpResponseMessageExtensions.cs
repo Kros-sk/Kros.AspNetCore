@@ -2,6 +2,7 @@
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.Extensions
@@ -55,16 +56,18 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="response">Http response message.</param>
         /// <param name="defaultException">Optional default exception to be returned on unsupported http code.
         /// Default is <see cref="UnknownStatusCodeException"/></param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         public static async Task ThrowIfNotSuccessStatusCodeAndKeepPayload(
             this HttpResponseMessage response,
-            Exception defaultException = null)
+            Exception defaultException = null,
+            CancellationToken cancellationToken = default)
         {
             if (!response.IsSuccessStatusCode)
             {
                 switch (response.StatusCode)
                 {
                     case System.Net.HttpStatusCode.PaymentRequired:
-                        throw (await GetExceptionWithResponseContent<PaymentRequiredException>(response));
+                        throw (await GetExceptionWithResponseContent<PaymentRequiredException>(response, cancellationToken));
 
                     default:
                         ThrowIfNotSuccessStatusCode(response, defaultException);
@@ -73,11 +76,13 @@ namespace Kros.AspNetCore.Extensions
             }
         }
 
-        private static async Task<T> GetExceptionWithResponseContent<T>(HttpResponseMessage response)
+        private static async Task<T> GetExceptionWithResponseContent<T>(
+            HttpResponseMessage response,
+            CancellationToken cancellationToken = default)
             where T : RequestUnsuccessfulException, new()
         {
             MediaTypeHeaderValue contentType = response.Content?.Headers.ContentType;
-            string content = await response.Content?.ReadAsStringAsync();
+            string content = await response.Content?.ReadAsStringAsync(cancellationToken);
 
             var exception = new T();
             if (!string.IsNullOrEmpty(content))
