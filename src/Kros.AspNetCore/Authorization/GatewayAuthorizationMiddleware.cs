@@ -2,6 +2,7 @@
 using Kros.AspNetCore.ServiceDiscovery;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -198,10 +199,13 @@ namespace Kros.AspNetCore.Authorization
 
         internal string GetUrlPathForCacheKey(HttpContext httpContext)
         {
+            var routeValues = httpContext.GetRouteData().Values;
+
             if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern)
                 && !string.IsNullOrWhiteSpace(httpContext.Request.Path))
             {
-                if (_cacheRegex.Match(httpContext.Request.Path) is var match && match.Success)
+                Match match = _cacheRegex.Match(httpContext.Request.Path);
+                if (match.Success)
                 {
                     return match.Groups.Values.Last().Value;
                 }
@@ -210,9 +214,7 @@ namespace Kros.AspNetCore.Authorization
         }
 
         internal static int GetKey(StringValues value, string additionalKeyPart = null)
-        {
-            return (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
-        }
+            => (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
 
         private void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
             => httpContext.Request.Headers[HeaderNames.Authorization] = $"{JwtAuthorizationHelper.AuthTokenPrefix} {userJwtToken}";
