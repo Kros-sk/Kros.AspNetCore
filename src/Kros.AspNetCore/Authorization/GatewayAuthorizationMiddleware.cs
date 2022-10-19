@@ -2,6 +2,7 @@
 using Kros.AspNetCore.ServiceDiscovery;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.Authorization
@@ -25,6 +27,7 @@ namespace Kros.AspNetCore.Authorization
 
         private readonly RequestDelegate _next;
         private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
+        private static Regex _cacheRegex = null;
 
         /// <summary>
         /// Ctor.
@@ -37,6 +40,10 @@ namespace Kros.AspNetCore.Authorization
         {
             _next = Check.NotNull(next, nameof(next));
             _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions, nameof(jwtAuthorizationOptions));
+            if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern))
+            {
+                _cacheRegex = new Regex(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern);
+            }
         }
 
         /// <summary>
@@ -74,12 +81,16 @@ namespace Kros.AspNetCore.Authorization
         {
             if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string token))
             {
-                int key = CacheHttpHeadersHelper.TryGetValue(
+                CacheHttpHeadersHelper.TryGetValue(
                     httpContext.Request.Headers,
                     _jwtAuthorizationOptions.CacheKeyHttpHeaders,
-                    out string cacheKeyPart)
-                    ? GetKey(token, cacheKeyPart)
-                    : GetKey(token);
+                    out string cacheKeyPart);
+                string urlPathForCache = GetUrlPathForCacheKey(httpContext);
+                if (urlPathForCache != null)
+                {
+                    cacheKeyPart += urlPathForCache;
+                }
+                int key = GetKey(token, cacheKeyPart);
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
@@ -185,6 +196,22 @@ namespace Kros.AspNetCore.Authorization
         private bool IsCacheAllowed()
             => _jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero
                 || _jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero;
+
+        internal string GetUrlPathForCacheKey(HttpContext httpContext)
+        {
+            var routeValues = httpContext.GetRouteData().Values;
+
+            if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern)
+                && !string.IsNullOrWhiteSpace(httpContext.Request.Path))
+            {
+                Match match = _cacheRegex.Match(httpContext.Request.Path);
+                if (match.Success)
+                {
+                    return match.Groups.Values.Last().Value;
+                }
+            }
+            return null;
+        }
 
         internal static int GetKey(StringValues value, string additionalKeyPart = null)
             => (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
