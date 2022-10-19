@@ -419,30 +419,30 @@ namespace Kros.AspNetCore.Tests.Authorization
                 .Contain($"Bearer {JwtToken}");
         }
 
-        //[Theory]
-        //[InlineData(null, null, null)]
-        //[InlineData("", "", null)]
-        //[InlineData("/companies/123456", "/companies/(?<companyId>\\d+)", "123456")]
-        //[InlineData("/companies/123456789/other-segment", "/companies/(?<companyId>\\d+)/other-segment", "123456789")]
-        //[InlineData("/companies/123456", null, null)]
-        //[InlineData("", "/companies/(?<companyId>\\d+)", null)]
-        //public void CacheUrlPath(string requestPath, string urlPathRegexPattern, string expectedResult)
-        //{
-        //    (_, var middleware) = CreateMiddleware(
-        //        HttpStatusCode.OK,
-        //        TimeSpan.Zero,
-        //        new List<string>(),
-        //        new GatewayJwtAuthorizationOptions()
-        //        {
-        //            CacheKeyUrlPathRegexPattern = urlPathRegexPattern
-        //        });
-        //    var context = new DefaultHttpContext();
-        //    context.Request.Path = requestPath;
+        [Theory]
+        [InlineData(null, null, null)]
+        [InlineData("", "", null)]
+        [InlineData("/companies/123456", "/companies/(?<companyId>\\d+)", "123456")]
+        [InlineData("/companies/123456789/other-segment", "/companies/(?<companyId>\\d+)/other-segment", "123456789")]
+        [InlineData("/companies/123456", null, null)]
+        [InlineData("", "/companies/(?<companyId>\\d+)", null)]
+        public void CacheUrlPath(string requestPath, string urlPathRegexPattern, string expectedResult)
+        {
+            (_, var middleware) = CreateMiddleware(
+                HttpStatusCode.OK,
+                TimeSpan.Zero,
+                new List<string>(),
+                new GatewayJwtAuthorizationOptions()
+                {
+                    CacheKeyUrlPathRegexPattern = urlPathRegexPattern
+                });
+            var context = new DefaultHttpContext();
+            context.Request.Path = requestPath;
 
-        //    string urlPathForCache = middleware.GetUrlPathForCacheKey(context);
+            string urlPathForCache = middleware.GetUrlPathForCacheKey(context);
 
-        //    urlPathForCache.Should().Be(expectedResult);
-        //}
+            urlPathForCache.Should().Be(expectedResult);
+        }
 
         private static (IHttpClientFactory, GatewayAuthorizationMiddleware) CreateMiddleware(HttpStatusCode statusCode)
             => CreateMiddleware(statusCode, TimeSpan.Zero, new List<string>());

@@ -84,7 +84,11 @@ namespace Kros.AspNetCore.Authorization
                     httpContext.Request.Headers,
                     _jwtAuthorizationOptions.CacheKeyHttpHeaders,
                     out string cacheKeyPart);
-                cacheKeyPart += GetUrlPathForCacheKey(httpContext);
+                string urlPathForCache = GetUrlPathForCacheKey(httpContext);
+                if (urlPathForCache != null)
+                {
+                    cacheKeyPart += urlPathForCache;
+                }
                 int key = GetKey(token, cacheKeyPart);
 
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
