@@ -73,5 +73,10 @@ namespace Kros.AspNetCore.Authorization
         /// Headers which will be used as cache key for authorization token.
         /// </summary>
         public List<string> CacheKeyHttpHeaders { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Part of url path which will be used as cache key for authorization token.
+        /// </summary>
+        public string CacheKeyUrlPathRegexPattern { get; set; }
     }
 }
