@@ -2,7 +2,6 @@
 using Kros.AspNetCore.ServiceDiscovery;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -199,8 +198,6 @@ namespace Kros.AspNetCore.Authorization
 
         internal string GetUrlPathForCacheKey(HttpContext httpContext)
         {
-            var routeValues = httpContext.GetRouteData().Values;
-
             if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern)
                 && !string.IsNullOrWhiteSpace(httpContext.Request.Path))
             {
