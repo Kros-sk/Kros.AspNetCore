@@ -23,7 +23,9 @@ namespace Kros.MediatR.Extensions
         /// <param name="configAction">Pipeline behaviors config.</param>
         /// <exception cref="InvalidOperationException">When number of implementation
         /// <typeparamref name="TRequest"/> and response are different.</exception>
-        public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(this IServiceCollection services, Action<PipelineBehaviorsConfig> configAction = null)
+        public static IServiceCollection AddPipelineBehaviorsForRequest<TRequest>(
+            this IServiceCollection services,
+            Action<PipelineBehaviorsConfig> configAction = null)
         {
             var config = new PipelineBehaviorsConfig();
             configAction?.Invoke(config);
@@ -43,8 +45,7 @@ namespace Kros.MediatR.Extensions
                 {
                     Type interfaceType = request.GetInterface(requestInterfaceName);
                     Type responseType = interfaceType.GetGenericArguments()[0];
-                    Type genericBehaviorType = null;
-
+                    Type genericBehaviorType;
                     if (behaviorGenericArgumentsCount == 1)
                     {
                         genericBehaviorType = behavior.MakeGenericType(request);
@@ -79,8 +80,9 @@ namespace Kros.MediatR.Extensions
             => behaviorsAssembly
             .GetTypes()
             .Where(t
-                => t.GetInterface(pipeLineType.Name) != null
-                && t.GetGenericArguments()[0].GetInterface(requestType.Name) != null);
+                => (t.GetInterface(pipeLineType.Name) != null)
+                    && (t.GetGenericArguments().Length > 0)
+                    && (t.GetGenericArguments()[0].GetInterface(requestType.Name) != null));
 
         private static IEnumerable<Type> GetTypes(Type type, IEnumerable<Assembly> assemblies)
         {
