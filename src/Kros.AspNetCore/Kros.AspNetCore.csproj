@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
-    <Version>3.4.1</Version>
+    <Version>3.4.2</Version>
     <Description>General utilities and helpers for building ASP.NET Core WEB API</Description>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
