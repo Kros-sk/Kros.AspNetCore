@@ -8,7 +8,7 @@ namespace Kros.AspNetCore.JsonPatch
     /// </summary>
     internal class JsonPatchMapperConfigStore
     {
-        private ConcurrentDictionary<Type, object> _configs = new ConcurrentDictionary<Type, object>();
+        private readonly ConcurrentDictionary<Type, object> _configs = new ConcurrentDictionary<Type, object>();
         private static JsonPatchMapperConfigStore _instance;
 
         /// <summary>

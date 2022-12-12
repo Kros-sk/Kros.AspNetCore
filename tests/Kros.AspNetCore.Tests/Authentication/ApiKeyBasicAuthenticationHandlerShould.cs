@@ -14,10 +14,10 @@ namespace Kros.AspNetCore.Tests.Authentication
 {
     public class ApiKeyBasicAuthenticationHandlerShould
     {
-        private ApiKeyBasicAuthenticationOptions _options;
-        private IOptionsMonitor<ApiKeyBasicAuthenticationOptions> _optionsMonitor;
-        private ILoggerFactory _loggerFactory;
-        private ApiKeyBasicAuthenticationHandler _handler;
+        private readonly ApiKeyBasicAuthenticationOptions _options;
+        private readonly IOptionsMonitor<ApiKeyBasicAuthenticationOptions> _optionsMonitor;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ApiKeyBasicAuthenticationHandler _handler;
 
         public ApiKeyBasicAuthenticationHandlerShould()
         {

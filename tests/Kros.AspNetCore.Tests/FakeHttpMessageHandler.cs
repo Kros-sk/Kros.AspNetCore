@@ -12,8 +12,8 @@ namespace Kros.AspNetCore.Tests
     /// </summary>
     public class FakeHttpMessageHandler : DelegatingHandler
     {
-        private HttpResponseMessage _fakeResponse;
-        private IEnumerable<KeyValuePair<HttpRequestFilter, HttpResponseMessage>> _specificResponses;
+        private readonly HttpResponseMessage _fakeResponse;
+        private readonly IEnumerable<KeyValuePair<HttpRequestFilter, HttpResponseMessage>> _specificResponses;
 
         /// <summary>
         /// Ctor.

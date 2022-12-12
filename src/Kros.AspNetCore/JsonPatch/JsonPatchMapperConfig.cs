@@ -13,7 +13,7 @@ namespace Kros.AspNetCore.JsonPatch
     public class JsonPatchMapperConfig<TSource> : IJsonPatchMapper where TSource : class
     {
         private Func<string, string> _pathMapping;
-        private ConcurrentDictionary<string, string> _mapping =
+        private readonly ConcurrentDictionary<string, string> _mapping =
             new ConcurrentDictionary<string, string>(StringComparer.InvariantCulture);
 
         /// <summary>
