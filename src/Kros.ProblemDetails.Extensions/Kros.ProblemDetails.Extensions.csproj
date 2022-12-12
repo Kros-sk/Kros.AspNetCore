@@ -21,10 +21,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Kros.AspNetCore\Kros.AspNetCore.csproj" />
+    <PackageReference Include="Kros.AspNetCore" />
   </ItemGroup>
 
 </Project>
