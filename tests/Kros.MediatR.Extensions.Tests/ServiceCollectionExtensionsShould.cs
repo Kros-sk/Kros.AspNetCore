@@ -33,8 +33,8 @@ namespace Kros.MediatR.Extensions.Tests
         {
             public async Task<TResponse> Handle(
                 TRequest request,
-                CancellationToken cancellationToken,
-                RequestHandlerDelegate<TResponse> next)
+                RequestHandlerDelegate<TResponse> next,
+                CancellationToken cancellationToken)
             {
                 TResponse result = await next();
                 return result;
@@ -60,13 +60,13 @@ namespace Kros.MediatR.Extensions.Tests
         }
 
         public class BarPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-            where TRequest : IBarRequest, IRequest<TResponse>
+            where TRequest : IRequest<TResponse>, IBarRequest
             where TResponse : IBarResponse
         {
             public async Task<TResponse> Handle(
                 TRequest request,
-                CancellationToken cancellationToken,
-                RequestHandlerDelegate<TResponse> next)
+                RequestHandlerDelegate<TResponse> next,
+                CancellationToken cancellationToken)
             {
                 TResponse result = await next();
                 return result;
@@ -90,8 +90,8 @@ namespace Kros.MediatR.Extensions.Tests
         {
             public async Task<TResponse> Handle(
                 TRequest request,
-                CancellationToken cancellationToken,
-                RequestHandlerDelegate<TResponse> next)
+                RequestHandlerDelegate<TResponse> next,
+                CancellationToken cancellationToken)
             {
                 TResponse result = await next();
                 return result;
@@ -109,8 +109,8 @@ namespace Kros.MediatR.Extensions.Tests
         {
             public async Task<Unit> Handle(
                 TRequest request,
-                CancellationToken cancellationToken,
-                RequestHandlerDelegate<Unit> next)
+                RequestHandlerDelegate<Unit> next,
+                CancellationToken cancellationToken)
             {
                 Unit result = await next();
                 return result;
