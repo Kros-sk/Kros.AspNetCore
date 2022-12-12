@@ -181,7 +181,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
         #region Helpers
 
-        private HostBuilderContext CreateHostBuilderContext()
+        private static HostBuilderContext CreateHostBuilderContext()
         {
             var context = new HostBuilderContext(new Dictionary<object, object>());
             context.Configuration = GetConfiguration();

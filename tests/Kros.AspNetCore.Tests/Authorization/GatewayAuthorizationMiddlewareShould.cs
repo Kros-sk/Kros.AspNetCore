@@ -526,7 +526,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             return new FakeHttpMessageHandler(responses);
         }
 
-        private IServiceDiscoveryProvider CreateProvider(string url = null)
+        private static IServiceDiscoveryProvider CreateProvider(string url = null)
         {
             IServiceDiscoveryProvider provider = Substitute.For<IServiceDiscoveryProvider>();
             provider.GetPath(Arg.Any<string>(), Arg.Any<string>()).Returns(new Uri(url ?? AuthorizationUrl));

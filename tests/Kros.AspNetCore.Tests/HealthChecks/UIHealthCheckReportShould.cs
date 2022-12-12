@@ -9,7 +9,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
 {
     public class UIHealthCheckReportShould
     {
-        private HealthReport CreateHealthReport(HealthStatus status)
+        private static HealthReport CreateHealthReport(HealthStatus status)
         {
             var entries = new Dictionary<string, HealthReportEntry>();
             entries.Add("Health_Test_Key", new HealthReportEntry(status, null, new TimeSpan(0, 0, 5), null, null));
@@ -19,7 +19,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
             return report;
         }
 
-        private HealthReport CreateMultiStatusHealthReport(List<HealthStatus> statuses)
+        private static HealthReport CreateMultiStatusHealthReport(List<HealthStatus> statuses)
         {
             var entries = new Dictionary<string, HealthReportEntry>();
 

@@ -30,12 +30,12 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             (telemetry as RequestTelemetry).Context.User.Id.Should().NotBe("User-Agent");
         }
-        private ITelemetry FakeTelemetry()
+        private static ITelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
         }
 
-        private IHttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)
+        private static IHttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)
         {
             IHeaderDictionary headers = new HeaderDictionary();
             var httpContext = new DefaultHttpContext();

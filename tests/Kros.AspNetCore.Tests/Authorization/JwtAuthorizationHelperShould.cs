@@ -73,7 +73,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             token.Should().Be(expectedToken);
         }
 
-        private IEnumerable<Claim> CreateClaims(int userId, string userEmail)
+        private static IEnumerable<Claim> CreateClaims(int userId, string userEmail)
             => new Claim[]
             {
                  new Claim(UserClaimTypes.UserId, userId.ToString()),

@@ -31,12 +31,12 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             (telemetry as RequestTelemetry).Properties.Should().NotContainKey("route_pattern");
         }
-        private ITelemetry FakeTelemetry()
+        private static ITelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
         }
 
-        private IHttpContextAccessor FakeHttpContextAccessor(bool addRoutePattern)
+        private static IHttpContextAccessor FakeHttpContextAccessor(bool addRoutePattern)
         {
             IHeaderDictionary headers = new HeaderDictionary();
             var httpContext = new DefaultHttpContext();

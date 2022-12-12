@@ -25,7 +25,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
             requestTelemetry.Sequence.Should().NotBe("TestPassed");
         }
 
-        private RequestTelemetry ProcessItems(bool isSynthetic)
+        private static RequestTelemetry ProcessItems(bool isSynthetic)
         {
             RequestTelemetry requestTelemetry = new RequestTelemetry()
             {

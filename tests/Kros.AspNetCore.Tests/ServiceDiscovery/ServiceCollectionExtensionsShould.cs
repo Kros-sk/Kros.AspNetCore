@@ -87,7 +87,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
                 .Should().Throw<ArgumentNullException>();
         }
 
-        private IConfiguration GetConfiguration()
+        private static IConfiguration GetConfiguration()
         {
             var cfg = @"{
                     ""ApiJwtAuthorization"": {
@@ -110,7 +110,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
             return cfgBuilder.Build();
         }
 
-        private IConfiguration GetApiKeyConfiguration()
+        private static IConfiguration GetApiKeyConfiguration()
         {
             var cfg = @"{
                             ""ApiKeyBasicAuthentication"": {

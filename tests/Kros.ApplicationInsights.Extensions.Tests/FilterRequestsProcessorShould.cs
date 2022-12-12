@@ -33,7 +33,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
             requestTelemetry.Sequence.Should().Be(expectedSequence);
         }
 
-        private RequestTelemetry ProcessItems(string name, string agentName)
+        private static RequestTelemetry ProcessItems(string name, string agentName)
         {
             RequestTelemetry requestTelemetry = new RequestTelemetry()
             {
