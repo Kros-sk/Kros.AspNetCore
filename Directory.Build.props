@@ -1,9 +1,5 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <RestoreSources>
-      https://api.nuget.org/v3/index.json;
-      https://nuget.kros.wtf/api/v2;
-    </RestoreSources>
   </PropertyGroup>
 </Project>
