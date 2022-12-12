@@ -137,7 +137,7 @@ namespace Kros.Swagger.Extensions
                     string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
             }
 
-            string clientId = GetOAuthClientId(swaggerDocumentationSettings);
+            string? clientId = GetOAuthClientId(swaggerDocumentationSettings);
 
             app.UseSwagger(c =>
             {
