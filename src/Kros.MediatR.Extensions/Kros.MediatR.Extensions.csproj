@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
@@ -19,11 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Kros.AspNetCore" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Kros.AspNetCore\Kros.AspNetCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
