@@ -88,15 +88,6 @@ namespace Kros.AspNetCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exception {0} was thrown during request pipeline. Status code of the response was changed to {1}..
-        /// </summary>
-        internal static string ErrorHandlingMiddleware_StatusCodeChange {
-            get {
-                return ResourceManager.GetString("ErrorHandlingMiddleware_StatusCodeChange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to  IdentityServer handler for scheme {0}.
         /// </summary>
         internal static string IdentityHealthCheckBuilderName {
