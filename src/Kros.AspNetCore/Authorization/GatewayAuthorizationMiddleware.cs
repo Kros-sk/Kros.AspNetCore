@@ -112,7 +112,7 @@ namespace Kros.AspNetCore.Authorization
                 int key = GetKey(hashValue.ToString());
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    var uriBuilder = new UriBuilder(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
+                    UriBuilder uriBuilder = new(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
                     uriBuilder.Query = QueryString.Create(
                         _jwtAuthorizationOptions.HashParameterName,
                         hashValue.ToString()).ToUriComponent();
@@ -173,7 +173,7 @@ namespace Kros.AspNetCore.Authorization
         {
             if (IsCacheAllowed() && !IsRequestPathAllowedForCache(request))
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions();
+                MemoryCacheEntryOptions cacheEntryOptions = new();
 
                 if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
                 {
@@ -213,7 +213,7 @@ namespace Kros.AspNetCore.Authorization
         internal static int GetKey(StringValues value, string additionalKeyPart = null)
             => (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
 
-        private void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
+        private static void AddUserProfileClaimsToIdentityAndHttpHeaders(HttpContext httpContext, string userJwtToken)
             => httpContext.Request.Headers[HeaderNames.Authorization] = $"{JwtAuthorizationHelper.AuthTokenPrefix} {userJwtToken}";
     }
 }

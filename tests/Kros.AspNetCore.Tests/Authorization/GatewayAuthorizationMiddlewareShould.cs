@@ -27,9 +27,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void AddJwtTokenIntoHeader()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
@@ -43,14 +43,12 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void AddCustomHeaderToHeadersIfItIsInOptions()
         {
-            List<string> forwardedHeaders = new List<string>() { "ApplicationType" };
+            List<string> forwardedHeaders = new() { "ApplicationType" };
 
-            (var httpClientFactoryMock, var middleware, var htttpClient) = CreateMiddlewareForForwardedHeaders(
-                HttpStatusCode.OK,
-                forwardedHeaders
-                );
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware, HttpClient htttpClient)
+                = CreateMiddlewareForForwardedHeaders(HttpStatusCode.OK, forwardedHeaders);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             context.Request.Headers.Add("ApplicationType", "25");
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
@@ -61,25 +59,23 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void NotAddCustomHeaderToHeadersIfItIsNotInOptions()
         {
-            List<string> forwardedHeaders = new List<string>();
+            List<string> forwardedHeaders = new();
 
-            (var httpClientFactoryMock, var middleware, var htttpClient) = CreateMiddlewareForForwardedHeaders(
-                HttpStatusCode.OK,
-                forwardedHeaders
-                );
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware, HttpClient htttpClient)
+                = CreateMiddlewareForForwardedHeaders(HttpStatusCode.OK, forwardedHeaders);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             context.Request.Headers.Add("ApplicationType", "25");
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
-            htttpClient.DefaultRequestHeaders.TryGetValues("ApplicationType", out IEnumerable<string> values).Should().BeFalse();
+            htttpClient.DefaultRequestHeaders.TryGetValues("ApplicationType", out IEnumerable<string> _).Should().BeFalse();
         }
 
         [Fact]
         public async void AddJwtTokenIntoHeaderWithServiceDiscovery()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(
                 HttpStatusCode.OK,
                 TimeSpan.Zero,
                 new List<string>(),
@@ -89,7 +85,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                     HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" }
                 });
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
@@ -103,9 +99,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void AddJwtTokenIntoHeaderForHash()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
@@ -119,7 +115,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void AddJwtTokenIntoHeaderForHashWithServiceDiscovery()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(
                 HttpStatusCode.OK,
                 TimeSpan.Zero,
                 new List<string>(),
@@ -130,7 +126,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                     HashParameterName = "hash"
                 });
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
             await middleware.Invoke(
                 context,
@@ -148,9 +144,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void AddJwtTokenIntoHeader_WithAccessTokenPriorityOverHash()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
@@ -165,11 +161,11 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void UseCachedJwtToken()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
             string accessToken = "access_token";
 
-            var context = new DefaultHttpContext();
-            var cache = new MemoryCache(new MemoryCacheOptions());
+            DefaultHttpContext context = new();
+            MemoryCache cache = new(new MemoryCacheOptions());
             cache.Set(HashCode.Combine(accessToken), "AAAAAA");
 
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
@@ -185,12 +181,12 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void UseCachedJwtTokenForHash()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
 
-            var cache = new MemoryCache(new MemoryCacheOptions());
+            MemoryCache cache = new(new MemoryCacheOptions());
             cache.Set(HashCode.Combine(context.Request.Query["hash"].ToString()), "BBQ");
 
             await middleware.Invoke(context, httpClientFactoryMock, cache, CreateProvider());
@@ -205,11 +201,11 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void CachesJwtToken()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5));
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5));
             string accessToken = "access_token";
 
-            var context = new DefaultHttpContext();
-            var cache = new MemoryCache(new MemoryCacheOptions());
+            DefaultHttpContext context = new();
+            MemoryCache cache = new(new MemoryCacheOptions());
 
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             await middleware.Invoke(context, httpClientFactoryMock, cache, CreateProvider());
@@ -222,11 +218,11 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void CachesJwtTokenForHash()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5));
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5));
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
-            var cache = new MemoryCache(new MemoryCacheOptions());
+            MemoryCache cache = new(new MemoryCacheOptions());
 
             await middleware.Invoke(context, httpClientFactoryMock, cache, CreateProvider());
 
@@ -238,13 +234,13 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void JwtTokenWithoutCaching()
         {
-            var ignoredPath = new List<string>();
+            List<string> ignoredPath = new();
             ignoredPath.Add("/IgnoredPath");
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5), ignoredPath);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK, TimeSpan.FromSeconds(5), ignoredPath);
             string accessToken = "access_token";
 
-            var context = new DefaultHttpContext();
-            var cache = new MemoryCache(new MemoryCacheOptions());
+            DefaultHttpContext context = new();
+            MemoryCache cache = new(new MemoryCacheOptions());
 
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             context.Request.Path = "/ignoredPath/";
@@ -259,9 +255,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void DoNotAddJwtTokenIntoHeaderWhenAuthorizationHeaderAndHashIsMissing()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.OK);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             context.Request.Headers[HeaderNames.Authorization]
@@ -273,9 +269,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [InlineData(HttpStatusCode.InternalServerError)]
         public async void ThrowUnauthorizedAccessExceptionWhenIsNotauthorized(HttpStatusCode statusCode)
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(statusCode);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(statusCode);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
 
             await Assert.ThrowsAsync<UnauthorizedAccessException>(()
@@ -291,9 +287,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [InlineData(HttpStatusCode.InternalServerError)]
         public async void ThrowUnauthorizedAccessExceptionWhenIsNotAuthorizedForHash(HttpStatusCode statusCode)
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(statusCode);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(statusCode);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
 
             await Assert.ThrowsAsync<UnauthorizedAccessException>(()
@@ -307,9 +303,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void ThrowResourceIsForbiddenExceptionWhenIsNotForbidden()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.Forbidden);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.Forbidden);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
 
             await Assert.ThrowsAsync<ResourceIsForbiddenException>(()
@@ -323,9 +319,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void ThrowNotFoundExceptionWhenResourceIsNotFound()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.NotFound);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.NotFound);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
 
             await Assert.ThrowsAsync<NotFoundException>(()
@@ -339,9 +335,9 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void ThrowBadRequestExceptionWhenRequestIsBad()
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(HttpStatusCode.BadRequest);
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.BadRequest);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
 
             await Assert.ThrowsAsync<BadRequestException>(()
@@ -358,7 +354,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [InlineData("connection_id")]
         public async void JwtTokenDoesNotContainConnectionId(string connectionId)
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(
                 HttpStatusCode.OK,
                 TimeSpan.Zero,
                 new List<string>(),
@@ -369,7 +365,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                     CacheKeyHttpHeaders = new List<string>() { "Connection-Id" }
                 });
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
             context.Request.Headers.Add("Connection-Id", connectionId);
             context.Request.Headers.Add("any-header", connectionId);
@@ -388,7 +384,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [InlineData("connection_id")]
         public async void CacheJwtToken(string connectionId)
         {
-            (var httpClientFactoryMock, var middleware) = CreateMiddleware(
+            (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(
                 HttpStatusCode.OK,
                 TimeSpan.Zero,
                 new List<string>(),
@@ -396,10 +392,10 @@ namespace Kros.AspNetCore.Tests.Authorization
                 {
                     Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
                     HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
-                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id"}
+                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id" }
                 });
             const string accessToken = "access_token";
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, accessToken);
             context.Request.Headers.Add("Connection-Id", connectionId);
             context.Request.Headers.Add("any-header", connectionId);
@@ -408,7 +404,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 ? GatewayAuthorizationMiddleware.GetKey(accessToken)
                 : GatewayAuthorizationMiddleware.GetKey(accessToken, connectionId);
 
-            var memoryCache = new MemoryCache(new MemoryCacheOptions());
+            MemoryCache memoryCache = new(new MemoryCacheOptions());
             memoryCache.Set(key, $"{JwtToken}");
             await middleware.Invoke(context, httpClientFactoryMock, memoryCache, CreateProvider());
 
@@ -428,7 +424,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [InlineData("", "/companies/(?<companyId>\\d+)", null)]
         public void CacheUrlPath(string requestPath, string urlPathRegexPattern, string expectedResult)
         {
-            (_, var middleware) = CreateMiddleware(
+            (_, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(
                 HttpStatusCode.OK,
                 TimeSpan.Zero,
                 new List<string>(),
@@ -436,7 +432,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 {
                     CacheKeyUrlPathRegexPattern = urlPathRegexPattern
                 });
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Path = requestPath;
 
             string urlPathForCache = middleware.GetUrlPathForCacheKey(context);
@@ -470,13 +466,13 @@ namespace Kros.AspNetCore.Tests.Authorization
             }
             options.IgnoredPathForCache.AddRange(ignoredPathForCache);
 
-            var httpClientFactory = Substitute.For<IHttpClientFactory>();
+            IHttpClientFactory httpClientFactory = Substitute.For<IHttpClientFactory>();
 
             FakeHttpMessageHandler fakeHttpMessageHandler = CreateFakeHttpMessageHandler(statusCode);
-            var fakeHttpClient = new HttpClient(fakeHttpMessageHandler);
+            HttpClient fakeHttpClient = new(fakeHttpMessageHandler);
             httpClientFactory.CreateClient("JwtAuthorizationClientName").Returns(fakeHttpClient);
 
-            var middleware = new GatewayAuthorizationMiddleware((c) => Task.CompletedTask, options);
+            GatewayAuthorizationMiddleware middleware = new((c) => Task.CompletedTask, options);
 
             return (httpClientFactory, middleware);
         }
@@ -485,7 +481,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             HttpStatusCode statusCode,
             List<string> forwardedHeaders)
         {
-            GatewayJwtAuthorizationOptions options = new GatewayJwtAuthorizationOptions()
+            GatewayJwtAuthorizationOptions options = new()
             {
                 AuthorizationUrl = AuthorizationUrl,
                 HashAuthorizationUrl = HashAuthorizationUrl,
@@ -494,20 +490,20 @@ namespace Kros.AspNetCore.Tests.Authorization
             };
             options.ForwardedHeaders.AddRange(forwardedHeaders);
 
-            var httpClientFactory = Substitute.For<IHttpClientFactory>();
+            IHttpClientFactory httpClientFactory = Substitute.For<IHttpClientFactory>();
 
             FakeHttpMessageHandler fakeHttpMessageHandler = CreateFakeHttpMessageHandler(statusCode);
-            var fakeHttpClient = new HttpClient(fakeHttpMessageHandler);
+            HttpClient fakeHttpClient = new(fakeHttpMessageHandler);
             httpClientFactory.CreateClient("JwtAuthorizationClientName").Returns(fakeHttpClient);
 
-            var middleware = new GatewayAuthorizationMiddleware((c) => Task.CompletedTask, options);
+            GatewayAuthorizationMiddleware middleware = new((c) => Task.CompletedTask, options);
 
             return (httpClientFactory, middleware, fakeHttpClient);
         }
 
         private static FakeHttpMessageHandler CreateFakeHttpMessageHandler(HttpStatusCode statusCode)
         {
-            var responses = new List<KeyValuePair<FakeHttpMessageHandler.HttpRequestFilter, HttpResponseMessage>>();
+            List<KeyValuePair<FakeHttpMessageHandler.HttpRequestFilter, HttpResponseMessage>> responses = new();
             responses.Add(new KeyValuePair<FakeHttpMessageHandler.HttpRequestFilter, HttpResponseMessage>(
                 (req) => req.RequestUri.AbsoluteUri.Contains(AuthorizationUrl),
                 new HttpResponseMessage()
@@ -526,7 +522,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             return new FakeHttpMessageHandler(responses);
         }
 
-        private IServiceDiscoveryProvider CreateProvider(string url = null)
+        private static IServiceDiscoveryProvider CreateProvider(string url = null)
         {
             IServiceDiscoveryProvider provider = Substitute.For<IServiceDiscoveryProvider>();
             provider.GetPath(Arg.Any<string>(), Arg.Any<string>()).Returns(new Uri(url ?? AuthorizationUrl));

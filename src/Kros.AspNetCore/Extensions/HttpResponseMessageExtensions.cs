@@ -79,7 +79,7 @@ namespace Kros.AspNetCore.Extensions
             MediaTypeHeaderValue contentType = response.Content?.Headers.ContentType;
             string content = await response.Content?.ReadAsStringAsync();
 
-            var exception = new T();
+            T exception = new();
             if (!string.IsNullOrEmpty(content))
             {
                 exception.AddPayload(content, contentType);

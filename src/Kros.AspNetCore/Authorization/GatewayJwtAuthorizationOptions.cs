@@ -35,7 +35,7 @@ namespace Kros.AspNetCore.Authorization
         internal string GetHashAuthorization(IServiceDiscoveryProvider provider)
             => HashAuthorizationUrl ?? GetUrl(provider, HashAuthorization);
 
-        private string GetUrl(IServiceDiscoveryProvider provider, AuthorizationServiceOptions authorization)
+        private static string GetUrl(IServiceDiscoveryProvider provider, AuthorizationServiceOptions authorization)
             => provider.GetPath(authorization.ServiceName, authorization.PathName).ToString();
 
         /// <summary>

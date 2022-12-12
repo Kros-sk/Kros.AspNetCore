@@ -8,12 +8,12 @@ namespace Kros.MediatR.PostProcessors
     /// </summary>
     public class NullCheckPostProcessorOptions
     {
-        private readonly HashSet<Type> _ignoredRequests = new HashSet<Type>();
+        private readonly HashSet<Type> _ignoredRequests = new();
 
         /// <summary>
         /// Default instance.
         /// </summary>
-        public static readonly NullCheckPostProcessorOptions Default = new NullCheckPostProcessorOptions();
+        public static readonly NullCheckPostProcessorOptions Default = new();
 
         /// <summary>
         /// Do not check <see langword="null"/> response for request type <typeparamref name="TRequest"/>.

@@ -43,7 +43,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async Task AddClaimsToHttpContextUserIdentity()
         {
-            string token = CreateJwtToken(("test", "testvalue"),("test2","testvalue2"));
+            string token = CreateJwtToken(("test", "testvalue"), ("test2", "testvalue2"));
             HttpContext context = CreateHttpContext(token);
             JwtBearerClaimsMiddleware middleware = CreateMiddleware();
 
@@ -53,22 +53,22 @@ namespace Kros.AspNetCore.Tests.Authorization
             context.User.HasClaim("test2", "testvalue2").Should().BeTrue();
         }
 
-        private string CreateJwtToken(params (string Key, string Value)[] claims)
+        private static string CreateJwtToken(params (string Key, string Value)[] claims)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor
+            JwtSecurityTokenHandler tokenHandler = new();
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims.Select(c => new Claim(c.Key, c.Value)).ToArray()),
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
             return $"Bearer {tokenHandler.WriteToken(token)}";
         }
 
-        private JwtBearerClaimsMiddleware CreateMiddleware()
-            => new JwtBearerClaimsMiddleware((c) => Task.CompletedTask, new JwtSecurityTokenHandler());
+        private static JwtBearerClaimsMiddleware CreateMiddleware()
+            => new((c) => Task.CompletedTask, new JwtSecurityTokenHandler());
 
-        private HttpContext CreateHttpContext(string authHeader = null)
+        private static HttpContext CreateHttpContext(string authHeader = null)
         {
             HttpContext context = new DefaultHttpContext();
             if (authHeader != null)

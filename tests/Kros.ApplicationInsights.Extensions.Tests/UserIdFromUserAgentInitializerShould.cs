@@ -12,7 +12,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         [Fact]
         public void AddUserIdFromAgentHeaderToTelemetry()
         {
-            UserIdFromUserAgentInitializer initializer = new UserIdFromUserAgentInitializer(FakeHttpContextAccessor(true));
+            UserIdFromUserAgentInitializer initializer = new(FakeHttpContextAccessor(true));
             ITelemetry telemetry = FakeTelemetry();
 
             initializer.Initialize(telemetry);
@@ -23,22 +23,21 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         [Fact]
         public void NoUserIdIfUserAgentHeaderIsEmpty()
         {
-            UserIdFromUserAgentInitializer initializer = new UserIdFromUserAgentInitializer(FakeHttpContextAccessor(false));
+            UserIdFromUserAgentInitializer initializer = new(FakeHttpContextAccessor(false));
             ITelemetry telemetry = FakeTelemetry();
 
             initializer.Initialize(telemetry);
 
             (telemetry as RequestTelemetry).Context.User.Id.Should().NotBe("User-Agent");
         }
-        private ITelemetry FakeTelemetry()
+        private static ITelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
         }
 
-        private IHttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)
+        private static IHttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)
         {
-            IHeaderDictionary headers = new HeaderDictionary();
-            var httpContext = new DefaultHttpContext();
+            DefaultHttpContext httpContext = new();
             IHttpContextAccessor context = new HttpContextAccessor()
             {
                 HttpContext = httpContext

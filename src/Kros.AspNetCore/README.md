@@ -185,7 +185,7 @@ JsonPatchMapperConfig<Document>
   {
       const string address = "/Address/";
 
-      var index = src.IndexOf(address);
+      int index = src.IndexOf(address);
       if (index > -1)
       {
           return src.Remove(index, address.Length);

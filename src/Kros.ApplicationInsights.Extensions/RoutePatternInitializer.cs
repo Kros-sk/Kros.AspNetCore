@@ -23,8 +23,7 @@ namespace Kros.ApplicationInsights.Extensions
 
         public void Initialize(ITelemetry telemetry)
         {
-            var request = telemetry as RequestTelemetry;
-            if (request != null)
+            if (telemetry is RequestTelemetry request)
             {
                 AddProperty(request, RoutePatternClaimType);
             }

@@ -27,7 +27,7 @@ namespace Kros.MediatR.Extensions
             this IServiceCollection services,
             Action<PipelineBehaviorsConfig> configAction = null)
         {
-            var config = new PipelineBehaviorsConfig();
+            PipelineBehaviorsConfig config = new();
             configAction?.Invoke(config);
 
             Type requestType = typeof(TRequest);
@@ -115,8 +115,7 @@ namespace Kros.MediatR.Extensions
             this IServiceCollection services,
             Action<NullCheckPostProcessorOptions> optionAction)
         {
-            var options = new NullCheckPostProcessorOptions();
-
+            NullCheckPostProcessorOptions options = new();
             optionAction(options);
 
             services.AddSingleton(options);

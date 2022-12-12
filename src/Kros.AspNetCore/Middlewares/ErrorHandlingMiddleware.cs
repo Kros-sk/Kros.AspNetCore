@@ -72,10 +72,9 @@ namespace Kros.AspNetCore.Middlewares
             {
                 SetResponseType(context, ex, StatusCodes.Status409Conflict);
             }
-            catch (Exception ex) when (!context.Response.HasStarted && IsSuccessStatusCode(context.Response.StatusCode))
+            catch (Exception) when (!context.Response.HasStarted && IsSuccessStatusCode(context.Response.StatusCode))
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                LogStatusCodeChange(ex, StatusCodes.Status500InternalServerError);
                 throw;
             }
         }
@@ -87,9 +86,12 @@ namespace Kros.AspNetCore.Middlewares
                 context.Response.ClearExceptCorsHeaders();
                 context.Response.StatusCode = statusCode;
                 context.Response.WriteAsync(ex.Message).Wait();
-                LogStatusCodeChange(ex, statusCode);
+                LogError(ex, true, statusCode);
             }
-            _logger.LogError(ex, ex.Message);
+            else
+            {
+                LogError(ex, false, statusCode);
+            }
         }
 
         private void SetResponse(HttpContext context, RequestUnsuccessfulException ex, int statusCode)
@@ -110,14 +112,30 @@ namespace Kros.AspNetCore.Middlewares
                 {
                     context.Response.WriteAsync(ex.Message).Wait();
                 }
-
-                LogStatusCodeChange(ex, statusCode);
+                LogError(ex, true, statusCode);
             }
-            _logger.LogError(ex, ex.Message);
+            else
+            {
+                LogError(ex, false, statusCode);
+            }
         }
 
-        private void LogStatusCodeChange(Exception ex, int statusCode)
-            => _logger.LogDebug(Resources.ErrorHandlingMiddleware_StatusCodeChange, ex.GetType().FullName, statusCode);
+        private void LogError(Exception ex, bool statusCodeChanged, int statusCode)
+        {
+            const string msg1 = "Exception {exceptionType} was thrown during request pipeline. "
+                + "Status code of the response was changed to {statusCode}.";
+            const string msg2 = "Exception {exceptionType} was thrown during request pipeline. "
+                + "Status code of the response should be {statusCode}, but was not changed, "
+                + "because response has already started.";
+            if (statusCodeChanged)
+            {
+                _logger.LogError(ex, msg1, ex.GetType().FullName, statusCode);
+            }
+            else
+            {
+                _logger.LogError(ex, msg2, ex.GetType().FullName, statusCode);
+            }
+        }
 
         private static bool IsSuccessStatusCode(int statusCode)
             => (statusCode >= StatusCodes.Status200OK) && (statusCode < StatusCodes.Status300MultipleChoices);

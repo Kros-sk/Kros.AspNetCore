@@ -41,7 +41,7 @@ namespace Kros.MediatR.Extensions.Tests
         [Fact]
         public void GetMediatR()
         {
-            var controller = CreateController();
+            TestController controller = CreateController();
 
             controller.Mediator().Should().NotBeNull();
         }
@@ -49,9 +49,9 @@ namespace Kros.MediatR.Extensions.Tests
         [Fact]
         public async Task SentRequest()
         {
-            var controller = CreateController();
+            TestController controller = CreateController();
 
-            var response = await controller.SendRequest(new Request() { Value = 22 });
+            Request.Response response = await controller.SendRequest(new Request() { Value = 22 });
 
             response.Value.Should().Be(22);
         }
@@ -59,20 +59,20 @@ namespace Kros.MediatR.Extensions.Tests
         [Fact]
         public async Task SentCreateCommand()
         {
-            var controller = CreateController();
+            TestController controller = CreateController();
 
-            var response = await controller.SendCreateCommand(new Request() { Value = 22 });
+            CreatedResult response = await controller.SendCreateCommand(new Request() { Value = 22 });
 
             response.StatusCode.Should().Be(201);
         }
 
         private static TestController CreateController()
         {
-            var service = new ServiceCollection();
+            ServiceCollection service = new();
             service.AddMediatR(Assembly.GetExecutingAssembly());
             service.AddMediatRNullCheckPostProcessor();
 
-            var actionContext = new ActionContext
+            ActionContext actionContext = new()
             {
                 HttpContext = new DefaultHttpContext()
                 {
@@ -82,7 +82,7 @@ namespace Kros.MediatR.Extensions.Tests
                 ActionDescriptor = new ControllerActionDescriptor()
             };
 
-            var controller = new TestController()
+            TestController controller = new()
             {
                 ControllerContext = new ControllerContext(actionContext)
             };

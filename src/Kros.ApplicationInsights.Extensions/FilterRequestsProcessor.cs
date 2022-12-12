@@ -61,7 +61,7 @@ namespace Kros.ApplicationInsights.Extensions
         private static bool IsHttpOptions(RequestTelemetry request)
             => request.Name.StartsWith(HttpMethods.Options, StringComparison.OrdinalIgnoreCase);
 
-        private string GetUserAgentName(RequestTelemetry request)
+        private static string GetUserAgentName(RequestTelemetry request)
          => request.Context?.User?.Id ?? string.Empty;
     }
 }

@@ -34,7 +34,7 @@ namespace Kros.AspNetCore.Extensions
 
         private static Uri GetHealthEndpointUri(string authorityUrl)
         {
-            var uriBuilder = new UriBuilder(authorityUrl);
+            UriBuilder uriBuilder = new(authorityUrl);
             uriBuilder.Path = HealthEndpointUri;
             return uriBuilder.Uri;
         }

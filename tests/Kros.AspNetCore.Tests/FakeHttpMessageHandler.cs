@@ -12,8 +12,8 @@ namespace Kros.AspNetCore.Tests
     /// </summary>
     public class FakeHttpMessageHandler : DelegatingHandler
     {
-        private HttpResponseMessage _fakeResponse;
-        private IEnumerable<KeyValuePair<HttpRequestFilter, HttpResponseMessage>> _specificResponses;
+        private readonly HttpResponseMessage _fakeResponse;
+        private readonly IEnumerable<KeyValuePair<HttpRequestFilter, HttpResponseMessage>> _specificResponses;
 
         /// <summary>
         /// Ctor.
@@ -45,7 +45,9 @@ namespace Kros.AspNetCore.Tests
                 foreach (var requestResponsePair in _specificResponses)
                 {
                     if (requestResponsePair.Key(request))
+                    {
                         return await Task.FromResult(requestResponsePair.Value);
+                    }
                 }
 
                 throw new ArgumentException();

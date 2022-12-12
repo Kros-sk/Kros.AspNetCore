@@ -1,6 +1,7 @@
 ﻿using Kros.ApplicationInsights.Extensions;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility.Implementation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Options;
@@ -23,7 +24,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             ApplicationInsightsOptions options = GetApplicationInsightsOptions(configuration);
             services
-                .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
+                .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
+                {
                     EnableAdaptiveSampling = false
                 })
                 .AddApplicationInsightsTelemetryProcessor<FilterSyntheticRequestsProcessor>()
@@ -45,9 +47,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration">Configuration.</param>
         public static IApplicationBuilder UseApplicationInsights(this IApplicationBuilder app, IConfiguration configuration)
         {
-            var telemetryConfiguration = app.ApplicationServices.GetService<TelemetryConfiguration>();
-
-            var builder = telemetryConfiguration.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
+            TelemetryConfiguration telemetryConfiguration = app.ApplicationServices.GetService<TelemetryConfiguration>();
+            TelemetryProcessorChainBuilder builder = telemetryConfiguration.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
             ApplicationInsightsOptions options = GetApplicationInsightsOptions(configuration);
 
             if (options != null)

@@ -9,8 +9,8 @@ namespace Kros.MediatR.Extensions
     /// </summary>
     public class PipelineBehaviorsConfig
     {
-        private readonly HashSet<Assembly> _pipelineBehaviorAssemblies = new HashSet<Assembly>();
-        private readonly HashSet<Assembly> _requestAssemblies = new HashSet<Assembly>();
+        private readonly HashSet<Assembly> _pipelineBehaviorAssemblies = new();
+        private readonly HashSet<Assembly> _requestAssemblies = new();
 
         /// <summary>
         /// Adds the assembly with pipeline behaviors.

@@ -12,10 +12,10 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void GetColumnsNamesForFlatModelWithoutConfiguration()
         {
-            var jsonPatch = new JsonPatchDocument<Foo>();
+            JsonPatchDocument<Foo> jsonPatch = new();
             jsonPatch.Replace(p => p.Property1, "Value");
 
-            var columns = jsonPatch.GetColumnsNames();
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames();
             columns.Should()
                 .BeEquivalentTo("Property1");
         }
@@ -23,11 +23,11 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void GetMoreColumnsNamesForFlatModelWithoutConfiguration()
         {
-            var jsonPatch = new JsonPatchDocument<Foo>();
+            JsonPatchDocument<Foo> jsonPatch = new();
             jsonPatch.Replace(p => p.Property1, "Value");
             jsonPatch.Replace(p => p.Property2, "Value");
 
-            var columns = jsonPatch.GetColumnsNames();
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames();
             columns.Should()
                 .BeEquivalentTo("Property1", "Property2");
         }
@@ -35,10 +35,10 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void GetColumnsNamesForComplexTypeWithFlattening()
         {
-            var jsonPatch = new JsonPatchDocument<Document>();
+            JsonPatchDocument<Document> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
-            var columns = jsonPatch.GetColumnsNames(new JsonPatchMapperConfig<Document>());
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames(new JsonPatchMapperConfig<Document>());
             columns.Should()
                 .BeEquivalentTo("SupplierName");
         }
@@ -52,7 +52,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                 {
                     const string address = "/Address/";
 
-                    var index = src.IndexOf(address);
+                    int index = src.IndexOf(address);
                     if (index > -1)
                     {
                         return src.Remove(index, address.Length);
@@ -61,11 +61,11 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            var jsonPatch = new JsonPatchDocument<Document>();
+            JsonPatchDocument<Document> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
-            var columns = jsonPatch.GetColumnsNames();
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames();
             columns.Should()
                 .BeEquivalentTo("SupplierCountry", "SupplierName");
         }
@@ -73,7 +73,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void NoMapProperties()
         {
-            var config = new JsonPatchMapperConfig<Document>()
+            JsonPatchMapperConfig<Document> config = new JsonPatchMapperConfig<Document>()
                 .Map(src =>
                 {
                     if (src.Contains("/Address/"))
@@ -84,11 +84,11 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            var jsonPatch = new JsonPatchDocument<Document>();
+            JsonPatchDocument<Document> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
-            var columns = jsonPatch.GetColumnsNames(config);
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames(config);
             columns.Should()
                 .BeEquivalentTo("SupplierName");
         }
@@ -96,12 +96,12 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void GetColumnsNamesForComplexTypeWithCustomMapping()
         {
-            var config = new JsonPatchMapperConfig<Document>()
+            JsonPatchMapperConfig<Document> config = new JsonPatchMapperConfig<Document>()
                 .Map(src =>
                 {
                     const string address = "/Address/";
 
-                    var index = src.IndexOf(address);
+                    int index = src.IndexOf(address);
                     if (index > -1)
                     {
                         return src.Remove(index, address.Length);
@@ -110,10 +110,10 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            var jsonPatch = new JsonPatchDocument<Document>();
+            JsonPatchDocument<Document> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
 
-            var columns = jsonPatch.GetColumnsNames(config);
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames(config);
             columns.Should()
                 .BeEquivalentTo("SupplierCountry");
         }
@@ -121,13 +121,13 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void MapPathToColumnsNamesAsPascalCase()
         {
-            var jsonPatch = new JsonPatchDocument();
+            JsonPatchDocument jsonPatch = new();
             jsonPatch.Replace("/supplier/address/country", "Slovakia");
 
-            var serialized = JsonConvert.SerializeObject(jsonPatch);
-            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
+            string serialized = JsonConvert.SerializeObject(jsonPatch);
+            JsonPatchDocument<Document> deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
 
-            var columns = deserialized.GetColumnsNames(new JsonPatchMapperConfig<Document>());
+            IEnumerable<string> columns = deserialized.GetColumnsNames(new JsonPatchMapperConfig<Document>());
             columns.Should()
                 .BeEquivalentTo("SupplierAddressCountry");
         }
@@ -135,18 +135,18 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void UseCaseSensitiveCaching()
         {
-            var jsonPatch = new JsonPatchDocument();
+            JsonPatchDocument jsonPatch = new();
             jsonPatch.Replace("pRoperty1", "Value");
-            var serialized = JsonConvert.SerializeObject(jsonPatch);
-            var deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
+            string serialized = JsonConvert.SerializeObject(jsonPatch);
+            JsonPatchDocument<Document> deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
 
-            var jsonPatch2 = new JsonPatchDocument();
+            JsonPatchDocument jsonPatch2 = new();
             jsonPatch2.Replace("property1", "Value");
-            var serialized2 = JsonConvert.SerializeObject(jsonPatch2);
-            var deserialized2 = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized2);
+            string serialized2 = JsonConvert.SerializeObject(jsonPatch2);
+            JsonPatchDocument<Document> deserialized2 = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized2);
 
-            var columns = deserialized.GetColumnsNames();
-            var columns2 = deserialized2.GetColumnsNames();
+            IEnumerable<string> columns = deserialized.GetColumnsNames();
+            IEnumerable<string> columns2 = deserialized2.GetColumnsNames();
 
             columns.Should()
                 .BeEquivalentTo("PRoperty1");

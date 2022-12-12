@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -36,16 +37,15 @@ namespace Kros.AspNetCore.Middlewares
             finally
             {
                 string rawText = context.Request.Method;
-                var endpointFeature = context.Features[typeof(Microsoft.AspNetCore.Http.Features.IEndpointFeature)]
-                                               as Microsoft.AspNetCore.Http.Features.IEndpointFeature;
-                var endpoint = endpointFeature?.Endpoint;
+                IEndpointFeature endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
+                Endpoint endpoint = endpointFeature?.Endpoint;
 
                 if (endpoint is RouteEndpoint e && e?.RoutePattern != null)
                 {
                     rawText += $" {e.RoutePattern.RawText}";
                 }
 
-                var claimsIdentity = new ClaimsIdentity(new[] { new Claim(RoutePatternClaimType, rawText) });
+                ClaimsIdentity claimsIdentity = new(new[] { new Claim(RoutePatternClaimType, rawText) });
                 context.User.AddIdentity(claimsIdentity);
             }
         }

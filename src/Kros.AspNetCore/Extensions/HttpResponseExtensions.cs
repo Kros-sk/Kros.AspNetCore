@@ -11,7 +11,7 @@ namespace Kros.AspNetCore.Extensions
     /// </summary>
     public static class HttpResponseExtensions
     {
-        private static readonly HashSet<string> _preservedHeaders = new HashSet<string>
+        private static readonly HashSet<string> _preservedHeaders = new()
         {
             HeaderNames.AccessControlAllowCredentials, HeaderNames.AccessControlAllowHeaders,
             HeaderNames.AccessControlAllowOrigin, HeaderNames.AccessControlAllowMethods
@@ -23,7 +23,8 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="response">Response object.</param>
         public static void ClearExceptCorsHeaders(this HttpResponse response)
         {
-            var headers = response.Headers.Where(kv => _preservedHeaders.Contains(kv.Key)).ToList();
+            List<KeyValuePair<string, StringValues>> headers = response.Headers
+                .Where(kv => _preservedHeaders.Contains(kv.Key)).ToList();
 
             response.Clear();
 

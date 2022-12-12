@@ -33,8 +33,8 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
         [InlineData(StatusCodes.Status401Unauthorized, StatusCodes.Status401Unauthorized)]
         public async Task ChangeSuccessStatusCodeTo500AndRethrowException(int requestStatusCode, int responseStatusCode)
         {
-            var context = new DefaultHttpContext();
-            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            DefaultHttpContext context = new();
+            ErrorHandlingMiddleware middleware = new(innerHttpContext =>
             {
                 innerHttpContext.Response.StatusCode = requestStatusCode;
                 throw new Exception("Exception");
@@ -60,7 +60,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             HttpContext context = Substitute.For<HttpContext>();
             context.Response.Returns(response);
 
-            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            ErrorHandlingMiddleware middleware = new(innerHttpContext =>
             {
                 throw new Exception();
             }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
@@ -75,10 +75,10 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
         [MemberData(nameof(ReturnCorectStatusCodeForExceptionData))]
         public async Task ReturnCorectStatusCodeForException(Exception exception, int expectedStatusCode)
         {
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Response.StatusCode = StatusCodes.Status100Continue;
 
-            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            ErrorHandlingMiddleware middleware = new(innerHttpContext =>
             {
                 throw exception;
             }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
@@ -107,7 +107,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             HttpContext context = Substitute.For<HttpContext>();
             context.Response.Returns(response);
 
-            var middleware = new ErrorHandlingMiddleware(innerHttpContext =>
+            ErrorHandlingMiddleware middleware = new(innerHttpContext =>
             {
                 throw exception;
             }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());

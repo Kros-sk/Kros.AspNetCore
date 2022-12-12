@@ -12,12 +12,12 @@ namespace Kros.AspNetCore.Tests.HealthChecks
 {
     public class HealthCheckResponseWriterShould
     {
-        private HealthReport CreateHealthReport(HealthStatus status)
+        private static HealthReport CreateHealthReport(HealthStatus status)
         {
-            var entries = new Dictionary<string, HealthReportEntry>();
+            Dictionary<string, HealthReportEntry> entries = new();
             entries.Add("Health_Test_Key", new HealthReportEntry(status, null, new TimeSpan(0, 0, 5), null, null));
 
-            var report = new HealthReport(entries, new TimeSpan(0, 0, 5));
+            HealthReport report = new(entries, new TimeSpan(0, 0, 5));
 
             return report;
         }
@@ -27,7 +27,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         {
             HealthReport report = CreateHealthReport(HealthStatus.Healthy);
 
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Response.Body = new MemoryStream();
 
             await HealthCheckResponseWriter.WriteHealthCheckResponseAsync(context, report);
@@ -35,7 +35,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             string responseBody = new StreamReader(context.Response.Body).ReadToEnd();
 
-            var uiHealthReport = JsonConvert.DeserializeObject<UIHealthCheckReport>(responseBody);
+            UIHealthCheckReport uiHealthReport = JsonConvert.DeserializeObject<UIHealthCheckReport>(responseBody);
 
             uiHealthReport.Status.Should().Be(HealthStatus.Healthy);
             uiHealthReport.TotalDuration.Seconds.Should().Be(5);

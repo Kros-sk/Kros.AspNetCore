@@ -27,7 +27,7 @@ namespace Kros.MassTransit.AzureServiceBus
         private readonly string _topicNamePrefix;
         private readonly string _endpointNamePrefix;
         private Action<IServiceBusBusFactoryConfigurator> _busConfigurator;
-        private readonly List<Endpoint> _endpoints = new List<Endpoint>();
+        private readonly List<Endpoint> _endpoints = new();
         private Endpoint _currentEndpoint;
         private Action<IRetryConfigurator> _retryConfigurator;
 
@@ -234,7 +234,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <returns>Service bus host.</returns>
         private void CreateServiceHost(IServiceBusBusFactoryConfigurator busCfg)
         {
-            var cstrBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
+            ServiceBusConnectionStringBuilder cstrBuilder = new(_connectionString);
             busCfg.Host(_connectionString, hostCfg =>
             {
                 hostCfg.SharedAccessSignature(sasCfg =>

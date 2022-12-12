@@ -16,12 +16,12 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public void CreateJwtTokensFromClaims()
         {
-            var claims = CreateClaims(11, "bob@bob.com");
-            var jwt = JwtAuthorizationHelper
+            IEnumerable<Claim> claims = CreateClaims(11, "bob@bob.com");
+            string jwt = JwtAuthorizationHelper
                 .CreateJwtTokenFromClaims(claims, "top_secreat_password", new DateTime(2200, 1, 1));
 
-            var handler = new JwtSecurityTokenHandler();
-            var tokenS = handler.ReadToken(jwt) as JwtSecurityToken;
+            JwtSecurityTokenHandler handler = new();
+            JwtSecurityToken tokenS = handler.ReadToken(jwt) as JwtSecurityToken;
 
             tokenS.Claims.First(claim => claim.Type == UserClaimTypes.Email).Value
                 .Should().Be("bob@bob.com");
@@ -32,12 +32,12 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public void CreateDifferentJwtTokensForDifferentClaims()
         {
-            var claims1 = CreateClaims(11, "bob@bob.com");
-            var jwt1 = JwtAuthorizationHelper
+            IEnumerable<Claim> claims1 = CreateClaims(11, "bob@bob.com");
+            string jwt1 = JwtAuthorizationHelper
                 .CreateJwtTokenFromClaims(claims1, "top_secreat_password", new DateTime(2200, 1, 1));
 
-            var claims2 = CreateClaims(22, "alice@gmail.com");
-            var jwt2 = JwtAuthorizationHelper
+            IEnumerable<Claim> claims2 = CreateClaims(22, "alice@gmail.com");
+            string jwt2 = JwtAuthorizationHelper
                 .CreateJwtTokenFromClaims(claims2, "top_secreat_password", new DateTime(2200, 1, 1));
 
             jwt1.Should().NotBe(jwt2);
@@ -73,7 +73,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             token.Should().Be(expectedToken);
         }
 
-        private IEnumerable<Claim> CreateClaims(int userId, string userEmail)
+        private static IEnumerable<Claim> CreateClaims(int userId, string userEmail)
             => new Claim[]
             {
                  new Claim(UserClaimTypes.UserId, userId.ToString()),

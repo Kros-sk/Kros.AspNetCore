@@ -27,7 +27,7 @@ namespace Kros.AspNetCore.Tests.Configuration
         [Fact]
         public void ValidateMustThrowIfSettingsAreIncorrect()
         {
-            var settings = new TestSettings();
+            TestSettings settings = new();
 
             Action action = () => settings.Validate();
 

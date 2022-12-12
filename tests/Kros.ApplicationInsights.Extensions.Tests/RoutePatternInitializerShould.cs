@@ -13,7 +13,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         [Fact]
         public void AddRoutePatternToTelemetry()
         {
-            var initializer = new RoutePatternInitializer(FakeHttpContextAccessor(true));
+            RoutePatternInitializer initializer = new(FakeHttpContextAccessor(true));
             ITelemetry telemetry = FakeTelemetry();
 
             initializer.Initialize(telemetry);
@@ -24,22 +24,21 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         [Fact]
         public void NoRoutePatternIfHeaderIsEmpty()
         {
-            var initializer = new RoutePatternInitializer(FakeHttpContextAccessor(false));
+            RoutePatternInitializer initializer = new(FakeHttpContextAccessor(false));
             ITelemetry telemetry = FakeTelemetry();
 
             initializer.Initialize(telemetry);
 
             (telemetry as RequestTelemetry).Properties.Should().NotContainKey("route_pattern");
         }
-        private ITelemetry FakeTelemetry()
+        private static ITelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
         }
 
-        private IHttpContextAccessor FakeHttpContextAccessor(bool addRoutePattern)
+        private static IHttpContextAccessor FakeHttpContextAccessor(bool addRoutePattern)
         {
-            IHeaderDictionary headers = new HeaderDictionary();
-            var httpContext = new DefaultHttpContext();
+            DefaultHttpContext httpContext = new();
             IHttpContextAccessor context = new HttpContextAccessor()
             {
                 HttpContext = httpContext

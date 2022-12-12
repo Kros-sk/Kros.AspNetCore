@@ -52,7 +52,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 .WithMessage("*GatewayJwtAuthorization*");
         }
 
-        private IConfiguration GetConfiguration(Dictionary<string, string> values) =>
+        private static IConfiguration GetConfiguration(Dictionary<string, string> values) =>
             new ConfigurationBuilder()
                 .AddInMemoryCollection(values)
                 .Build();
