@@ -35,7 +35,7 @@ namespace Kros.MassTransit.Analyzers
         private const string MessagePrefix = "I";
         private const string MessageSufix = "Message";
         private const string ConfigureSubscrionMethodName = "ConfigureSubscription";
-        private static readonly DiagnosticDescriptor _rule = new DiagnosticDescriptor(
+        private static readonly DiagnosticDescriptor _rule = new(
             DiagnosticId,
             _title,
             _message,

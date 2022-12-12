@@ -27,14 +27,14 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
         private static RequestTelemetry ProcessItems(bool isSynthetic)
         {
-            RequestTelemetry requestTelemetry = new RequestTelemetry()
+            RequestTelemetry requestTelemetry = new()
             {
                 Name = "SomeRequest",
                 Sequence = "",
             };
             requestTelemetry.Context.Operation.SyntheticSource = isSynthetic ? "source" : null;
-            PassedToNextTelemetryProcessor next = new PassedToNextTelemetryProcessor();
-            FilterSyntheticRequestsProcessor filterRequestsProcessor = new FilterSyntheticRequestsProcessor(next);
+            PassedToNextTelemetryProcessor next = new();
+            FilterSyntheticRequestsProcessor filterRequestsProcessor = new(next);
 
             filterRequestsProcessor.Process(requestTelemetry);
 

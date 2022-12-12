@@ -11,7 +11,7 @@ namespace Kros.AspNetCore.Extensions
     /// </summary>
     public static class HttpResponseExtensions
     {
-        private static readonly HashSet<string> _preservedHeaders = new HashSet<string>
+        private static readonly HashSet<string> _preservedHeaders = new()
         {
             HeaderNames.AccessControlAllowCredentials, HeaderNames.AccessControlAllowHeaders,
             HeaderNames.AccessControlAllowOrigin, HeaderNames.AccessControlAllowMethods

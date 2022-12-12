@@ -62,7 +62,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         public async Task GetAndSetIfDoNotExistInCache()
         {
             IDistributedCache cache = new MemoryDistributedCache();
-            DistributedCacheEntryOptions options = new DistributedCacheEntryOptions();
+            DistributedCacheEntryOptions options = new();
             var callCount = 0;
             Foo func()
             {
@@ -80,7 +80,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
         internal class MemoryDistributedCache : IDistributedCache
         {
-            private readonly Dictionary<string, byte[]> _cache = new Dictionary<string, byte[]>();
+            private readonly Dictionary<string, byte[]> _cache = new();
 
             public byte[] Get(string key)
                 => _cache.TryGetValue(key, out var value) ? value : null;

@@ -30,7 +30,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public void GetDefaultUserIdWhenDoNotExist()
         {
-            ClaimsPrincipal user = new ClaimsPrincipal();
+            ClaimsPrincipal user = new();
 
             user.GetUserId()
                 .Should().Be(0);
@@ -39,7 +39,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public void GetDefaultUserEmailWhenDoNotExist()
         {
-            ClaimsPrincipal user = new ClaimsPrincipal();
+            ClaimsPrincipal user = new();
 
             user.GetUserEmail()
                 .Should().BeEmpty();
@@ -57,14 +57,14 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public void GetCustomClaimWhenItDoesNotExist()
         {
-            ClaimsPrincipal user = new ClaimsPrincipal();
+            ClaimsPrincipal user = new();
 
             user.GetValueFromUserClaims(_customClaim)
                 .Should().Be(string.Empty);
         }
 
         private static ClaimsPrincipal CreateUser()
-            => new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            => new(new ClaimsIdentity(new Claim[]
             {
                  new Claim(UserClaimTypes.UserId, "22"),
                  new Claim(ClaimTypes.Email, "bob@gmail.com"),

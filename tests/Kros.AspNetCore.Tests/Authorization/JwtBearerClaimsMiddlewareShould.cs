@@ -43,7 +43,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async Task AddClaimsToHttpContextUserIdentity()
         {
-            string token = CreateJwtToken(("test", "testvalue"),("test2","testvalue2"));
+            string token = CreateJwtToken(("test", "testvalue"), ("test2", "testvalue2"));
             HttpContext context = CreateHttpContext(token);
             JwtBearerClaimsMiddleware middleware = CreateMiddleware();
 
@@ -66,7 +66,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         }
 
         private static JwtBearerClaimsMiddleware CreateMiddleware()
-            => new JwtBearerClaimsMiddleware((c) => Task.CompletedTask, new JwtSecurityTokenHandler());
+            => new((c) => Task.CompletedTask, new JwtSecurityTokenHandler());
 
         private static HttpContext CreateHttpContext(string authHeader = null)
         {

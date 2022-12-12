@@ -190,7 +190,7 @@ namespace Kros.Swagger.Extensions
             string folderPath,
             Func<string, bool>? filePathFilter = null)
         {
-            List<string> usedXmlFiles = new List<string>();
+            List<string> usedXmlFiles = new();
             foreach (string filePath in Directory.EnumerateFiles(folderPath, "*.xml"))
             {
                 bool addFile = filePathFilter is null || filePathFilter(filePath);

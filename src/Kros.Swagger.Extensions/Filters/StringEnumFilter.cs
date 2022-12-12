@@ -193,7 +193,7 @@ namespace Kros.Swagger.Extensions.Filters
         }
 
         private static List<IOpenApiAny> CreateStringEnumMembers(Type enumType)
-            => new List<IOpenApiAny>(Enum.GetNames(enumType).Select(enumMemberName => new OpenApiString(enumMemberName)));
+            => new(Enum.GetNames(enumType).Select(enumMemberName => new OpenApiString(enumMemberName)));
 
         private static List<Type> CheckTypes(IEnumerable<Type> sourceTypes, string paramName)
         {

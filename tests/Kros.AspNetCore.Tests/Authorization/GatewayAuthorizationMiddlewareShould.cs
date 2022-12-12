@@ -43,7 +43,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void AddCustomHeaderToHeadersIfItIsInOptions()
         {
-            List<string> forwardedHeaders = new List<string>() { "ApplicationType" };
+            List<string> forwardedHeaders = new() { "ApplicationType" };
 
             (var httpClientFactoryMock, var middleware, var htttpClient) = CreateMiddlewareForForwardedHeaders(
                 HttpStatusCode.OK,
@@ -61,7 +61,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         [Fact]
         public async void NotAddCustomHeaderToHeadersIfItIsNotInOptions()
         {
-            List<string> forwardedHeaders = new List<string>();
+            List<string> forwardedHeaders = new();
 
             (var httpClientFactoryMock, var middleware, var htttpClient) = CreateMiddlewareForForwardedHeaders(
                 HttpStatusCode.OK,
@@ -396,7 +396,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 {
                     Authorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
                     HashAuthorization = new AuthorizationServiceOptions() { ServiceName = "Authorization", PathName = "jwt" },
-                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id"}
+                    CacheKeyHttpHeaders = new List<string>() { "Connection-Id" }
                 });
             const string accessToken = "access_token";
             var context = new DefaultHttpContext();
@@ -485,7 +485,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             HttpStatusCode statusCode,
             List<string> forwardedHeaders)
         {
-            GatewayJwtAuthorizationOptions options = new GatewayJwtAuthorizationOptions()
+            GatewayJwtAuthorizationOptions options = new()
             {
                 AuthorizationUrl = AuthorizationUrl,
                 HashAuthorizationUrl = HashAuthorizationUrl,

@@ -13,8 +13,7 @@ namespace Kros.AspNetCore.JsonPatch
     public class JsonPatchMapperConfig<TSource> : IJsonPatchMapper where TSource : class
     {
         private Func<string, string> _pathMapping;
-        private readonly ConcurrentDictionary<string, string> _mapping =
-            new ConcurrentDictionary<string, string>(StringComparer.InvariantCulture);
+        private readonly ConcurrentDictionary<string, string> _mapping = new(StringComparer.InvariantCulture);
 
         /// <summary>
         /// Creates new config for <typeparamref name="TSource"/> and store it for non parametric  extension

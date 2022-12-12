@@ -35,15 +35,15 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
         private static RequestTelemetry ProcessItems(string name, string agentName)
         {
-            RequestTelemetry requestTelemetry = new RequestTelemetry()
+            RequestTelemetry requestTelemetry = new()
             {
                 Name = name,
                 Sequence = ""
             };
             requestTelemetry.Context.User.Id = agentName;
 
-            PassedToNextTelemetryProcessor next = new PassedToNextTelemetryProcessor();
-            FilterRequestsProcessor filterRequestsProcessor = new FilterRequestsProcessor(next);
+            PassedToNextTelemetryProcessor next = new();
+            FilterRequestsProcessor filterRequestsProcessor = new(next);
 
             filterRequestsProcessor.Process(requestTelemetry);
 

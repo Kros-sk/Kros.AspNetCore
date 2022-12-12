@@ -12,7 +12,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         [Fact]
         public void AddUserIdFromAgentHeaderToTelemetry()
         {
-            UserIdFromUserAgentInitializer initializer = new UserIdFromUserAgentInitializer(FakeHttpContextAccessor(true));
+            UserIdFromUserAgentInitializer initializer = new(FakeHttpContextAccessor(true));
             ITelemetry telemetry = FakeTelemetry();
 
             initializer.Initialize(telemetry);
@@ -23,7 +23,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         [Fact]
         public void NoUserIdIfUserAgentHeaderIsEmpty()
         {
-            UserIdFromUserAgentInitializer initializer = new UserIdFromUserAgentInitializer(FakeHttpContextAccessor(false));
+            UserIdFromUserAgentInitializer initializer = new(FakeHttpContextAccessor(false));
             ITelemetry telemetry = FakeTelemetry();
 
             initializer.Initialize(telemetry);

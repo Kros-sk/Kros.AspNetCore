@@ -43,12 +43,12 @@ namespace Kros.AspNetCore.Authentication
 
             if (headerApiKeyvalues[0] == $"{ApiKeyPrefix}{Options.ApiKey}")
             {
-                List<Claim> claims = new List<Claim>()
+                List<Claim> claims = new()
                 {
                     new Claim(ClaimTypes.Role, ApiKeyRole)
                 };
-                ClaimsIdentity identity = new ClaimsIdentity(claims, Options.Scheme);
-                AuthenticationTicket ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), Options.Scheme);
+                ClaimsIdentity identity = new(claims, Options.Scheme);
+                AuthenticationTicket ticket = new(new ClaimsPrincipal(identity), Options.Scheme);
 
                 return Task.FromResult(AuthenticateResult.Success(ticket));
             }
