@@ -21,8 +21,10 @@ namespace Kros.AspNetCore.Net
                 string authHeader = httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
                 if (authHeader != null)
                 {
-                    AuthenticationHeaderValue.TryParse(authHeader, out AuthenticationHeaderValue newVal);
-                    client.DefaultRequestHeaders.Authorization = newVal;
+                    if (AuthenticationHeaderValue.TryParse(authHeader, out AuthenticationHeaderValue newVal))
+                    {
+                        client.DefaultRequestHeaders.Authorization = newVal;
+                    }
                 }
             }
             catch

@@ -45,7 +45,9 @@ namespace Kros.AspNetCore.Tests
                 foreach (var requestResponsePair in _specificResponses)
                 {
                     if (requestResponsePair.Key(request))
+                    {
                         return await Task.FromResult(requestResponsePair.Value);
+                    }
                 }
 
                 throw new ArgumentException();

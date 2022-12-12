@@ -36,7 +36,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddApiJwtAuthentication(new string[] { JwtAuthorizationHelper.JwtSchemeName }, GetConfiguration());
-            serviceCollection.AddLogging(x => new object());
+            serviceCollection.AddLogging();
             serviceCollection.BuildServiceProvider().GetServices<JwtBearerHandler>().Count().Should().Be(1);
         }
 
@@ -47,7 +47,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
             serviceCollection.AddApiJwtAuthentication(
                 new string[] { JwtAuthorizationHelper.JwtSchemeName, JwtAuthorizationHelper.HashJwtSchemeName },
                 GetConfiguration());
-            serviceCollection.AddLogging(x => new object());
+            serviceCollection.AddLogging();
             serviceCollection.BuildServiceProvider().GetServices<JwtBearerHandler>().Count().Should().Be(2);
         }
 
@@ -55,7 +55,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         public void AddApiJwtAuthenticationRequiresAtLeastOneScheme()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.Invoking(sc =>  sc.AddApiJwtAuthentication(new string[] { }, GetConfiguration()))
+            serviceCollection.Invoking(sc =>  sc.AddApiJwtAuthentication(Array.Empty<string>(), GetConfiguration()))
                 .Should().Throw<ArgumentException>();
         }
 
