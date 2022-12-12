@@ -17,13 +17,13 @@ namespace Kros.AspNetCore.Tests.Middlewares
         [Fact]
         public async Task AddRoutePatternToClaims()
         {
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Method = "POST";
             IEndpointFeature endpointFeature = Substitute.For<IEndpointFeature>();
             RoutePattern routePattern = RoutePatternFactory.Pattern("weather/{town}");
-            var routeEndpoint = new RouteEndpoint(_ => null, routePattern, default, default, string.Empty);
+            RouteEndpoint routeEndpoint = new(_ => null, routePattern, default, default, string.Empty);
             endpointFeature.Endpoint.Returns(routeEndpoint);
-            var middleware = new RoutePatternMiddleware(innerHttpContext =>
+            RoutePatternMiddleware middleware = new(innerHttpContext =>
             {
                 innerHttpContext.Features.Set(endpointFeature);
                 return null;
@@ -44,9 +44,9 @@ namespace Kros.AspNetCore.Tests.Middlewares
         [Fact]
         public async Task AddEmptyRoutePatternToClaims()
         {
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Method = "POST";
-            var middleware = new RoutePatternMiddleware(innerHttpContext =>
+            RoutePatternMiddleware middleware = new(innerHttpContext =>
             {
                 return null;
             });

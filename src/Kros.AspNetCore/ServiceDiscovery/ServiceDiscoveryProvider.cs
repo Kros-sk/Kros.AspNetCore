@@ -30,7 +30,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         /// <inheritdoc />
         public Uri GetPath(string serviceName, string pathName)
         {
-            var uriBuilder = new UriBuilder(GetService(serviceName));
+            UriBuilder uriBuilder = new(GetService(serviceName));
 
             string path = _configuration.GetValue<string>($"{_option.SectionName}:{serviceName}:Paths:{pathName}");
 
@@ -76,7 +76,8 @@ namespace Kros.AspNetCore.ServiceDiscovery
 
         private string GetServiceNameFromEnumAttribute(Enum enumValue)
         {
-            var serviceNameAttribute = (ServiceNameAttribute)enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault()
+            ServiceNameAttribute serviceNameAttribute = (ServiceNameAttribute)enumValue.GetType()
+                .GetMember(enumValue.ToString()).FirstOrDefault()
                 .GetCustomAttributes(typeof(ServiceNameAttribute), false).FirstOrDefault();
             if (serviceNameAttribute == null)
             {

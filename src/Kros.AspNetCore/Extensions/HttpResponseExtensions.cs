@@ -23,7 +23,8 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="response">Response object.</param>
         public static void ClearExceptCorsHeaders(this HttpResponse response)
         {
-            var headers = response.Headers.Where(kv => _preservedHeaders.Contains(kv.Key)).ToList();
+            List<KeyValuePair<string, StringValues>> headers = response.Headers
+                .Where(kv => _preservedHeaders.Contains(kv.Key)).ToList();
 
             response.Clear();
 

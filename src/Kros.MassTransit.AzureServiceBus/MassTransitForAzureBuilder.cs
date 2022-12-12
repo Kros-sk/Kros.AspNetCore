@@ -234,7 +234,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <returns>Service bus host.</returns>
         private void CreateServiceHost(IServiceBusBusFactoryConfigurator busCfg)
         {
-            var cstrBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
+            ServiceBusConnectionStringBuilder cstrBuilder = new(_connectionString);
             busCfg.Host(_connectionString, hostCfg =>
             {
                 hostCfg.SharedAccessSignature(sasCfg =>

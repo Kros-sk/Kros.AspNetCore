@@ -12,11 +12,11 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void CopyAuthorizationHeader()
         {
-            var httpClient = new HttpClient();
+            HttpClient httpClient = new();
             IHttpClientFactory httpClientFactory = Substitute.For<IHttpClientFactory>();
             httpClientFactory.CreateClient().Returns(httpClient);
 
-            var httpContext = new DefaultHttpContext();
+            DefaultHttpContext httpContext = new();
             httpContext.Request.Headers["Authorization"] = "Bearer sfasdfasdf414weqr";
             IHttpContextAccessor httpContextAccessor = Substitute.For<IHttpContextAccessor>();
             httpContextAccessor.HttpContext.Returns(httpContext);

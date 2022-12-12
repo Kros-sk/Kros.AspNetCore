@@ -43,14 +43,14 @@ namespace Kros.AspNetCore.HealthChecks
         /// <param name="report">Report.</param>
         public static UIHealthCheckReport CreateFrom(HealthReport report)
         {
-            var uiReport = new UIHealthCheckReport(new Dictionary<string, HealthCheckReportEntry>(), report.TotalDuration)
+            UIHealthCheckReport uiReport = new(new Dictionary<string, HealthCheckReportEntry>(), report.TotalDuration)
             {
                 Status = report.Status,
             };
 
             foreach (var item in report.Entries)
             {
-                var entry = new HealthCheckReportEntry()
+                HealthCheckReportEntry entry = new()
                 {
                     Data = item.Value.Data,
                     Description = item.Value.Description,
@@ -60,7 +60,7 @@ namespace Kros.AspNetCore.HealthChecks
 
                 if (item.Value.Exception != null)
                 {
-                    var message = item.Value.Exception
+                    string message = item.Value.Exception
                         .Message;
 
                     entry.Exception = message;

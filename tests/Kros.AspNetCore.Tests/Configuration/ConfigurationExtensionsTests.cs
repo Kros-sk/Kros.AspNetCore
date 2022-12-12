@@ -40,7 +40,7 @@ namespace Kros.AspNetCore.Tests.Configuration
             IConfiguration cfg = new ConfigurationBuilder()
                 .AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(TestSettingsJson)))
                 .Build();
-            var services = new ServiceCollection();
+            ServiceCollection services = new();
 
             services.ConfigureOptions<TestSettings>(cfg);
 
@@ -59,7 +59,7 @@ namespace Kros.AspNetCore.Tests.Configuration
         public void ConfigureOptionsRegistersClassAsIValidatableIntoDiContainer()
         {
             IConfiguration cfg = new ConfigurationBuilder().Build();
-            var services = new ServiceCollection();
+            ServiceCollection services = new();
             services.ConfigureOptions<ValidatableTestSettings>(cfg);
             ServiceProvider provider = services.BuildServiceProvider();
 

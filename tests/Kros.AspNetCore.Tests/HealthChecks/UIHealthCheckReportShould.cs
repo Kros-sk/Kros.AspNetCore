@@ -11,17 +11,17 @@ namespace Kros.AspNetCore.Tests.HealthChecks
     {
         private static HealthReport CreateHealthReport(HealthStatus status)
         {
-            var entries = new Dictionary<string, HealthReportEntry>();
+            Dictionary<string, HealthReportEntry> entries = new();
             entries.Add("Health_Test_Key", new HealthReportEntry(status, null, new TimeSpan(0, 0, 5), null, null));
 
-            var report = new HealthReport(entries, new TimeSpan(0, 0, 5));
+            HealthReport report = new(entries, new TimeSpan(0, 0, 5));
 
             return report;
         }
 
         private static HealthReport CreateMultiStatusHealthReport(List<HealthStatus> statuses)
         {
-            var entries = new Dictionary<string, HealthReportEntry>();
+            Dictionary<string, HealthReportEntry> entries = new();
 
             foreach (HealthStatus status in statuses)
             {
@@ -30,7 +30,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
                     new HealthReportEntry(status, null, new TimeSpan(0, 0, 5), null, null));
             }
 
-            var report = new HealthReport(entries, new TimeSpan(0, 0, 5));
+            HealthReport report = new(entries, new TimeSpan(0, 0, 5));
 
             return report;
         }
@@ -38,7 +38,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         [Fact]
         public void CreateUIReportFromReport()
         {
-            var uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(HealthStatus.Healthy));
+            UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(HealthStatus.Healthy));
 
             Assert.NotNull(uiReport);
         }
@@ -49,7 +49,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         [InlineData(HealthStatus.Unhealthy)]
         public void CreateUIReportFromSpecificReportStatus(HealthStatus healthStatus)
         {
-            var uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(healthStatus));
+            UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(healthStatus));
 
             uiReport.Status.Should().Be(healthStatus);
         }
@@ -57,7 +57,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         [Fact]
         public void CreateUIReportFromReportWithDuration()
         {
-            var uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(HealthStatus.Healthy));
+            UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(HealthStatus.Healthy));
 
             uiReport.TotalDuration.Seconds.Should().Be(5);
         }
@@ -66,7 +66,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         public void CreateUIReportFromReportWithEntries()
         {
             HealthReport healthReport = CreateHealthReport(HealthStatus.Healthy);
-            var uiReport = UIHealthCheckReport.CreateFrom(healthReport);
+            UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(healthReport);
 
             uiReport.Entries.Count.Should().Be(healthReport.Entries.Count);
         }
@@ -78,7 +78,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
                 HealthStatus.Healthy,
                 HealthStatus.Unhealthy
             });
-            var uiReport = UIHealthCheckReport.CreateFrom(healthReport);
+            UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(healthReport);
 
             uiReport.Status.Should().Be(HealthStatus.Unhealthy);
         }
@@ -90,7 +90,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
                 HealthStatus.Unhealthy,
                 HealthStatus.Healthy
             });
-            var uiReport = UIHealthCheckReport.CreateFrom(healthReport);
+            UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(healthReport);
 
             uiReport.Status.Should().Be(HealthStatus.Unhealthy);
         }

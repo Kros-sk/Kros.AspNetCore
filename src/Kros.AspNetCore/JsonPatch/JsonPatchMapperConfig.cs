@@ -22,10 +22,8 @@ namespace Kros.AspNetCore.JsonPatch
         /// <returns>New configuration.</returns>
         public static JsonPatchMapperConfig<TSource> NewConfig()
         {
-            var config = new JsonPatchMapperConfig<TSource>();
-
+            JsonPatchMapperConfig<TSource> config = new();
             JsonPatchMapperConfigStore.Instance.Add(config);
-
             return config;
         }
 

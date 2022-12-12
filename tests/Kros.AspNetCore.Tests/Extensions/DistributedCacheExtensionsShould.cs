@@ -26,7 +26,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             await cache.SetAsync("2", 2, new DistributedCacheEntryOptions());
 
-            var value = await cache.GetAsync<int>("2");
+            int value = await cache.GetAsync<int>("2");
 
             value.Should().Be(2);
         }
@@ -38,7 +38,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             await cache.SetAsync("foo", new Foo() { Value = 2 }, new DistributedCacheEntryOptions());
 
-            var value = await cache.GetAsync<Foo>("foo");
+            Foo value = await cache.GetAsync<Foo>("foo");
 
             value.Value.Should().Be(2);
         }
@@ -48,13 +48,13 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
 
-            var foo = await cache.GetAsync<Foo>("foo");
+            Foo foo = await cache.GetAsync<Foo>("foo");
             foo.Should().BeNull();
 
-            var intValue = await cache.GetAsync<int?>("int");
+            int? intValue = await cache.GetAsync<int?>("int");
             intValue.Should().BeNull();
 
-            var stringValue = await cache.GetAsync<string>("string");
+            string stringValue = await cache.GetAsync<string>("string");
             stringValue.Should().BeNull();
         }
 
@@ -63,17 +63,17 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
             DistributedCacheEntryOptions options = new();
-            var callCount = 0;
+            int callCount = 0;
             Foo func()
             {
                 callCount++;
                 return new Foo() { Value = 2 };
             }
 
-            var foo = await cache.GetAndSetAsync<Foo>("foo", func, options);
+            Foo foo = await cache.GetAndSetAsync<Foo>("foo", func, options);
             foo.Value.Should().Be(2);
 
-            var foo2 = await cache.GetAndSetAsync<Foo>("foo", func, options);
+            Foo foo2 = await cache.GetAndSetAsync<Foo>("foo", func, options);
             foo2.Should().BeEquivalentTo(foo);
             callCount.Should().Be(1);
         }
@@ -83,7 +83,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             private readonly Dictionary<string, byte[]> _cache = new();
 
             public byte[] Get(string key)
-                => _cache.TryGetValue(key, out var value) ? value : null;
+                => _cache.TryGetValue(key, out byte[] value) ? value : null;
 
             public Task<byte[]> GetAsync(string key, CancellationToken token = default)
                 => Task.FromResult(Get(key));

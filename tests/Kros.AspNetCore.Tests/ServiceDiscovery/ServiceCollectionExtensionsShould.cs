@@ -19,12 +19,12 @@ namespace Kros.AspNetCore.ServiceDiscovery
         [Fact]
         public void RegisterServiceDiscoveryProvider()
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
 
             serviceCollection.AddServiceDiscovery();
 
-            IServiceDiscoveryProvider provider =  serviceCollection
+            IServiceDiscoveryProvider provider = serviceCollection
                 .BuildServiceProvider()
                 .GetService<IServiceDiscoveryProvider>();
 
@@ -34,7 +34,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         [Fact]
         public void AddApiJwtAuthenticationShouldAddOneScheme()
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection.AddApiJwtAuthentication(new string[] { JwtAuthorizationHelper.JwtSchemeName }, GetConfiguration());
             serviceCollection.AddLogging();
             serviceCollection.BuildServiceProvider().GetServices<JwtBearerHandler>().Count().Should().Be(1);
@@ -43,7 +43,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         [Fact]
         public void AddApiJwtAuthenticationShouldAddMultipleSchemes()
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection.AddApiJwtAuthentication(
                 new string[] { JwtAuthorizationHelper.JwtSchemeName, JwtAuthorizationHelper.HashJwtSchemeName },
                 GetConfiguration());
@@ -54,15 +54,15 @@ namespace Kros.AspNetCore.ServiceDiscovery
         [Fact]
         public void AddApiJwtAuthenticationRequiresAtLeastOneScheme()
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.Invoking(sc =>  sc.AddApiJwtAuthentication(Array.Empty<string>(), GetConfiguration()))
+            ServiceCollection serviceCollection = new();
+            serviceCollection.Invoking(sc => sc.AddApiJwtAuthentication(Array.Empty<string>(), GetConfiguration()))
                 .Should().Throw<ArgumentException>();
         }
 
         [Fact]
         public void AddApiJwtAuthenticationIgnoresUnconfiguredSchemes()
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection.Invoking(sc => sc.AddApiJwtAuthentication(new string[] { "unknown" }, GetConfiguration()))
                 .Should().Throw<ArgumentException>();
         }
@@ -70,10 +70,11 @@ namespace Kros.AspNetCore.ServiceDiscovery
         [Fact]
         public async Task AddApiKeyBasicAuthentication()
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             serviceCollection.AddAuthentication().AddApiKeyBasicAuthentication(GetApiKeyConfiguration());
-            var schemeProvider = serviceCollection.BuildServiceProvider().GetRequiredService<IAuthenticationSchemeProvider>();
-            var scheme = await schemeProvider.GetSchemeAsync("Basic.ApiKey");
+            IAuthenticationSchemeProvider schemeProvider = serviceCollection.BuildServiceProvider()
+                .GetRequiredService<IAuthenticationSchemeProvider>();
+            AuthenticationScheme scheme = await schemeProvider.GetSchemeAsync("Basic.ApiKey");
             scheme.Should().NotBeNull();
             scheme.HandlerType.Name.Should().Be(typeof(ApiKeyBasicAuthenticationHandler).Name);
         }
@@ -81,15 +82,15 @@ namespace Kros.AspNetCore.ServiceDiscovery
         [Fact]
         public void ThrowOnAddApiKeyBasicAuthenticationWithoutConfig()
         {
-            var serviceCollection = new ServiceCollection();
-            var config = new ConfigurationBuilder().Build();
+            ServiceCollection serviceCollection = new();
+            IConfigurationRoot config = new ConfigurationBuilder().Build();
             serviceCollection.AddAuthentication().Invoking(builder => builder.AddApiKeyBasicAuthentication(config))
                 .Should().Throw<ArgumentNullException>();
         }
 
         private static IConfiguration GetConfiguration()
         {
-            var cfg = @"{
+            string cfg = @"{
                     ""ApiJwtAuthorization"": {
                         ""Schemes"": [
                           {
@@ -105,20 +106,20 @@ namespace Kros.AspNetCore.ServiceDiscovery
                         ]
                        }
                     }";
-            var cfgBuilder = new ConfigurationBuilder();
+            ConfigurationBuilder cfgBuilder = new();
             cfgBuilder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(cfg)));
             return cfgBuilder.Build();
         }
 
         private static IConfiguration GetApiKeyConfiguration()
         {
-            var cfg = @"{
+            string cfg = @"{
                             ""ApiKeyBasicAuthentication"": {
                                 ""ApiKey"": ""key2"",
                                 ""Scheme"": ""Basic.ApiKey""
                             }
                         }";
-            var cfgBuilder = new ConfigurationBuilder();
+            ConfigurationBuilder cfgBuilder = new();
             cfgBuilder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(cfg)));
             return cfgBuilder.Build();
         }

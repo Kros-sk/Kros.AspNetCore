@@ -55,13 +55,13 @@ namespace Kros.AspNetCore.Tests.Authorization
 
         private static string CreateJwtToken(params (string Key, string Value)[] claims)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor
+            JwtSecurityTokenHandler tokenHandler = new();
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims.Select(c => new Claim(c.Key, c.Value)).ToArray()),
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
             return $"Bearer {tokenHandler.WriteToken(token)}";
         }
 

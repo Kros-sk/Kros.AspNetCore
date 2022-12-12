@@ -21,11 +21,11 @@ namespace Kros.AspNetCore.HealthChecks
         /// <param name="report">Report for health.</param>
         public static Task WriteHealthCheckResponseAsync(HttpContext httpContext, HealthReport report)
         {
-            var response = "{}";
+            string response = "{}";
 
             if (report != null)
             {
-                var settings = new JsonSerializerSettings()
+                JsonSerializerSettings settings = new()
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
                     NullValueHandling = NullValueHandling.Ignore,
@@ -36,9 +36,7 @@ namespace Kros.AspNetCore.HealthChecks
 
                 httpContext.Response.ContentType = DefaultContentType;
 
-                var uiReport = UIHealthCheckReport
-                    .CreateFrom(report);
-
+                UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(report);
                 response = JsonConvert.SerializeObject(uiReport, settings);
             }
 

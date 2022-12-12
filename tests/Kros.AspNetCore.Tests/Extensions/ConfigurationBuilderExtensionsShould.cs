@@ -21,7 +21,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             AppConfigOptions actualAppConfig = new();
             cfg.Bind("AppConfig", actualAppConfig);
 
-            var expectedAppConfig = new AppConfigOptions
+            AppConfigOptions expectedAppConfig = new()
             {
                 Endpoint = "https://example.azconfig.io",
                 IdentityClientId = "Ipsum",
@@ -41,7 +41,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             AppConfigOptions actualAppConfig = new();
             cfg.Bind("AppConfig", actualAppConfig);
 
-            var expectedAppConfig = new AppConfigOptions
+            AppConfigOptions expectedAppConfig = new()
             {
                 Endpoint = "",
                 IdentityClientId = "",
@@ -114,7 +114,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             KeyVaultOptions actualKv = new();
             cfg.Bind("KeyVault", actualKv);
 
-            var expectedKv = new KeyVaultOptions
+            KeyVaultOptions expectedKv = new()
             {
                 Name = "example-kv",
                 IdentityClientId = "Lorem",
@@ -132,7 +132,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             KeyVaultOptions actualKv = new();
             cfg.Bind("KeyVault", actualKv);
 
-            var expectedKv = new KeyVaultOptions
+            KeyVaultOptions expectedKv = new()
             {
                 Name = string.Empty,
                 IdentityClientId = string.Empty
@@ -183,7 +183,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
         private static HostBuilderContext CreateHostBuilderContext()
         {
-            var context = new HostBuilderContext(new Dictionary<object, object>());
+            HostBuilderContext context = new(new Dictionary<object, object>());
             context.Configuration = GetConfiguration();
             context.HostingEnvironment = Substitute.For<IHostEnvironment>();
             context.HostingEnvironment.EnvironmentName.Returns("Development");

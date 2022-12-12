@@ -13,7 +13,7 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         [Fact]
         public void ThrowExceptionWhenResponseIsNull()
         {
-            var postProcessor = new NullCheckPostProcessor<IRequest<string>, string>(NullCheckPostProcessorOptions.Default);
+            NullCheckPostProcessor<IRequest<string>, string> postProcessor = new(NullCheckPostProcessorOptions.Default);
 
             Action action = () => postProcessor.Process(null, null, CancellationToken.None);
 
@@ -23,7 +23,7 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         [Fact]
         public void DoNotThrowExceptionWhenResponseIsNotNull()
         {
-            var postProcessor = new NullCheckPostProcessor<IRequest<string>, string>(NullCheckPostProcessorOptions.Default);
+            NullCheckPostProcessor<IRequest<string>, string> postProcessor = new(NullCheckPostProcessorOptions.Default);
 
             Action action = () => postProcessor.Process(null, "response", CancellationToken.None);
 
@@ -33,10 +33,10 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
         [Fact]
         public void DoNotCheckResponseIfNullCheckIgnoreIsSet()
         {
-            var options = new NullCheckPostProcessorOptions();
+            NullCheckPostProcessorOptions options = new();
             options.IgnoreRequest<Request>();
 
-            var postProcessor = new NullCheckPostProcessor<Request, string>(options);
+            NullCheckPostProcessor<Request, string> postProcessor = new(options);
 
             Action action = () => postProcessor.Process(new Request(), null, CancellationToken.None);
 

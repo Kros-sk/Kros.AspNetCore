@@ -112,7 +112,7 @@ namespace Kros.AspNetCore.Authorization
                 int key = GetKey(hashValue.ToString());
                 if (!memoryCache.TryGetValue(key, out string jwtToken))
                 {
-                    var uriBuilder = new UriBuilder(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
+                    UriBuilder uriBuilder = new(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
                     uriBuilder.Query = QueryString.Create(
                         _jwtAuthorizationOptions.HashParameterName,
                         hashValue.ToString()).ToUriComponent();
@@ -173,7 +173,7 @@ namespace Kros.AspNetCore.Authorization
         {
             if (IsCacheAllowed() && !IsRequestPathAllowedForCache(request))
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions();
+                MemoryCacheEntryOptions cacheEntryOptions = new();
 
                 if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
                 {

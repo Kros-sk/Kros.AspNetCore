@@ -31,9 +31,9 @@ namespace Kros.MassTransit.Analyzers
         {
             SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
-            var diagnostic = context.Diagnostics.First();
+            Diagnostic diagnostic = context.Diagnostics.First();
             string newName = diagnostic.Properties[EndpointKeyNamingAnalyzer.NewNameProperty];
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
+            Microsoft.CodeAnalysis.Text.TextSpan diagnosticSpan = diagnostic.Location.SourceSpan;
 
             ArgumentSyntax declaration = root.FindNode(diagnosticSpan) as ArgumentSyntax;
 

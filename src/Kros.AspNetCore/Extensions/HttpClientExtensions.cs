@@ -67,7 +67,7 @@ namespace Kros.AspNetCore.Extensions
             CancellationToken cancellationToken = default)
         {
             string jsonBody = JsonSerializer.Serialize(body);
-            var request = new HttpRequestMessage
+            HttpRequestMessage request = new()
             {
                 Method = HttpMethod.Get,
                 RequestUri = uri,

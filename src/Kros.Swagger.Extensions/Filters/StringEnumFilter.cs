@@ -197,7 +197,7 @@ namespace Kros.Swagger.Extensions.Filters
 
         private static List<Type> CheckTypes(IEnumerable<Type> sourceTypes, string paramName)
         {
-            var result = new List<Type>();
+            List<Type> result = new();
             foreach (Type enumType in sourceTypes)
             {
                 if (!enumType.IsEnum)
@@ -219,7 +219,7 @@ namespace Kros.Swagger.Extensions.Filters
 
         private static List<XDocument> LoadXmlDocs(IEnumerable<string> xmlDocPaths)
         {
-            var result = new List<XDocument>();
+            List<XDocument> result = new();
             if (xmlDocPaths != null)
             {
                 foreach (string xmlDocPath in xmlDocPaths)
@@ -235,7 +235,7 @@ namespace Kros.Swagger.Extensions.Filters
 
         private string CreateEnumMembersDescription(Type enumType, string defaultDescription)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new();
             AppendDefaultDescription(sb, defaultDescription);
             AppendEnumMembers(sb, enumType);
             return sb.ToString();

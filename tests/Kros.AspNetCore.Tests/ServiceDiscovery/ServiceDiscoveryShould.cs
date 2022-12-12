@@ -14,7 +14,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("Authorization", "https://authorizationservice.domain.com/")]
         public void FindServiceUriByName(string serviceName, string expectedUri)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+            ServiceDiscoveryProvider provider = new(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Uri uri = provider.GetService(serviceName);
 
@@ -29,7 +29,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("Catalog", "create", "http://localhost:9004/api/catalog", true)]
         public void FindPathUriByServiceAndPathName(string serviceName, string pathName, string expectedUri, bool allowHost)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), new ServiceDiscoveryOptions()
+            ServiceDiscoveryProvider provider = new(GetConfiguration(), new ServiceDiscoveryOptions()
             {
                 AllowServiceNameAsHost = allowHost
             });
@@ -42,7 +42,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [Fact]
         public void FindServiceUriByNameInAnotherSection()
         {
-            var provider = new ServiceDiscoveryProvider(
+            ServiceDiscoveryProvider provider = new(
                 GetConfiguration(),
                 new ServiceDiscoveryOptions() { SectionName = "ApiServices" });
 
@@ -54,7 +54,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [Fact]
         public void ThrowExceptionIfServiceDoesntExist()
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+            ServiceDiscoveryProvider provider = new(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Action action = () => provider.GetService("doesntExist");
 
@@ -67,7 +67,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("doesntExist", "getById")]
         public void ThrowExceptionIfServiceOrPathDoesntExist(string serviceName, string pathName)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+            ServiceDiscoveryProvider provider = new(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Action action = () => provider.GetPath(serviceName, pathName);
 
@@ -80,7 +80,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData(TestServiceType.AuthorizationServiceType, "https://authorizationservice.domain.com/")]
         public void FindServiceUriByType(TestServiceType serviceType, string expectedUri)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+            ServiceDiscoveryProvider provider = new(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Uri uri = provider.GetService(serviceType);
 
@@ -93,7 +93,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData(TestServiceType.ProjectsServiceType, "create", "http://localhost:9002/api/projects")]
         public void FindPathUriByServiceTypeAndPathName(TestServiceType serviceType, string pathName, string expectedUri)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+            ServiceDiscoveryProvider provider = new(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Uri uri = provider.GetPath(serviceType, pathName);
 
@@ -103,7 +103,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [Fact]
         public void ThrowExceptionIfServiceTypeWithoutAttribute()
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(), ServiceDiscoveryOptions.Default);
+            ServiceDiscoveryProvider provider = new(GetConfiguration(), ServiceDiscoveryOptions.Default);
 
             Action action = () => provider.GetService(TestServiceType.WithtoutParameter);
 
@@ -115,7 +115,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
         [InlineData("nonexisting")]
         public void AllowServiceNameAsHost(string serviceName)
         {
-            var provider = new ServiceDiscoveryProvider(GetConfiguration(),
+            ServiceDiscoveryProvider provider = new(GetConfiguration(),
                 new ServiceDiscoveryOptions()
                 {
                     AllowServiceNameAsHost = true

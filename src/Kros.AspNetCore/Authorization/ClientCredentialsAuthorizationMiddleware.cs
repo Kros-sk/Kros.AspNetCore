@@ -59,7 +59,7 @@ namespace Kros.AspNetCore.Authorization
         {
             Check.NotNullOrWhiteSpace(accessToken, nameof(accessToken));
 
-            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            ConfigurationManager<OpenIdConnectConfiguration> configurationManager = new(
                 _authorizationOptions.AuthorityUrl + "/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever(),
                 new HttpDocumentRetriever());
@@ -75,7 +75,7 @@ namespace Kros.AspNetCore.Authorization
             CancellationToken ct = default)
         {
             OpenIdConnectConfiguration discoveryDocument = await configurationManager.GetConfigurationAsync(ct);
-            var validationParameters = new TokenValidationParameters
+            TokenValidationParameters validationParameters = new()
             {
                 RequireExpirationTime = true,
                 RequireSignedTokens = true,

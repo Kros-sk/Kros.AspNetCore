@@ -58,7 +58,7 @@ namespace Kros.MassTransit.Analyzers
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-            var node = (InvocationExpressionSyntax)context.Node;
+            InvocationExpressionSyntax node = (InvocationExpressionSyntax)context.Node;
 
             if (node.Expression is MemberAccessExpressionSyntax expression
                 && expression.Name is GenericNameSyntax name
@@ -114,7 +114,7 @@ namespace Kros.MassTransit.Analyzers
             string prefix = type.TypeKind == TypeKind.Interface ? MessagePrefix : string.Empty;
             if (typeName != $"{prefix}{endpointKeyName}{MessageSufix}")
             {
-                var diagnostic = Diagnostic.Create(_rule, location, new Dictionary<string, string>()
+                Diagnostic diagnostic = Diagnostic.Create(_rule, location, new Dictionary<string, string>()
                     { { NewNameProperty, GetNewName(type.TypeKind, typeName)} }.ToImmutableDictionary(),
                     endpointKeyName, typeName);
 

@@ -10,7 +10,7 @@ namespace Kros.MediatR.Extensions.Tests
         [Fact]
         public void IgnoreNullRequestAssembly()
         {
-            var config = new PipelineBehaviorsConfig();
+            PipelineBehaviorsConfig config = new();
             config.AddRequestAssembly(typeof(string).Assembly);
             config.AddRequestAssembly(GetType().Assembly);
 

@@ -41,11 +41,11 @@ namespace Kros.AspNetCore.Tests.Authentication
         [Fact]
         public async Task NotProcessRequestsWithoutAuthHeader()
         {
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             await _handler.InitializeAsync(
                 new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
-            var result = await _handler.AuthenticateAsync();
+            AuthenticateResult result = await _handler.AuthenticateAsync();
 
             result.Succeeded.Should().BeFalse();
             result.None.Should().BeTrue();
@@ -54,12 +54,12 @@ namespace Kros.AspNetCore.Tests.Authentication
         [Fact]
         public async Task NotProcessRequestsWithoutBasicAuthHeader()
         {
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "Bearer key2");
             await _handler.InitializeAsync(
                 new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
-            var result = await _handler.AuthenticateAsync();
+            AuthenticateResult result = await _handler.AuthenticateAsync();
 
             result.Succeeded.Should().BeFalse();
             result.None.Should().BeTrue();
@@ -68,12 +68,12 @@ namespace Kros.AspNetCore.Tests.Authentication
         [Fact]
         public async Task RejectRequestsWithIncorrectApiKey()
         {
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "Basic wrong_key");
             await _handler.InitializeAsync(
                 new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
-            var result = await _handler.AuthenticateAsync();
+            AuthenticateResult result = await _handler.AuthenticateAsync();
 
             result.Succeeded.Should().BeFalse();
             result.Failure.Should().NotBeNull();
@@ -82,12 +82,12 @@ namespace Kros.AspNetCore.Tests.Authentication
         [Fact]
         public async Task AcceptRequestsWithCorrectApiKey()
         {
-            var context = new DefaultHttpContext();
+            DefaultHttpContext context = new();
             context.Request.Headers.Add(HeaderNames.Authorization, "Basic key2");
             await _handler.InitializeAsync(
                 new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
-            var result = await _handler.AuthenticateAsync();
+            AuthenticateResult result = await _handler.AuthenticateAsync();
 
             result.Succeeded.Should().BeTrue();
             result.None.Should().BeFalse();

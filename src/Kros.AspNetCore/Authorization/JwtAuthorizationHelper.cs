@@ -45,9 +45,9 @@ namespace Kros.AspNetCore.Authorization
         /// <returns>Jwt token.</returns>
         public static string CreateJwtTokenFromClaims(IEnumerable<Claim> userClaims, string secretKey, DateTime? expires = null)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityTokenHandler tokenHandler = new();
             byte[] key = Encoding.ASCII.GetBytes(secretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(userClaims),
                 Expires = expires,
