@@ -85,7 +85,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             public byte[] Get(string key)
                 => _cache.TryGetValue(key, out var value) ? value : null;
 
-            public Task<byte[]> GetAsync(string key, CancellationToken token = default(CancellationToken))
+            public Task<byte[]> GetAsync(string key, CancellationToken token = default)
                 => Task.FromResult(Get(key));
 
             public void Refresh(string key)
@@ -93,7 +93,7 @@ namespace Kros.AspNetCore.Tests.Extensions
                 throw new NotImplementedException();
             }
 
-            public Task RefreshAsync(string key, CancellationToken token = default(CancellationToken))
+            public Task RefreshAsync(string key, CancellationToken token = default)
             {
                 throw new NotImplementedException();
             }
@@ -103,7 +103,7 @@ namespace Kros.AspNetCore.Tests.Extensions
                 throw new NotImplementedException();
             }
 
-            public Task RemoveAsync(string key, CancellationToken token = default(CancellationToken))
+            public Task RemoveAsync(string key, CancellationToken token = default)
             {
                 throw new NotImplementedException();
             }
@@ -114,7 +114,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             public Task SetAsync(string key,
                 byte[] value,
                 DistributedCacheEntryOptions options,
-                CancellationToken token = default(CancellationToken))
+                CancellationToken token = default)
             {
                 Set(key, value, options);
 
