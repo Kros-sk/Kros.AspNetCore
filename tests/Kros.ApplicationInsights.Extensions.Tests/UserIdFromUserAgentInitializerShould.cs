@@ -37,7 +37,6 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
         private static IHttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)
         {
-            IHeaderDictionary headers = new HeaderDictionary();
             var httpContext = new DefaultHttpContext();
             IHttpContextAccessor context = new HttpContextAccessor()
             {

@@ -73,7 +73,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             context.Request.Headers.Add("ApplicationType", "25");
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
-            htttpClient.DefaultRequestHeaders.TryGetValues("ApplicationType", out IEnumerable<string> values).Should().BeFalse();
+            htttpClient.DefaultRequestHeaders.TryGetValues("ApplicationType", out IEnumerable<string> _).Should().BeFalse();
         }
 
         [Fact]

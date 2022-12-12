@@ -38,7 +38,6 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
         private static IHttpContextAccessor FakeHttpContextAccessor(bool addRoutePattern)
         {
-            IHeaderDictionary headers = new HeaderDictionary();
             var httpContext = new DefaultHttpContext();
             IHttpContextAccessor context = new HttpContextAccessor()
             {
