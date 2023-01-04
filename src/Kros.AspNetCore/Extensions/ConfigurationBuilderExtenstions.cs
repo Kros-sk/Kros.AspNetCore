@@ -163,7 +163,8 @@ namespace Kros.AspNetCore.Extensions
         {
             DefaultAzureCredentialOptions credentialOptions = new()
             {
-                ManagedIdentityClientId = managedIdentityClientId
+                // 'null' means use system assigned identity (if possible). Empty string is invalid value.
+                ManagedIdentityClientId = string.IsNullOrEmpty(managedIdentityClientId) ? null : managedIdentityClientId
             };
             return new DefaultAzureCredential(credentialOptions);
         }
