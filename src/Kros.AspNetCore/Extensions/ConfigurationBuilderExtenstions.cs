@@ -172,13 +172,13 @@ namespace Kros.AspNetCore.Extensions
         {
             if (credentialOptions.ManagedIdentityClientId != null)
             {
-                credentialOptions.ExcludeEnvironmentCredential = false;
-                credentialOptions.ExcludeInteractiveBrowserCredential = false;
-                credentialOptions.ExcludeAzurePowerShellCredential = false;
-                credentialOptions.ExcludeSharedTokenCacheCredential = false;
-                credentialOptions.ExcludeVisualStudioCodeCredential = false;
-                credentialOptions.ExcludeVisualStudioCredential = false;
-                credentialOptions.ExcludeAzureCliCredential = false;
+                credentialOptions.ExcludeAzurePowerShellCredential = true;
+                credentialOptions.ExcludeAzureCliCredential = true;
+                credentialOptions.ExcludeEnvironmentCredential = true;
+                credentialOptions.ExcludeInteractiveBrowserCredential = true;
+                credentialOptions.ExcludeSharedTokenCacheCredential = true;
+                credentialOptions.ExcludeVisualStudioCodeCredential = true;
+                credentialOptions.ExcludeVisualStudioCredential = true;
             }
         }
     }
