@@ -64,6 +64,7 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="config">The configuration.</param>
         /// <param name="environmentName">Environment name.</param>
         /// <param name="refreshConfiguration">A callback used to configure Azure App Configuration refresh options.</param>
+        /// <param name="initCredential">A callback used to configure Azure credential.</param>
         /// <returns>The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.</returns>
         /// <remarks>
         /// Configuration should contain <b>AppConfig</b> section, which is mapped to <see cref="AppConfigOptions "/> class.
@@ -71,7 +72,8 @@ namespace Kros.AspNetCore.Extensions
         public static IConfigurationBuilder AddAzureAppConfig(
             this IConfigurationBuilder config,
             string environmentName,
-            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null,
+            Action<DefaultAzureCredential> initCredential = null)
         {
             IConfigurationRoot settings = config.Build();
             AppConfigOptions appConfig = new();
@@ -85,6 +87,8 @@ namespace Kros.AspNetCore.Extensions
             config.AddAzureAppConfiguration(options =>
             {
                 DefaultAzureCredential credential = CreateAzureCredential(appConfig.IdentityClientId);
+                initCredential?.Invoke(credential);
+
                 options
                     .Connect(new Uri(appConfig.Endpoint), credential)
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
@@ -118,6 +122,7 @@ namespace Kros.AspNetCore.Extensions
         /// <param name="config">The configuration.</param>
         /// <param name="hostingContext">The hosting context.</param>
         /// <param name="refreshConfiguration">A callback used to configure Azure App Configuration refresh options.</param>
+        /// <param name="initCredential">A callback used to configure Azure credential.</param>
         /// <returns>The same instance of the Microsoft.Extensions.Hosting.IHostBuilder for chaining.</returns>
         /// <remarks>
         /// Configuration should contain <b>AppConfig</b> section, which is mapped to <see cref="AppConfigOptions "/> class.
@@ -125,16 +130,9 @@ namespace Kros.AspNetCore.Extensions
         public static IConfigurationBuilder AddAzureAppConfig(
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext,
-            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
-            => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration);
-
-        /// <inheritdoc cref="AddAzureAppConfig(IConfigurationBuilder, HostBuilderContext, Action{AzureAppConfigurationRefreshOptions})"/>
-        [Obsolete("Use AddAzureAppConfig(...) method.")]
-        public static IConfigurationBuilder AddAzureAppConfiguration(
-            this IConfigurationBuilder config,
-            HostBuilderContext hostingContext,
-            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null)
-            => AddAzureAppConfig(config, hostingContext, refreshConfiguration);
+            Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null,
+            Action<DefaultAzureCredential> initCredential = null)
+            => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration, initCredential);
 
         private static void ConfigureCacheRefresh(
             AzureAppConfigurationOptions options,
@@ -166,7 +164,22 @@ namespace Kros.AspNetCore.Extensions
                 // 'null' means use system assigned identity (if possible). Empty string is invalid value.
                 ManagedIdentityClientId = string.IsNullOrEmpty(managedIdentityClientId) ? null : managedIdentityClientId
             };
+            ExcludeCredentials(credentialOptions);
             return new DefaultAzureCredential(credentialOptions);
+        }
+
+        private static void ExcludeCredentials(DefaultAzureCredentialOptions credentialOptions)
+        {
+            if (credentialOptions.ManagedIdentityClientId != null)
+            {
+                credentialOptions.ExcludeAzurePowerShellCredential = true;
+                credentialOptions.ExcludeAzureCliCredential = true;
+                credentialOptions.ExcludeEnvironmentCredential = true;
+                credentialOptions.ExcludeInteractiveBrowserCredential = true;
+                credentialOptions.ExcludeSharedTokenCacheCredential = true;
+                credentialOptions.ExcludeVisualStudioCodeCredential = true;
+                credentialOptions.ExcludeVisualStudioCredential = true;
+            }
         }
     }
 }
