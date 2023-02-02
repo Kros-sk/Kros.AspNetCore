@@ -164,7 +164,22 @@ namespace Kros.AspNetCore.Extensions
                 // 'null' means use system assigned identity (if possible). Empty string is invalid value.
                 ManagedIdentityClientId = string.IsNullOrEmpty(managedIdentityClientId) ? null : managedIdentityClientId
             };
+            ExcludeCredentials(credentialOptions);
             return new DefaultAzureCredential(credentialOptions);
+        }
+
+        private static void ExcludeCredentials(DefaultAzureCredentialOptions credentialOptions)
+        {
+            if (credentialOptions.ManagedIdentityClientId != null)
+            {
+                credentialOptions.ExcludeEnvironmentCredential = false;
+                credentialOptions.ExcludeInteractiveBrowserCredential = false;
+                credentialOptions.ExcludeAzurePowerShellCredential = false;
+                credentialOptions.ExcludeSharedTokenCacheCredential = false;
+                credentialOptions.ExcludeVisualStudioCodeCredential = false;
+                credentialOptions.ExcludeVisualStudioCredential = false;
+                credentialOptions.ExcludeAzureCliCredential = false;
+            }
         }
     }
 }
