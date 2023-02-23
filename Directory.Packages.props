@@ -8,7 +8,7 @@
     <PackageVersion Include="FluentValidation" Version="11.4.0" />
     <PackageVersion Include="Hellang.Middleware.ProblemDetails" Version="6.5.1" />
     <PackageVersion Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
-    <PackageVersion Include="Kros.AspNetCore" Version="3.6.0" />
+    <PackageVersion Include="Kros.AspNetCore" Version="3.7.0" />
     <PackageVersion Include="Kros.Utils" Version="2.0.0" />
     <PackageVersion Include="MassTransit.AspNetCore" Version="7.1.8" />
     <PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="7.1.8" />
