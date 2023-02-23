@@ -73,7 +73,7 @@ namespace Kros.AspNetCore.Extensions
             this IConfigurationBuilder config,
             string environmentName,
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null,
-            Action<DefaultAzureCredential> initCredential = null)
+            Action<DefaultAzureCredentialOptions> initCredential = null)
         {
             IConfigurationRoot settings = config.Build();
             AppConfigOptions appConfig = new();
@@ -86,8 +86,7 @@ namespace Kros.AspNetCore.Extensions
 
             config.AddAzureAppConfiguration(options =>
             {
-                DefaultAzureCredential credential = CreateAzureCredential(appConfig.IdentityClientId);
-                initCredential?.Invoke(credential);
+                DefaultAzureCredential credential = CreateAzureCredential(appConfig.IdentityClientId, initCredential);
 
                 options
                     .Connect(new Uri(appConfig.Endpoint), credential)
@@ -131,7 +130,7 @@ namespace Kros.AspNetCore.Extensions
             this IConfigurationBuilder config,
             HostBuilderContext hostingContext,
             Action<AzureAppConfigurationRefreshOptions> refreshConfiguration = null,
-            Action<DefaultAzureCredential> initCredential = null)
+            Action<DefaultAzureCredentialOptions> initCredential = null)
             => config.AddAzureAppConfig(hostingContext.HostingEnvironment.EnvironmentName, refreshConfiguration, initCredential);
 
         private static void ConfigureCacheRefresh(
@@ -157,7 +156,9 @@ namespace Kros.AspNetCore.Extensions
             }
         }
 
-        private static DefaultAzureCredential CreateAzureCredential(string managedIdentityClientId)
+        private static DefaultAzureCredential CreateAzureCredential(
+            string managedIdentityClientId,
+            Action<DefaultAzureCredentialOptions> initCredential = null)
         {
             DefaultAzureCredentialOptions credentialOptions = new()
             {
@@ -165,6 +166,9 @@ namespace Kros.AspNetCore.Extensions
                 ManagedIdentityClientId = string.IsNullOrEmpty(managedIdentityClientId) ? null : managedIdentityClientId
             };
             ExcludeCredentials(credentialOptions);
+
+            initCredential?.Invoke(credentialOptions);
+
             return new DefaultAzureCredential(credentialOptions);
         }
 
