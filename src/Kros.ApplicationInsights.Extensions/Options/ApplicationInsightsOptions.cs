@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Extensions.DependencyInjection.Options
+﻿using Kros.ApplicationInsights.Extensions.Options;
+
+namespace Microsoft.Extensions.DependencyInjection.Options
 {
     /// <summary>
     /// Settings for Application insights.
@@ -15,5 +17,10 @@
         /// Must be a number 100/N, where N is integer.(100,50,25,...,0.1....)
         /// </summary>
         public int SamplingRate { get; set; }
+
+        /// <summary>
+        /// Adaptive sampling options.
+        /// </summary>
+        public AdaptiveSamplingOptions AdaptiveSamplingOptions { get; set; }
     }
 }

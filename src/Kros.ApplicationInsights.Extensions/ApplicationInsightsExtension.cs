@@ -54,6 +54,14 @@ namespace Microsoft.Extensions.DependencyInjection
             if (options != null)
             {
                 builder.UseSampling(options.SamplingRate);
+
+                if (options.AdaptiveSamplingOptions != null)
+                {
+                    builder.UseAdaptiveSampling(
+                        options.AdaptiveSamplingOptions.MaxTelemetryItemsPerSecond,
+                        options.AdaptiveSamplingOptions.ExcludedTypes,
+                        options.AdaptiveSamplingOptions.IncludedTypes);
+                }
             }
 
             builder.Build();
