@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
-    <Version>2.2.0</Version>
+    <Version>2.3.0</Version>
     <Description>Extensions to facilitate work with Application Insights.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>

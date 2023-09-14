@@ -34,4 +34,18 @@ Ak sa jedná o request na url `/health`, request sa nezahrnie do telemetry.
 
 ## FilterSyntheticRequestsProcessor
 
-Preskoćí syntetické requesty - requesty od botov, z web searchu a pod.
+Preskočí syntetické requesty - requesty od botov, z web searchu a pod.
+
+## HeadersTelemetryInitializer
+
+Umožní logovať ľubovoľné hlavičky z requestu.
+
+```csharp
+services.AddHeadersTelemetryInitializer("my-custom-header-1", "my-custom-header-2");
+```
+
+Hlavička bude pridaná do properties s kľúčom `Header-{headerKey}`. Pokiaľ chcete tento názov zmeniť, použite na to property name resolver.
+
+```csharp
+services.AddHeadersTelemetryInitializer((headerKey) => $"MyPrefix-{headerKey}-myPostfix","my-custom-header-1", "my-custom-header-2");
+```
