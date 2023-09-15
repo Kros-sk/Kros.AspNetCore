@@ -1,10 +1,12 @@
 ﻿using Kros.ApplicationInsights.Extensions;
+using Kros.Utils;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Options;
+using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -80,5 +82,41 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return configurationSection.Get<ApplicationInsightsOptions>();
         }
+
+        /// <summary>
+        /// Adds the headers telemetry initializer.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="propertyNameResolver">The property name resolver.</param>
+        /// <param name="headersToCapture">The headers to capture.</param>
+        public static IServiceCollection AddHeadersTelemetryInitializer(
+            this IServiceCollection services,
+            Func<string, string> propertyNameResolver = null,
+            params string[] headersToCapture)
+        {
+            Check.GreaterThan(headersToCapture.Length, 0, nameof(headersToCapture));
+
+            services.AddHttpContextAccessor();
+            services.Configure<HeadersTelemetryInitializer.HeadersToCaptureOptions>(options =>
+            {
+                options.Add(headersToCapture);
+                if (propertyNameResolver is not null)
+                {
+                    options.PropertyNameResolver = propertyNameResolver;
+                }
+            });
+            services.AddSingleton<ITelemetryInitializer, HeadersTelemetryInitializer>();
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the headers telemetry initializer.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="headersToCapture">The headers to capture.</param>
+        public static IServiceCollection AddHeadersTelemetryInitializer(
+            this IServiceCollection services,
+            params string[] headersToCapture)
+            => services.AddHeadersTelemetryInitializer(null, headersToCapture);
     }
 }
