@@ -108,11 +108,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsStringAsync();
-#else
                 .Content.ReadAsStringAsync(cancellationToken);
-#endif
 
         /// <summary>
         /// Get string response from http request and throws exception if request is unsuccessful.
@@ -127,11 +123,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsStringAsync();
-#else
                 .Content.ReadAsStringAsync(cancellationToken);
-#endif
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -146,11 +138,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsStreamAsync();
-#else
                 .Content.ReadAsStreamAsync(cancellationToken);
-#endif
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -165,11 +153,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsStreamAsync();
-#else
                 .Content.ReadAsStreamAsync(cancellationToken);
-#endif
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -186,11 +170,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, body, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsStreamAsync();
-#else
                 .Content.ReadAsStreamAsync(cancellationToken);
-#endif
 
         /// <summary>
         /// Get stream response from http request and throws exception if request is unsuccessful.
@@ -207,11 +187,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, body, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsStreamAsync();
-#else
                 .Content.ReadAsStreamAsync(cancellationToken);
-#endif
 
         /// <summary>
         /// Get byte array response from http request and throws exception if request is unsuccessful.
@@ -226,11 +202,7 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(uri, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsByteArrayAsync();
-#else
                 .Content.ReadAsByteArrayAsync(cancellationToken);
-#endif
 
         /// <summary>
         /// Get byte array response from http request and throws exception if request is unsuccessful.
@@ -245,10 +217,6 @@ namespace Kros.AspNetCore.Extensions
             Exception defaultException = null,
             CancellationToken cancellationToken = default)
             => await (await client.GetAndCheckResponseAsync(url, defaultException, cancellationToken))
-#if NETCOREAPP3_1
-                .Content.ReadAsByteArrayAsync();
-#else
                 .Content.ReadAsByteArrayAsync(cancellationToken);
-#endif
     }
 }
