@@ -1,11 +1,8 @@
-﻿using GreenPipes;
-using GreenPipes.Configurators;
+﻿using Azure;
+using Azure.Messaging.ServiceBus;
 using Kros.MassTransit.AzureServiceBus.Endpoints;
 using Kros.Utils;
 using MassTransit;
-using MassTransit.Azure.ServiceBus.Core;
-using MassTransit.ConsumeConfigurators;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
@@ -217,11 +214,6 @@ namespace Kros.MassTransit.AzureServiceBus
                 {
                     busCfg.UseMessageRetry(_retryConfigurator);
                 }
-
-                if (_registrationContext != null)
-                {
-                    busCfg.UseHealthCheck(_registrationContext);
-                }
             });
 
             return bus;
@@ -234,14 +226,12 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <returns>Service bus host.</returns>
         private void CreateServiceHost(IServiceBusBusFactoryConfigurator busCfg)
         {
-            ServiceBusConnectionStringBuilder cstrBuilder = new(_connectionString);
+            var cstrBuilder = ServiceBusConnectionStringProperties.Parse(_connectionString);
             busCfg.Host(_connectionString, hostCfg =>
             {
                 hostCfg.SharedAccessSignature(sasCfg =>
                 {
-                    sasCfg.KeyName = cstrBuilder.SasKeyName;
-                    sasCfg.SharedAccessKey = cstrBuilder.SasKey;
-                    sasCfg.TokenTimeToLive = _tokenTimeToLive;
+                    sasCfg.SasCredential = new AzureSasCredential(cstrBuilder.SharedAccessSignature);
                 });
             });
         }

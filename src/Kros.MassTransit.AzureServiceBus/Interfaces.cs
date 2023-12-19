@@ -1,7 +1,4 @@
-﻿using GreenPipes.Configurators;
-using MassTransit;
-using MassTransit.Azure.ServiceBus.Core;
-using MassTransit.ConsumeConfigurators;
+﻿using MassTransit;
 using System;
 
 namespace Kros.MassTransit.AzureServiceBus

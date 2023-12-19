@@ -1,12 +1,12 @@
 ﻿using Kros.Utils;
-using MassTransit.Topology;
+using MassTransit;
 
 namespace Kros.MassTransit.AzureServiceBus
 {
     /// <summary>
     /// Entity name formatter for MassTransit with prefixes.
     /// </summary>
-    class PrefixEntityNameFormatter: IEntityNameFormatter
+    class PrefixEntityNameFormatter : IEntityNameFormatter
     {
         private readonly IEntityNameFormatter _originalFormatter;
         private readonly string _prefix;
