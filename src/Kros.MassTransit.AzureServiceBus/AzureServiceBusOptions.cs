@@ -17,7 +17,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <summary>
         /// Base service bus endpoint.
         /// </summary>
-        public Uri Endpoint => ServiceBusConnectionStringProperties.Parse(ConnectionString).Endpoint;
+        public string Endpoint => ServiceBusConnectionStringProperties.Parse(ConnectionString).Endpoint.ToString();
 
         /// <summary>
         /// Token time to live in seconds.
