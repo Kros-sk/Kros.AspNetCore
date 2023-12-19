@@ -30,7 +30,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             context.Request.Headers[HeaderNames.Authorization]
@@ -49,8 +49,8 @@ namespace Kros.AspNetCore.Tests.Authorization
                 = CreateMiddlewareForForwardedHeaders(HttpStatusCode.OK, forwardedHeaders);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
-            context.Request.Headers.Add("ApplicationType", "25");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
+            context.Request.Headers["ApplicationType"] = "25";
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             htttpClient.DefaultRequestHeaders.GetValues("ApplicationType").Should().Equal("25");
@@ -65,8 +65,8 @@ namespace Kros.AspNetCore.Tests.Authorization
                 = CreateMiddlewareForForwardedHeaders(HttpStatusCode.OK, forwardedHeaders);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
-            context.Request.Headers.Add("ApplicationType", "25");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
+            context.Request.Headers["ApplicationType"] = "25";
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             htttpClient.DefaultRequestHeaders.TryGetValues("ApplicationType", out IEnumerable<string> _).Should().BeFalse();
@@ -86,7 +86,7 @@ namespace Kros.AspNetCore.Tests.Authorization
                 });
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             context.Request.Headers[HeaderNames.Authorization]
@@ -147,7 +147,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.OK);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
             context.Request.Query = new QueryCollection(QueryHelpers.ParseQuery("?hash=asdf"));
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
@@ -168,7 +168,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             MemoryCache cache = new(new MemoryCacheOptions());
             cache.Set(HashCode.Combine(accessToken), "AAAAAA");
 
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
             await middleware.Invoke(context, httpClientFactoryMock, cache, CreateProvider());
 
             context.Request.Headers[HeaderNames.Authorization]
@@ -207,7 +207,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             DefaultHttpContext context = new();
             MemoryCache cache = new(new MemoryCacheOptions());
 
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
             await middleware.Invoke(context, httpClientFactoryMock, cache, CreateProvider());
 
             cache.Get(HashCode.Combine(accessToken))
@@ -242,7 +242,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             DefaultHttpContext context = new();
             MemoryCache cache = new(new MemoryCacheOptions());
 
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
             context.Request.Path = "/ignoredPath/";
             context.Request.Method = HttpMethod.Get.ToString();
             await middleware.Invoke(context, httpClientFactoryMock, cache, CreateProvider());
@@ -272,7 +272,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(statusCode);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
 
             await Assert.ThrowsAsync<UnauthorizedAccessException>(()
                 => middleware.Invoke(
@@ -306,7 +306,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.Forbidden);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
 
             await Assert.ThrowsAsync<ResourceIsForbiddenException>(()
                 => middleware.Invoke(
@@ -322,7 +322,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.NotFound);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
 
             await Assert.ThrowsAsync<NotFoundException>(()
                 => middleware.Invoke(
@@ -338,7 +338,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             (IHttpClientFactory httpClientFactoryMock, GatewayAuthorizationMiddleware middleware) = CreateMiddleware(HttpStatusCode.BadRequest);
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
 
             await Assert.ThrowsAsync<BadRequestException>(()
                 => middleware.Invoke(
@@ -366,9 +366,9 @@ namespace Kros.AspNetCore.Tests.Authorization
                 });
 
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, "access_token");
-            context.Request.Headers.Add("Connection-Id", connectionId);
-            context.Request.Headers.Add("any-header", connectionId);
+            context.Request.Headers[HeaderNames.Authorization] = "access_token";
+            context.Request.Headers["Connection-Id"] = connectionId;
+            context.Request.Headers["any-header"] = connectionId;
             await middleware.Invoke(context, httpClientFactoryMock, new MemoryCache(new MemoryCacheOptions()), CreateProvider());
 
             context.Request.Headers[HeaderNames.Authorization]
@@ -396,9 +396,9 @@ namespace Kros.AspNetCore.Tests.Authorization
                 });
             const string accessToken = "access_token";
             DefaultHttpContext context = new();
-            context.Request.Headers.Add(HeaderNames.Authorization, accessToken);
-            context.Request.Headers.Add("Connection-Id", connectionId);
-            context.Request.Headers.Add("any-header", connectionId);
+            context.Request.Headers[HeaderNames.Authorization] = accessToken;
+            context.Request.Headers["Connection-Id"] = connectionId;
+            context.Request.Headers["any-header"] = connectionId;
 
             int key = connectionId == null
                 ? GatewayAuthorizationMiddleware.GetKey(accessToken)
