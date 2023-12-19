@@ -100,7 +100,7 @@ namespace Kros.MediatR.Extensions.Tests
 
         public interface ICommandRequest { }
 
-        public class TestCommand : IRequest, ICommandRequest
+        public class TestCommand : IRequest<Unit>, ICommandRequest
         {
         }
 
