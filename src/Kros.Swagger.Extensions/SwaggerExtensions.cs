@@ -46,7 +46,7 @@ namespace Kros.Swagger.Extensions
             services.ConfigureSwaggerGen(options =>
             {
                 // '+' (nested classes) is not valid character in OpenApi reference.
-                options.CustomSchemaIds(x => x.FullName.Replace("+", "-"));
+                options.CustomSchemaIds(x => x.FullName?.Replace("+", "-"));
             });
 
             services.AddSwaggerGen(c =>
@@ -79,7 +79,7 @@ namespace Kros.Swagger.Extensions
 
         private static void AddSwaggerSecurity(SwaggerGenOptions swaggerOptions, OpenApiInfo swaggerDocumentationSettings)
         {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("TokenUrl", out IOpenApiExtension t) &&
+            if (swaggerDocumentationSettings.Extensions.TryGetValue("TokenUrl", out IOpenApiExtension? t) &&
                 t is OpenApiString tokenUrl)
             {
                 swaggerOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -89,7 +89,7 @@ namespace Kros.Swagger.Extensions
                     {
                         Password = new OpenApiOAuthFlow()
                         {
-                            TokenUrl = new Uri(tokenUrl?.Value)
+                            TokenUrl = new Uri(tokenUrl.Value)
                         }
                     }
                 });
@@ -163,10 +163,10 @@ namespace Kros.Swagger.Extensions
 
         private static string? GetOAuthClientId(OpenApiInfo swaggerDocumentationSettings)
         {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out IOpenApiExtension c) &&
+            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out IOpenApiExtension? c) &&
                 c is OpenApiString clientId)
             {
-                return clientId?.Value;
+                return clientId.Value;
             }
 
             return DefaultOAuthClientId;

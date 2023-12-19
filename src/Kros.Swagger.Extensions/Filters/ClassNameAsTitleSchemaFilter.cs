@@ -23,7 +23,7 @@ namespace Kros.Swagger.Extensions.Filters
             {
                 return true;
             }
-            Type nullableType = Nullable.GetUnderlyingType(type);
+            Type? nullableType = Nullable.GetUnderlyingType(type);
             if (nullableType != null)
             {
                 return nullableType.IsPrimitive || nullableType == typeof(string);
