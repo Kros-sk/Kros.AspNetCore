@@ -33,9 +33,7 @@ namespace Kros.AspNetCore.Tests.Authentication
             _handler = new ApiKeyBasicAuthenticationHandler(
                 _optionsMonitor,
                 _loggerFactory,
-                Substitute.For<UrlEncoder>(),
-                Substitute.For<ISystemClock>()
-                );
+                Substitute.For<UrlEncoder>());
         }
 
         [Fact]

@@ -20,8 +20,9 @@ namespace Kros.MassTransit.AzureServiceBus
         public Uri Endpoint => ServiceBusConnectionStringProperties.Parse(ConnectionString).Endpoint;
 
         /// <summary>
-        /// Token time to live in seconds. If 0, default value <see cref=" ConfigDefaults.TokenTimeToLive"/> is used.
+        /// Token time to live in seconds.
         /// </summary>
+        [Obsolete("This property is not used anymore.")]
         public int TokenTimeToLive { get; set; }
 
         /// <summary>

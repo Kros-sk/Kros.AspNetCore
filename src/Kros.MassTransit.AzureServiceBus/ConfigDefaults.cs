@@ -8,11 +8,6 @@ namespace Kros.MassTransit.AzureServiceBus
     public static class ConfigDefaults
     {
         /// <summary>
-        /// Default time to live for Azure service bus token.
-        /// </summary>
-        public static TimeSpan TokenTimeToLive { get; } = TimeSpan.FromMinutes(1);
-
-        /// <summary>
         /// Default message time to live in the queue.
         /// </summary>
         public static readonly TimeSpan MessageTimeToLive = TimeSpan.FromDays(14);

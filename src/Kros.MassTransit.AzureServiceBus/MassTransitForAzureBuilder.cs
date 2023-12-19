@@ -18,8 +18,6 @@ namespace Kros.MassTransit.AzureServiceBus
         #region Attributes
 
         private readonly string _connectionString;
-        private readonly TimeSpan _tokenTimeToLive;
-        private readonly IBusRegistrationContext _registrationContext;
         private readonly IServiceProvider _provider;
         private readonly string _topicNamePrefix;
         private readonly string _endpointNamePrefix;
@@ -36,7 +34,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// Ctor.
         /// </summary>
         /// <param name="connectionString">Connection string to Azure service bus.</param>
-        public MassTransitForAzureBuilder(string connectionString) : this(connectionString, ConfigDefaults.TokenTimeToLive)
+        public MassTransitForAzureBuilder(string connectionString) : this(connectionString, null)
         { }
 
         /// <summary>
@@ -44,8 +42,9 @@ namespace Kros.MassTransit.AzureServiceBus
         /// </summary>
         /// <param name="connectionString">Connection string to Azure service bus.</param>
         /// <param name="tokenTimeToLive">TTL for Azure service bus token.</param>
+        [Obsolete("'tokenTimeToLive' parameter is not used anymore. Use constructor without this parameter.")]
         public MassTransitForAzureBuilder(string connectionString, TimeSpan tokenTimeToLive) :
-            this(connectionString, tokenTimeToLive, null)
+            this(connectionString, null)
         { }
 
         /// <summary>
@@ -53,9 +52,11 @@ namespace Kros.MassTransit.AzureServiceBus
         /// </summary>
         /// <param name="connectionString">Connection string to Azure service bus.</param>
         /// <param name="provider">DI container.</param>
-        public MassTransitForAzureBuilder(string connectionString, IServiceProvider provider) :
-            this(connectionString, ConfigDefaults.TokenTimeToLive, provider)
-        { }
+        public MassTransitForAzureBuilder(string connectionString, IServiceProvider provider)
+        {
+            _connectionString = Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
+            _provider = provider;
+        }
 
         /// <summary>
         /// Ctor.
@@ -67,9 +68,6 @@ namespace Kros.MassTransit.AzureServiceBus
 
             _connectionString = Check.NotNullOrWhiteSpace(options.ConnectionString,
                 nameof(AzureServiceBusOptions.ConnectionString));
-            _tokenTimeToLive = options.TokenTimeToLive > 0
-                ? TimeSpan.FromSeconds(options.TokenTimeToLive)
-                : ConfigDefaults.TokenTimeToLive;
             _provider = provider;
             _topicNamePrefix = options.TopicNamePrefix;
             _endpointNamePrefix = options.EndpointNamePrefix;
@@ -80,10 +78,10 @@ namespace Kros.MassTransit.AzureServiceBus
         /// Ctor.
         /// </summary>
         /// <param name="registrationContext">MassTransit registration context.</param>
+        [Obsolete("'registrationContext' is not used anymore. Use constructor with IServiceProvider paramter.")]
         public MassTransitForAzureBuilder(IBusRegistrationContext registrationContext)
             : this((IServiceProvider)registrationContext)
         {
-            _registrationContext = registrationContext;
         }
 
         /// <summary>
@@ -92,11 +90,10 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <param name="connectionString">Connection string to Azure service bus.</param>
         /// <param name="tokenTimeToLive">TTL for Azure service bus token.</param>
         /// <param name="provider">DI container.</param>
+        [Obsolete("'tokenTimeToLive' parameter is not used anymore. Use constructor without this parameter.")]
         public MassTransitForAzureBuilder(string connectionString, TimeSpan tokenTimeToLive, IServiceProvider provider)
+            : this(connectionString, provider)
         {
-            _connectionString = Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
-            _tokenTimeToLive = Check.GreaterThan(tokenTimeToLive, TimeSpan.Zero, nameof(tokenTimeToLive));
-            _provider = provider;
         }
 
         #endregion

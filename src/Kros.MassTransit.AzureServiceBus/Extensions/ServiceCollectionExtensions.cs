@@ -38,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 cfg.AddBus(provider =>
                 {
-                    MassTransitForAzureBuilder builder = new(provider);
+                    MassTransitForAzureBuilder builder = new((IServiceProvider)provider);
                     busCfg?.Invoke(builder);
 
                     return builder.Build();
