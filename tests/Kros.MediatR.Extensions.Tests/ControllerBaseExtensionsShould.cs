@@ -69,7 +69,7 @@ namespace Kros.MediatR.Extensions.Tests
         private static TestController CreateController()
         {
             ServiceCollection service = new();
-            service.AddMediatR(Assembly.GetExecutingAssembly());
+            service.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             service.AddMediatRNullCheckPostProcessor();
 
             ActionContext actionContext = new()

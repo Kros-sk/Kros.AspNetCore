@@ -21,7 +21,7 @@ namespace Kros.ProblemDetails.Extensions
         /// <param name="configAction">Additional action for configuring Hellang problem details.</param>
         public static IServiceCollection AddKrosProblemDetails(
             this IServiceCollection services,
-            Action<ProblemDetailsOptions> configAction = null)
+            Action<Hellang.Middleware.ProblemDetails.ProblemDetailsOptions> configAction = null)
             => services.AddProblemDetails(p =>
             {
                 p.IncludeExceptionDetails = (context, ex) => IncludeExceptionDetails(context, ex);

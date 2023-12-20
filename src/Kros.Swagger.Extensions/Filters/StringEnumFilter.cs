@@ -212,7 +212,7 @@ namespace Kros.Swagger.Extensions.Filters
         private static string CreateNotEnumTypeMessage(Type type)
         {
             string typeName = type.Name;
-            string typeFullName = type.FullName;
+            string? typeFullName = type.FullName;
             return $"{nameof(StringEnumFilter)} can be used only with Enum types. "
                 + $"The type {typeName} ({typeFullName}) is not an enum.";
         }
@@ -266,16 +266,22 @@ namespace Kros.Swagger.Extensions.Filters
 
         private string GetXmlSummaryForEnumMember(string enumMemberName)
         {
+            static bool FindElementByNameAttribute(XElement el, string value)
+            {
+                XAttribute? attribute = el.Attribute("name");
+                return (attribute is not null) && attribute.Value.Equals(value, StringComparison.OrdinalIgnoreCase);
+            }
+
             string enumMemberSummary = "";
             foreach (XDocument xmlDoc in _xmlDocs)
             {
-                XElement enumMemberComments = xmlDoc.Descendants("member")
-                    .FirstOrDefault(m => m.Attribute("name").Value.Equals(enumMemberName, StringComparison.OrdinalIgnoreCase));
+                XElement? enumMemberComments = xmlDoc.Descendants("member")
+                    .FirstOrDefault(m => FindElementByNameAttribute(m, enumMemberName));
                 if (enumMemberComments == null)
                 {
                     continue;
                 }
-                XElement summary = enumMemberComments.Descendants("summary").FirstOrDefault();
+                XElement? summary = enumMemberComments.Descendants("summary").FirstOrDefault();
                 if (summary == null)
                 {
                     continue;

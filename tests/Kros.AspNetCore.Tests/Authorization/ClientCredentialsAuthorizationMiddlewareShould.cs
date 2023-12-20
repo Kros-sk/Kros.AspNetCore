@@ -41,7 +41,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             HttpContext context = new DefaultHttpContext();
             if (authHeader != null)
             {
-                context.Request.Headers.Add(HeaderNames.Authorization, authHeader);
+                context.Request.Headers[HeaderNames.Authorization] = authHeader;
             }
             return context;
         }

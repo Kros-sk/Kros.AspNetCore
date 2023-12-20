@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.ServiceBus;
+﻿using Azure.Messaging.ServiceBus;
+using System;
 using System.Collections.Generic;
 
 namespace Kros.MassTransit.AzureServiceBus
@@ -20,8 +21,9 @@ namespace Kros.MassTransit.AzureServiceBus
         {
             get
             {
-                string endpoint = new ServiceBusConnectionStringBuilder(ConnectionString).Endpoint;
-                if (!string.IsNullOrEmpty(endpoint) && endpoint.EndsWith("/"))
+                Uri endpointUri = ServiceBusConnectionStringProperties.Parse(ConnectionString).Endpoint;
+                string endpoint = endpointUri is null ? string.Empty : endpointUri.ToString();
+                if (!string.IsNullOrEmpty(endpoint) && endpoint.EndsWith('/'))
                 {
                     return endpoint;
                 }
@@ -33,8 +35,9 @@ namespace Kros.MassTransit.AzureServiceBus
         }
 
         /// <summary>
-        /// Token time to live in seconds. If 0, default value <see cref=" ConfigDefaults.TokenTimeToLive"/> is used.
+        /// Token time to live in seconds.
         /// </summary>
+        [Obsolete("This property is not used anymore.")]
         public int TokenTimeToLive { get; set; }
 
         /// <summary>

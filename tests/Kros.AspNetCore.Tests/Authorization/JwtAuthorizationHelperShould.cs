@@ -67,7 +67,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             string expectedToken)
         {
             IHeaderDictionary headers = new HeaderDictionary();
-            headers.Add(HeaderNames.Authorization, token);
+            headers[HeaderNames.Authorization] = token;
             bool contains = JwtAuthorizationHelper.TryGetTokenValue(headers, out token, removePrefix);
             contains.Should().Be(expectedContains);
             token.Should().Be(expectedToken);

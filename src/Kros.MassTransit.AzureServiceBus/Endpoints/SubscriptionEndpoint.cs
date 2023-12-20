@@ -1,6 +1,4 @@
 ﻿using MassTransit;
-using MassTransit.Azure.ServiceBus.Core;
-using MassTransit.ConsumeConfigurators;
 using System;
 using System.Collections.Generic;
 

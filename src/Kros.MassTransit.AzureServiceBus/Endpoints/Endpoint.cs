@@ -1,7 +1,5 @@
 ﻿using Kros.Utils;
 using MassTransit;
-using MassTransit.Azure.ServiceBus.Core;
-using MassTransit.ConsumeConfigurators;
 using System;
 
 namespace Kros.MassTransit.AzureServiceBus.Endpoints
