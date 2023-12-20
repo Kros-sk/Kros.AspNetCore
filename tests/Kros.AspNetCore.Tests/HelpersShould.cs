@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Kros.AspNetCore.Tests
@@ -35,13 +34,14 @@ namespace Kros.AspNetCore.Tests
                 .Be(expectedSectionName);
         }
 
-        public static IEnumerable<object[]> GetSectionName_TestData()
+        public static TheoryData<Type, string> GetSectionName_TestData()
+            => new()
         {
-            yield return new object[] { typeof(TestOptions), "Test" };
-            yield return new object[] { typeof(Test2options), "Test2" };
-            yield return new object[] { typeof(TestSettings), "Test" };
-            yield return new object[] { typeof(Test2settings), "Test2" };
-            yield return new object[] { typeof(TestClass), "TestClass" };
-        }
+            { typeof(TestOptions), "Test" },
+            { typeof(Test2options), "Test2" },
+            { typeof(TestSettings), "Test" },
+            { typeof(Test2settings), "Test2" },
+            { typeof(TestClass), "TestClass" }
+        };
     }
 }

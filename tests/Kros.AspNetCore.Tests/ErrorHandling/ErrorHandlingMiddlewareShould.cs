@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.JsonPatch.Exceptions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -88,12 +88,11 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             context.Response.StatusCode.Should().Be(expectedStatusCode);
         }
 
-        public static IEnumerable<object[]> ReturnCorectStatusCodeForExceptionData()
+        public static TheoryData<Exception, int> ReturnCorectStatusCodeForExceptionData()
         {
-            foreach ((Exception ex, int statusCode) in _knownExceptions)
-            {
-                yield return new object[] { ex, statusCode };
-            }
+            TheoryData<Exception, int> data = new();
+            _knownExceptions.ForEach(item => data.Add(item.ex, item.statusCode));
+            return data;
         }
 
         [Theory]
@@ -117,12 +116,11 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             context.Response.StatusCode.Should().Be(StatusCodes.Status100Continue);
         }
 
-        public static IEnumerable<object[]> NotChangeStatusCodeIfResponseHasStartedData()
+        public static TheoryData<Exception> NotChangeStatusCodeIfResponseHasStartedData()
         {
-            foreach ((Exception ex, int _) in _knownExceptions)
-            {
-                yield return new object[] { ex };
-            }
+            TheoryData<Exception> data = new();
+            _knownExceptions.ForEach(item => data.Add(item.ex));
+            return data;
         }
     }
 }
