@@ -28,12 +28,13 @@ namespace Kros.AspNetCore.Tests.Extensions
             action.Should().Throw<ArgumentException>();
         }
 
-        public static IEnumerable<object[]> ThrowArgumentExceptionIfNoValidPrefix_Data()
-        {
-            yield return new object[] { null };
-            yield return new object[] { Array.Empty<string>() };
-            yield return new object[] { new string[] { "", "   ", "\t" } };
-        }
+        public static TheoryData<IEnumerable<string>> ThrowArgumentExceptionIfNoValidPrefix_Data()
+            => new()
+            {
+                { null },
+                { Array.Empty<string>() },
+                { new string[] { "", "   ", "\t" } }
+            };
 
         [Theory]
         [InlineData("lorem-ipsum1", true)]

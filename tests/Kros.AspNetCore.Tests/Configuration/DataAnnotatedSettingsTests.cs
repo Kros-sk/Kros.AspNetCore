@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Kros.AspNetCore.Configuration;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Xunit;
 
@@ -43,10 +42,11 @@ namespace Kros.AspNetCore.Tests.Configuration
             action.Should().NotThrow();
         }
 
-        public static IEnumerable<object[]> ValidateMustNotThrowIfSettingsAreCorrect_Data()
-        {
-            yield return new object[] { new TestSettings { Text = "Lorem Ipsum" } };
-            yield return new object[] { new NotAnnotatedTestSettings() };
-        }
+        public static TheoryData<IValidatable> ValidateMustNotThrowIfSettingsAreCorrect_Data()
+            => new()
+            {
+                { new TestSettings() { Text = "Lorem Ipsum" } },
+                { new NotAnnotatedTestSettings() }
+            };
     }
 }
