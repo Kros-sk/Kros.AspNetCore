@@ -12,8 +12,6 @@
     <PackageReleaseNotes>https://github.com/Kros-sk/Kros.AspNetCore/releases</PackageReleaseNotes>
     <PackageTags>kros;masstransit;azure;service bus;</PackageTags>
     <RepositoryUrl>https://github.com/Kros-sk/Kros.AspNetCore</RepositoryUrl>
-
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,20 +25,4 @@
     <PackageReference Include="Scrutor" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Kros.MassTransit.Analyzers\Kros.MassTransit.Analyzers.csproj">
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-      <IncludeAssets>Kros.MassTransit.Analyzers.dll</IncludeAssets>
-    </ProjectReference>
-  </ItemGroup>
-
-  <Target Name="_AddAnalyzersToOutput">
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\Kros.MassTransit.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
-    </ItemGroup>
-  </Target>
-
-  <ItemGroup>
-    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
-  </ItemGroup>
 </Project>
