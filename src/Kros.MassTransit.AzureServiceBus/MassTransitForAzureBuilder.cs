@@ -222,16 +222,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <param name="busCfg">Service bus configuration.</param>
         /// <returns>Service bus host.</returns>
         private void CreateServiceHost(IServiceBusBusFactoryConfigurator busCfg)
-        {
-            var cstrBuilder = ServiceBusConnectionStringProperties.Parse(_connectionString);
-            busCfg.Host(_connectionString, hostCfg =>
-            {
-                hostCfg.SharedAccessSignature(sasCfg =>
-                {
-                    sasCfg.SasCredential = new AzureSasCredential(cstrBuilder.SharedAccessSignature);
-                });
-            });
-        }
+            => busCfg.Host(_connectionString);
 
         /// <summary>
         /// Configures service bus.
