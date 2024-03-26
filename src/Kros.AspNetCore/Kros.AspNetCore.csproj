@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>4.0.0</Version>
+    <Version>4.1.0</Version>
     <Description>General utilities and helpers for building ASP.NET Core WEB API</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
