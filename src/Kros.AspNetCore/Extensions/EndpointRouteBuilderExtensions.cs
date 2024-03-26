@@ -23,7 +23,7 @@ namespace Kros.AspNetCore.Extensions
         /// <exception cref="InvalidOperationException">
         /// When `HttpConnectionDispatcher` section is missing in configuration.
         /// </exception>
-        public static void MapSignalRHubWithOptions<THub>(
+        public static IHubEndpointConventionBuilder MapSignalRHubWithOptions<THub>(
             this IEndpointRouteBuilder endpoints,
             IConfiguration configuration,
             [StringSyntax("Route")] string pattern)  where THub : Hub
@@ -37,7 +37,7 @@ namespace Kros.AspNetCore.Extensions
                         Helpers.GetSectionName<HttpConnectionDispatcherOptions>()));
             }
 
-            endpoints.MapHub<THub>(pattern, o =>
+            return endpoints.MapHub<THub>(pattern, o =>
             {
                 o = options;
             });
