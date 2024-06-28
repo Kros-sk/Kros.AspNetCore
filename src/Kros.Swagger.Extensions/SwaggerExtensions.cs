@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Any;
@@ -36,7 +36,7 @@ namespace Kros.Swagger.Extensions
             bool includeXmlcomments,
             Action<SwaggerGenOptions>? setupAction = null)
         {
-            OpenApiInfo? options = GetSwaggerDocumentationSettings(configuration);
+            SwaggerSettings? settings = GetSwaggerSettings(configuration);
 
             services.ConfigureSwaggerGen(options =>
             {
@@ -46,15 +46,15 @@ namespace Kros.Swagger.Extensions
 
             services.AddSwaggerGen(c =>
             {
-                if (options is not null)
+                if (settings is not null)
                 {
-                    c.SwaggerDoc(options.Version, options);
+                    c.SwaggerDoc(settings.Version, MapSwaggerSettingsToOpenApiInfo(settings));
                 }
                 if (includeXmlcomments)
                 {
                     c.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory();
                 }
-                AddSwaggerSecurity(c, options);
+                //AddSwaggerSecurity(c, options);
                 c.UseClassNameAsTitle();
                 c.UseNullableSchemaFilter();
                 setupAction?.Invoke(c);
@@ -108,11 +108,42 @@ namespace Kros.Swagger.Extensions
             }
         }
 
-        private static OpenApiInfo? GetSwaggerDocumentationSettings(IConfiguration configuration)
+        private static SwaggerSettings? GetSwaggerSettings(IConfiguration configuration)
         {
             IConfigurationSection configurationSection = configuration.GetSection(SwaggerDocumentationSectionName);
+            return configurationSection.Exists() ? configurationSection.Get<SwaggerSettings>() : null;
+        }
 
-            return configurationSection.Exists() ? configurationSection.Get<OpenApiInfo>() : null;
+        private static OpenApiInfo? MapSwaggerSettingsToOpenApiInfo(SwaggerSettings? settings)
+        {
+            if (settings is null)
+            {
+                return null;
+            }
+            OpenApiInfo info = new()
+            {
+                Title = settings.Title,
+                Description = settings.Description,
+                Version = settings.Version
+            };
+            if (settings.Contact is not null)
+            {
+                info.Contact = new()
+                {
+                    Name = settings.Contact.Name,
+                    Url = settings.Contact.Url is not null ? new Uri(settings.Contact.Url) : null,
+                    Email = settings.Contact.Email
+                };
+            }
+            if (settings.License is not null)
+            {
+                info.License = new()
+                {
+                    Name = settings.License.Name,
+                    Url = settings.License.Url is not null ? new Uri(settings.License.Url) : null
+                };
+            }
+            return info;
         }
 
         /// <summary>
@@ -128,43 +159,23 @@ namespace Kros.Swagger.Extensions
             Action<SwaggerOptions>? setupAction = null,
             Action<SwaggerUIOptions>? setupUiAction = null)
         {
-            OpenApiInfo? options = GetSwaggerDocumentationSettings(configuration);
-            string? clientId = GetOAuthClientId(options);
+            SwaggerSettings? settings = GetSwaggerSettings(configuration);
 
             app.UseSwagger(c =>
             {
-                c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
-                {
-                    swaggerDoc.Servers.Add(new OpenApiServer() { Url = "/" });
-                });
-
                 setupAction?.Invoke(c);
             })
 
             .UseSwaggerUI(c =>
             {
-                if (options is not null)
+                if (settings is not null)
                 {
-                    c.SwaggerEndpoint($"{options.Version}/swagger.json", options.Title);
+                    c.SwaggerEndpoint($"{settings.Version}/swagger.json", settings.Title);
                 }
-                c.OAuthClientId(clientId);
-                c.OAuthClientSecret(string.Empty);
-
                 setupUiAction?.Invoke(c);
             });
 
             return app;
-        }
-
-        private static string? GetOAuthClientId(OpenApiInfo swaggerDocumentationSettings)
-        {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out IOpenApiExtension? c) &&
-                c is OpenApiString clientId)
-            {
-                return clientId.Value;
-            }
-
-            return DefaultOAuthClientId;
         }
     }
 }
