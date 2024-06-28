@@ -1,82 +1,32 @@
-﻿using System;
+﻿using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
 
 namespace Kros.Swagger.Extensions
 {
     /// <summary>
     /// Settings for Swagger documentation.
     /// </summary>
-    public class SwaggerSettings
+    public class SwaggerSettings : OpenApiInfo
     {
-        #region Nested types
+        /// <summary>
+        /// OAuth client ID.
+        /// </summary>
+        public string OAuthClientId { get; set; } = string.Empty;
 
         /// <summary>
-        /// API contact settings.
+        /// OAuth client secret.
         /// </summary>
-        public class ContactSettings
-        {
-            /// <summary>
-            /// The identifying name of the contact person/organization.
-            /// </summary>
-            public string Name { get; set; } = string.Empty;
-
-            /// <summary>
-            /// The URL pointing to the contact information. MUST be in the format of a URL.
-            /// </summary>
-            public string Url { get; set; } = string.Empty;
-
-            /// <summary>
-            /// The email address of the contact person/organization.
-            /// MUST be in the format of an email address.
-            /// </summary>
-            public string Email { get; set; } = string.Empty;
-        }
+        public string OAuthClientSecret { get; set; } = string.Empty;
 
         /// <summary>
-        /// API license settings.
+        /// OAuth scopes. There is usually no need to set this property.
+        /// If the property is empty, all scopes from OAuth security schemes are automatically added.
         /// </summary>
-        public class LicenseSettings
-        {
-            /// <summary>
-            /// REQUIRED. The license name used for the API.
-            /// </summary>
-            public string Name { get; set; } = string.Empty;
-
-            /// <summary>
-            /// The URL pointing to the contact information. MUST be in the format of a URL.
-            /// </summary>
-            public string Url { get; set; } = string.Empty;
-        }
-
-        #endregion Nested types
+        public List<string> OAuthScopes { get; } = [];
 
         /// <summary>
-        /// The title of the application.
+        /// Authorization security schemes.
         /// </summary>
-        public string Title { get; set; } = string.Empty;
-
-        /// <summary>
-        /// A short description of the application.
-        /// </summary>
-        public string Description { get; set; } = string.Empty;
-
-        /// <summary>
-        /// REQUIRED. The version of the OpenAPI document.
-        /// </summary>
-        public string Version { get; set; } = string.Empty;
-
-        /// <summary>
-        /// A URL to the Terms of Service for the API. MUST be in the format of a URL.
-        /// </summary>
-        public string TermsOfService { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The contact information for the exposed API.
-        /// </summary>
-        public ContactSettings Contact { get; } = new ContactSettings();
-
-        /// <summary>
-        /// The license information for the exposed API.
-        /// </summary>
-        public LicenseSettings License { get; } = new LicenseSettings();
+        public Dictionary<string, OpenApiSecurityScheme> Authorizations { get; } = [];
     }
 }
