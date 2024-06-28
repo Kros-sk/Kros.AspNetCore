@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Any;
@@ -36,12 +36,7 @@ namespace Kros.Swagger.Extensions
             bool includeXmlcomments,
             Action<SwaggerGenOptions>? setupAction = null)
         {
-            OpenApiInfo? swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
-            if (swaggerDocumentationSettings is null)
-            {
-                throw new InvalidOperationException(
-                    string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
-            }
+            OpenApiInfo? options = GetSwaggerDocumentationSettings(configuration);
 
             services.ConfigureSwaggerGen(options =>
             {
@@ -51,12 +46,15 @@ namespace Kros.Swagger.Extensions
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
+                if (options is not null)
+                {
+                    c.SwaggerDoc(options.Version, options);
+                }
                 if (includeXmlcomments)
                 {
                     c.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory();
                 }
-                AddSwaggerSecurity(c, swaggerDocumentationSettings);
+                AddSwaggerSecurity(c, options);
                 c.UseClassNameAsTitle();
                 c.UseNullableSchemaFilter();
                 setupAction?.Invoke(c);
@@ -130,14 +128,8 @@ namespace Kros.Swagger.Extensions
             Action<SwaggerOptions>? setupAction = null,
             Action<SwaggerUIOptions>? setupUiAction = null)
         {
-            OpenApiInfo? swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
-            if (swaggerDocumentationSettings is null)
-            {
-                throw new InvalidOperationException(
-                    string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
-            }
-
-            string? clientId = GetOAuthClientId(swaggerDocumentationSettings);
+            OpenApiInfo? options = GetSwaggerDocumentationSettings(configuration);
+            string? clientId = GetOAuthClientId(options);
 
             app.UseSwagger(c =>
             {
@@ -151,7 +143,10 @@ namespace Kros.Swagger.Extensions
 
             .UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("../swagger/v1/swagger.json", swaggerDocumentationSettings.Title);
+                if (options is not null)
+                {
+                    c.SwaggerEndpoint($"{options.Version}/swagger.json", options.Title);
+                }
                 c.OAuthClientId(clientId);
                 c.OAuthClientSecret(string.Empty);
 
