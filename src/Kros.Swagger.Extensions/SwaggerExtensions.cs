@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Kros.Swagger.Extensions
 {
@@ -18,7 +17,6 @@ namespace Kros.Swagger.Extensions
     public static class SwaggerExtensions
     {
         private const string SwaggerDocumentationSectionName = "SwaggerDocumentation";
-        private const string DefaultOAuthClientId = "kros_postman";
 
         /// <summary>
         /// Registers Swagger documentation generator to IoC container.
@@ -36,12 +34,7 @@ namespace Kros.Swagger.Extensions
             bool includeXmlcomments,
             Action<SwaggerGenOptions>? setupAction = null)
         {
-            OpenApiInfo? swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
-            if (swaggerDocumentationSettings is null)
-            {
-                throw new InvalidOperationException(
-                    string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
-            }
+            SwaggerSettings? settings = configuration.GetSwaggerSettings();
 
             services.ConfigureSwaggerGen(options =>
             {
@@ -51,12 +44,15 @@ namespace Kros.Swagger.Extensions
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc(swaggerDocumentationSettings.Version, swaggerDocumentationSettings);
+                if (settings is not null)
+                {
+                    c.SwaggerDoc(settings.Version, settings);
+                    AddAuthorization(c, settings);
+                }
                 if (includeXmlcomments)
                 {
                     c.IncludeXmlCommentsFromAllFilesInCurrentDomainBaseDirectory();
                 }
-                AddSwaggerSecurity(c, swaggerDocumentationSettings);
                 c.UseClassNameAsTitle();
                 c.UseNullableSchemaFilter();
                 setupAction?.Invoke(c);
@@ -77,46 +73,6 @@ namespace Kros.Swagger.Extensions
             Action<SwaggerGenOptions>? setupAction = null)
             => AddSwaggerDocumentation(services, configuration, false, setupAction);
 
-        private static void AddSwaggerSecurity(SwaggerGenOptions swaggerOptions, OpenApiInfo swaggerDocumentationSettings)
-        {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("TokenUrl", out IOpenApiExtension? t) &&
-                t is OpenApiString tokenUrl)
-            {
-                swaggerOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Type = SecuritySchemeType.OAuth2,
-                    Flows = new OpenApiOAuthFlows()
-                    {
-                        Password = new OpenApiOAuthFlow()
-                        {
-                            TokenUrl = new Uri(tokenUrl.Value)
-                        }
-                    }
-                });
-                swaggerOptions.AddSecurityRequirement(new OpenApiSecurityRequirement()
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "Bearer",
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        },
-                        new List<string>()
-                    }
-                });
-            }
-        }
-
-        private static OpenApiInfo? GetSwaggerDocumentationSettings(IConfiguration configuration)
-        {
-            IConfigurationSection configurationSection = configuration.GetSection(SwaggerDocumentationSectionName);
-
-            return configurationSection.Exists() ? configurationSection.Get<OpenApiInfo>() : null;
-        }
-
         /// <summary>
         /// Adds Swagger documentation generator middleware.
         /// </summary>
@@ -130,46 +86,113 @@ namespace Kros.Swagger.Extensions
             Action<SwaggerOptions>? setupAction = null,
             Action<SwaggerUIOptions>? setupUiAction = null)
         {
-            OpenApiInfo? swaggerDocumentationSettings = GetSwaggerDocumentationSettings(configuration);
-            if (swaggerDocumentationSettings is null)
-            {
-                throw new InvalidOperationException(
-                    string.Format(Properties.Resources.SwaggerDocMissingSection, SwaggerDocumentationSectionName));
-            }
-
-            string? clientId = GetOAuthClientId(swaggerDocumentationSettings);
+            SwaggerSettings? settings = configuration.GetSwaggerSettings();
 
             app.UseSwagger(c =>
             {
-                c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
-                {
-                    swaggerDoc.Servers.Add(new OpenApiServer() { Url = "/" });
-                });
-
                 setupAction?.Invoke(c);
             })
 
             .UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("../swagger/v1/swagger.json", swaggerDocumentationSettings.Title);
-                c.OAuthClientId(clientId);
-                c.OAuthClientSecret(string.Empty);
-
+                if (settings is not null)
+                {
+                    c.SwaggerEndpoint($"{settings.Version}/swagger.json", settings.Title);
+                    c.OAuthClientId(settings.OAuthClientId);
+                    c.OAuthClientSecret(settings.OAuthClientSecret);
+                    c.OAuthScopes(GetAllOAuthScopes(settings.Authorizations.Values));
+                    c.OAuthUsePkce();
+                }
                 setupUiAction?.Invoke(c);
             });
 
             return app;
         }
 
-        private static string? GetOAuthClientId(OpenApiInfo swaggerDocumentationSettings)
+        internal static SwaggerSettings? GetSwaggerSettings(this IConfiguration configuration)
         {
-            if (swaggerDocumentationSettings.Extensions.TryGetValue("OAuthClientId", out IOpenApiExtension? c) &&
-                c is OpenApiString clientId)
+            IConfigurationSection configurationSection = configuration.GetSection(SwaggerDocumentationSectionName);
+            return configurationSection.Exists() ? configurationSection.Get<SwaggerSettings>() : null;
+        }
+
+        private static void AddAuthorization(SwaggerGenOptions swaggerOptions, SwaggerSettings settings)
+        {
+            foreach (KeyValuePair<string, OpenApiSecurityScheme> auth in settings.Authorizations)
             {
-                return clientId.Value;
+                string name = auth.Key;
+                OpenApiSecurityScheme scheme = auth.Value;
+
+                swaggerOptions.AddSecurityDefinition(name, scheme);
+            }
+        }
+
+        internal static IList<OpenApiSecurityRequirement> CreateSecurityRequirements(this SwaggerSettings settings)
+        {
+            return settings.Authorizations.Select(item =>
+            {
+                OpenApiSecurityScheme scheme = item.Value;
+                string schemeName = item.Key;
+
+                // From OpenApiSecurityRequirement documentation:
+                // If the security scheme is of type "oauth2" or "openIdConnect",
+                // then the scopes value is a list of scope names required for the execution.
+                // For other security scheme types, the array MUST be empty
+                List<string> scopes = [];
+                if (((scheme.Type == SecuritySchemeType.OAuth2) || (scheme.Type == SecuritySchemeType.OpenIdConnect))
+                    && (scheme.Flows is not null))
+                {
+                    scheme.GetScopes(scopes);
+                    scopes = scopes.Distinct(StringComparer.Ordinal).ToList();
+                }
+
+                OpenApiSecurityRequirement req = new()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = schemeName
+                            }
+                        },
+                        scopes
+                    }
+                };
+
+                return req;
+            }).ToList();
+        }
+
+        private static string[] GetAllOAuthScopes(IEnumerable<OpenApiSecurityScheme> schemes)
+        {
+            List<string> allScopes = [];
+            foreach (OpenApiSecurityScheme scheme in schemes)
+            {
+                scheme.GetScopes(allScopes);
+            }
+            return allScopes.Distinct(StringComparer.Ordinal).ToArray();
+        }
+
+        internal static void GetScopes(this OpenApiSecurityScheme scheme, List<string> scopes)
+        {
+            static void AddFlowScopes(List<string> scopes, OpenApiOAuthFlow? flow)
+            {
+                IEnumerable<string>? flowScopes = flow?.Scopes?.Keys;
+                if (flowScopes is not null)
+                {
+                    scopes.AddRange(flowScopes);
+                }
             }
 
-            return DefaultOAuthClientId;
+            if (((scheme.Type == SecuritySchemeType.OAuth2) || (scheme.Type == SecuritySchemeType.OpenIdConnect))
+                && (scheme.Flows is not null))
+            {
+                AddFlowScopes(scopes, scheme.Flows.Implicit);
+                AddFlowScopes(scopes, scheme.Flows.Password);
+                AddFlowScopes(scopes, scheme.Flows.ClientCredentials);
+                AddFlowScopes(scopes, scheme.Flows.AuthorizationCode);
+            }
         }
     }
 }
