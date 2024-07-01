@@ -1,4 +1,5 @@
 ﻿using Kros.Swagger.Extensions.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -13,6 +14,34 @@ namespace Kros.Swagger.Extensions
     /// </summary>
     public static class SwaggerGenOptionsExtensions
     {
+        /// <summary>
+        /// Add operation filter for allowing anonymous access to operations.
+        /// This filter is suitable, if by default all your endpoints are authorized and you want just for some of them
+        /// to allow anonymous access. It clears any security requirements from operation if the operation
+        /// has <see cref="AllowAnonymousAttribute"/> and sets security requirements for all other operations.
+        /// </summary>
+        /// <param name="opt">Swagger generator options.</param>
+        /// <returns>Input <paramref name="opt"/> value for fluent chaining.</returns>
+        public static SwaggerGenOptions ClearSecurityRequirementsFromAnonymousEndpoints(this SwaggerGenOptions opt)
+        {
+            opt.OperationFilter<AllowAnonymousOperationFilter>();
+            return opt;
+        }
+
+        /// <summary>
+        /// Add operation filter for allowing authorized access to operations.
+        /// This filter is suitable, if by default all your endpoints allow anonymous access and you want just for some of them
+        /// to be authorized. It sets security requirements for all operations which have <see cref="AuthorizeAttribute"/>
+        /// and clears any security requirements from all other operations.
+        /// </summary>
+        /// <param name="opt">Swagger generator options.</param>
+        /// <returns>Input <paramref name="opt"/> value for fluent chaining.</returns>
+        public static SwaggerGenOptions SetSecurityRequirementsToAuthorizedEndpoints(this SwaggerGenOptions opt)
+        {
+            opt.OperationFilter<AuthorizeOperationFilter>();
+            return opt;
+        }
+
         /// <summary>
         /// Sets correct <c>nullable</c> flag in schema for nullable reference types.
         /// </summary>

@@ -34,7 +34,7 @@ namespace Kros.Swagger.Extensions
             bool includeXmlcomments,
             Action<SwaggerGenOptions>? setupAction = null)
         {
-            SwaggerSettings? settings = GetSwaggerSettings(configuration);
+            SwaggerSettings? settings = configuration.GetSwaggerSettings();
 
             services.ConfigureSwaggerGen(options =>
             {
@@ -86,7 +86,7 @@ namespace Kros.Swagger.Extensions
             Action<SwaggerOptions>? setupAction = null,
             Action<SwaggerUIOptions>? setupUiAction = null)
         {
-            SwaggerSettings? settings = GetSwaggerSettings(configuration);
+            SwaggerSettings? settings = configuration.GetSwaggerSettings();
 
             app.UseSwagger(c =>
             {
@@ -109,7 +109,7 @@ namespace Kros.Swagger.Extensions
             return app;
         }
 
-        private static SwaggerSettings? GetSwaggerSettings(IConfiguration configuration)
+        internal static SwaggerSettings? GetSwaggerSettings(this IConfiguration configuration)
         {
             IConfigurationSection configurationSection = configuration.GetSection(SwaggerDocumentationSectionName);
             return configurationSection.Exists() ? configurationSection.Get<SwaggerSettings>() : null;
@@ -123,19 +123,29 @@ namespace Kros.Swagger.Extensions
                 OpenApiSecurityScheme scheme = auth.Value;
 
                 swaggerOptions.AddSecurityDefinition(name, scheme);
+            }
+        }
 
-                /// From OpenApiSecurityRequirement documentation:
-                /// If the security scheme is of type "oauth2" or "openIdConnect",
-                /// then the scopes value is a list of scope names required for the execution.
-                /// For other security scheme types, the array MUST be empty
+        internal static IList<OpenApiSecurityRequirement> CreateSecurityRequirements(this SwaggerSettings settings)
+        {
+            return settings.Authorizations.Select(item =>
+            {
+                OpenApiSecurityScheme scheme = item.Value;
+                string schemeName = item.Key;
+
+                // From OpenApiSecurityRequirement documentation:
+                // If the security scheme is of type "oauth2" or "openIdConnect",
+                // then the scopes value is a list of scope names required for the execution.
+                // For other security scheme types, the array MUST be empty
                 List<string> scopes = [];
                 if (((scheme.Type == SecuritySchemeType.OAuth2) || (scheme.Type == SecuritySchemeType.OpenIdConnect))
                     && (scheme.Flows is not null))
                 {
-                    GetScopes(scopes, scheme);
+                    scheme.GetScopes(scopes);
                     scopes = scopes.Distinct(StringComparer.Ordinal).ToList();
                 }
-                swaggerOptions.AddSecurityRequirement(new OpenApiSecurityRequirement()
+
+                OpenApiSecurityRequirement req = new()
                 {
                     {
                         new OpenApiSecurityScheme
@@ -143,13 +153,15 @@ namespace Kros.Swagger.Extensions
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id = name,
+                                Id = schemeName
                             }
                         },
                         scopes
                     }
-                });
-            }
+                };
+
+                return req;
+            }).ToList();
         }
 
         private static string[] GetAllOAuthScopes(IEnumerable<OpenApiSecurityScheme> schemes)
@@ -157,12 +169,12 @@ namespace Kros.Swagger.Extensions
             List<string> allScopes = [];
             foreach (OpenApiSecurityScheme scheme in schemes)
             {
-                GetScopes(allScopes, scheme);
+                scheme.GetScopes(allScopes);
             }
             return allScopes.Distinct(StringComparer.Ordinal).ToArray();
         }
 
-        private static void GetScopes(List<string> scopes, OpenApiSecurityScheme scheme)
+        internal static void GetScopes(this OpenApiSecurityScheme scheme, List<string> scopes)
         {
             static void AddFlowScopes(List<string> scopes, OpenApiOAuthFlow? flow)
             {
