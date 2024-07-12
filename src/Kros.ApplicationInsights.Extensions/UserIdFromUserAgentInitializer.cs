@@ -2,10 +2,7 @@
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 [assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
@@ -33,7 +30,7 @@ namespace Kros.ApplicationInsights.Extensions
         public void Initialize(ITelemetry telemetry)
         {
             if (telemetry is RequestTelemetry requestTelemetry
-                && _httpContextAccessor.HttpContext.Request.Headers.ContainsKey("User-Agent"))
+                && _httpContextAccessor?.HttpContext.Request.Headers.ContainsKey("User-Agent") == true)
             {
                 requestTelemetry.Context.User.Id = _httpContextAccessor.HttpContext.Request.Headers["User-Agent"];
             }
