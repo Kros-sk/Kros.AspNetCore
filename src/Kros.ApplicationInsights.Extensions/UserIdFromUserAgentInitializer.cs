@@ -30,7 +30,7 @@ namespace Kros.ApplicationInsights.Extensions
         public void Initialize(ITelemetry telemetry)
         {
             if (telemetry is RequestTelemetry requestTelemetry
-                && _httpContextAccessor.HttpContext?.Request.Headers.ContainsKey("User-Agent") == true)
+              && _httpContextAccessor.HttpContext?.Request.Headers.ContainsKey("User-Agent") == true)
             {
                 requestTelemetry.Context.User.Id = _httpContextAccessor.HttpContext.Request.Headers["User-Agent"];
             }
