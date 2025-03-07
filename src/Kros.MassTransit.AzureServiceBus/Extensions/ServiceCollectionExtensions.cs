@@ -22,7 +22,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration,
             Type consumerNamespaceAnchor,
-            Action<IMassTransitForAzureBuilder> busCfg = null)
+            Action<IMassTransitForAzureBuilder, IBusRegistrationContext> busCfg = null)
         {
             const string sectionName = "AzureServiceBus";
             services.Configure<AzureServiceBusOptions>(options => configuration.GetSection(sectionName).Bind(options));
@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 cfg.AddBus(provider =>
                 {
                     MassTransitForAzureBuilder builder = new((IServiceProvider)provider);
-                    busCfg?.Invoke(builder);
+                    busCfg?.Invoke(builder, provider);
 
                     return builder.Build();
                 });
@@ -59,7 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddMassTransitForAzure(
             this IServiceCollection services,
             IConfiguration configuration,
-            Action<IMassTransitForAzureBuilder> busCfg = null)
+            Action<IMassTransitForAzureBuilder, IBusRegistrationContext> busCfg = null)
             => services.AddMassTransitForAzure(configuration, null, busCfg);
 
         private static void RegisterConsumers(IServiceCollection services, Type namespaceAnchor)
