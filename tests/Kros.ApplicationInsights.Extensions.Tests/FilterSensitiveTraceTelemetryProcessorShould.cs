@@ -1,9 +1,8 @@
-﻿using Microsoft.ApplicationInsights.Channel;
+﻿using FluentAssertions;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
-using Kros.ApplicationInsights.Extensions;
-using Xunit;
 using Microsoft.ApplicationInsights.Extensibility;
-using FluentAssertions;
+using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
 {
@@ -28,7 +27,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             processor.Process(trace);
 
-            next.ReceivedTelemetry.Equals(trace);
+            next.ReceivedTelemetry.Should().Be(trace);
         }
 
         [Theory]

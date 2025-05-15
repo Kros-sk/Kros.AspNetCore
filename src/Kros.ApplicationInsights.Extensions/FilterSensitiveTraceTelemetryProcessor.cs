@@ -14,13 +14,12 @@ namespace Kros.ApplicationInsights.Extensions
     /// <seealso cref="ITelemetryProcessor" />
     public class FilterSensitiveTraceTelemetryProcessor : ITelemetryProcessor
     {
-        private ITelemetryProcessor Next { get; set; }
+        private readonly ITelemetryProcessor _next;
 
         private static readonly List<string> _sensitivePatterns = new()
         {
-            "Authorization:",
-            "Basic",
-            "Bearer"
+            "Request Headers:\r\nAuthorization:",
+            "Request Headers:\r\nx-functions-key:"
         };
 
         /// <summary>
@@ -29,7 +28,7 @@ namespace Kros.ApplicationInsights.Extensions
         /// <param name="next">ITelemetryProcessor instance.</param>
         public FilterSensitiveTraceTelemetryProcessor(ITelemetryProcessor next)
         {
-            this.Next = next;
+            _next = next;
         }
 
         /// <summary>
@@ -38,21 +37,19 @@ namespace Kros.ApplicationInsights.Extensions
         /// <param name="item">ITelemetry instance.</param>
         public void Process(ITelemetry item)
         {
-            if (!OKtoSend(item))
+            if (!OkToSend(item))
             {
                 return;
             }
 
-            this.Next.Process(item);
+            _next.Process(item);
         }
 
-        private bool OKtoSend(ITelemetry item)
+        private bool OkToSend(ITelemetry item)
         {
-            if (item is TraceTelemetry trace)
+            if (item is TraceTelemetry trace && !string.IsNullOrEmpty(trace.Message))
             {
-                string message = trace.Message ?? string.Empty;
-
-                return !_sensitivePatterns.Any(p => message.Contains(p, System.StringComparison.OrdinalIgnoreCase));
+                return !_sensitivePatterns.Any(p => trace.Message.StartsWith(p, System.StringComparison.OrdinalIgnoreCase));
             }
 
             return true;
