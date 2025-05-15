@@ -31,9 +31,8 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         }
 
         [Theory]
-        [InlineData("Authorization: SecretKey")]
-        [InlineData("Bearer token123")]
-        [InlineData("Basic abcdefg")]
+        [InlineData("Request Headers:\r\nAuthorization: SecretKey")]
+        [InlineData("Request Headers:\r\nx-functions-key: SecretKey")]
         public void FilterOutTelemetry_WhenMessageContainsSensitiveData(string sensitiveMessage)
         {
             var next = new ReceivingTestProcessor();
