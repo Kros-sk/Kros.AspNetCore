@@ -68,15 +68,32 @@ namespace Kros.AspNetCore.ServiceDiscovery
         }
 
         [Fact]
-        public async Task AddApiKeyBasicAuthentication()
+        public async Task AddSingleApiKeyBasicAuthentication()
         {
             ServiceCollection serviceCollection = new();
-            serviceCollection.AddAuthentication().AddApiKeyBasicAuthentication(GetApiKeyConfiguration());
+            serviceCollection.AddAuthentication().AddApiKeyBasicAuthentication(GetSingleApiKeyConfiguration());
             IAuthenticationSchemeProvider schemeProvider = serviceCollection.BuildServiceProvider()
                 .GetRequiredService<IAuthenticationSchemeProvider>();
             AuthenticationScheme scheme = await schemeProvider.GetSchemeAsync("Basic.ApiKey");
             scheme.Should().NotBeNull();
             scheme.HandlerType.Name.Should().Be(typeof(ApiKeyBasicAuthenticationHandler).Name);
+        }
+
+        [Fact]
+        public async Task AddMultipleApiKeyBasicAuthenticationSchemes()
+        {
+            ServiceCollection serviceCollection = new();
+            serviceCollection.AddAuthentication().AddApiKeyBasicAuthentication(GetMultipleApiKeyConfiguration());
+            IAuthenticationSchemeProvider schemeProvider = serviceCollection.BuildServiceProvider()
+                .GetRequiredService<IAuthenticationSchemeProvider>();
+
+            AuthenticationScheme scheme = await schemeProvider.GetSchemeAsync("Basic.ApiKey");
+            scheme.Should().NotBeNull();
+            scheme.HandlerType.Name.Should().Be(typeof(ApiKeyBasicAuthenticationHandler).Name);
+
+            AuthenticationScheme anotherScheme = await schemeProvider.GetSchemeAsync("Another.ApiKey");
+            anotherScheme.Should().NotBeNull();
+            anotherScheme.HandlerType.Name.Should().Be(typeof(ApiKeyBasicAuthenticationHandler).Name);
         }
 
         [Fact]
@@ -111,12 +128,28 @@ namespace Kros.AspNetCore.ServiceDiscovery
             return cfgBuilder.Build();
         }
 
-        private static IConfiguration GetApiKeyConfiguration()
+        private static IConfiguration GetSingleApiKeyConfiguration()
         {
             string cfg = @"{
                             ""ApiKeyBasicAuthentication"": {
                                 ""ApiKey"": ""key2"",
                                 ""Scheme"": ""Basic.ApiKey""
+                            }
+                        }";
+            ConfigurationBuilder cfgBuilder = new();
+            cfgBuilder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(cfg)));
+            return cfgBuilder.Build();
+        }
+
+        private static IConfiguration GetMultipleApiKeyConfiguration()
+        {
+            string cfg = @"{
+                            ""ApiKeyBasicAuthentication"": {
+                                ""Schemes"":
+                                    {
+                                        ""Basic.ApiKey"": ""key1"",
+                                        ""Another.ApiKey"": ""key2""
+                                    }
                             }
                         }";
             ConfigurationBuilder cfgBuilder = new();

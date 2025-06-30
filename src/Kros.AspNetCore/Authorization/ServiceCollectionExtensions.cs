@@ -10,121 +10,124 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 
-namespace Kros.AspNetCore.Authorization
+namespace Kros.AspNetCore.Authorization;
+
+/// <summary>
+/// Authorization extensions for <see cref="IServiceCollection"/>.
+/// </summary>
+public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Authorization extensions for <see cref="IServiceCollection"/>.
+    /// Configure gateway authorization.
     /// </summary>
-    public static class ServiceCollectionExtensions
+    /// <param name="services">Collection of app services.</param>
+    public static IServiceCollection AddGatewayJwtAuthorization(this IServiceCollection services)
+        => services
+        .AddMemoryCache()
+        .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
+        .Services;
+
+    /// <summary>
+    /// Configure downstream api authentication.
+    /// </summary>
+    /// <param name="services">Collection of app services.</param>
+    /// <param name="scheme">Scheme name for authentication.</param>
+    /// <param name="configuration">Configuration from which the options are loaded.</param>
+    /// <param name="configureOptions">Configuration.</param>
+    public static AuthenticationBuilder AddApiJwtAuthentication(
+        this IServiceCollection services,
+        string scheme,
+        IConfiguration configuration,
+        Action<JwtBearerOptions> configureOptions = null)
     {
-        /// <summary>
-        /// Configure gateway authorization.
-        /// </summary>
-        /// <param name="services">Collection of app services.</param>
-        public static IServiceCollection AddGatewayJwtAuthorization(this IServiceCollection services)
-            => services
-            .AddMemoryCache()
-            .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
-            .Services;
+        return AddApiJwtAuthentication(services, new string[] { scheme }, configuration, configureOptions);
+    }
 
-        /// <summary>
-        /// Configure downstream api authentication.
-        /// </summary>
-        /// <param name="services">Collection of app services.</param>
-        /// <param name="scheme">Scheme name for authentication.</param>
-        /// <param name="configuration">Configuration from which the options are loaded.</param>
-        /// <param name="configureOptions">Configuration.</param>
-        public static AuthenticationBuilder AddApiJwtAuthentication(
-            this IServiceCollection services,
-            string scheme,
-            IConfiguration configuration,
-            Action<JwtBearerOptions> configureOptions = null)
+    /// <summary>
+    /// Configure downstream api authentication.
+    /// </summary>
+    /// <param name="services">Collection of app services.</param>
+    /// <param name="schemeNames">Scheme names for authentication.</param>
+    /// <param name="configuration">Configuration from which the options are loaded.</param>
+    /// <param name="configureOptions">Configuration.</param>
+    public static AuthenticationBuilder AddApiJwtAuthentication(
+        this IServiceCollection services,
+        IEnumerable<string> schemeNames,
+        IConfiguration configuration,
+        Action<JwtBearerOptions> configureOptions = null)
+    {
+        ApiJwtAuthorizationOptions configuredOptionsList = configuration.GetSection<ApiJwtAuthorizationOptions>();
+        IEnumerable<ApiJwtAuthorizationScheme> schemeList = (from scheme in configuredOptionsList.Schemes
+                                                             where schemeNames.Contains(scheme.SchemeName)
+                                                             select scheme);
+
+        if (!schemeList.Any())
         {
-            return AddApiJwtAuthentication(services, new string[] { scheme }, configuration, configureOptions);
+            throw new ArgumentException("No valid schemes for Api JWT authentication", nameof(schemeNames));
         }
 
-        /// <summary>
-        /// Configure downstream api authentication.
-        /// </summary>
-        /// <param name="services">Collection of app services.</param>
-        /// <param name="schemeNames">Scheme names for authentication.</param>
-        /// <param name="configuration">Configuration from which the options are loaded.</param>
-        /// <param name="configureOptions">Configuration.</param>
-        public static AuthenticationBuilder AddApiJwtAuthentication(
-            this IServiceCollection services,
-            IEnumerable<string> schemeNames,
-            IConfiguration configuration,
-            Action<JwtBearerOptions> configureOptions = null)
+        AuthenticationBuilder builder;
+
+        if (schemeList.Count() == 1)
         {
-            ApiJwtAuthorizationOptions configuredOptionsList = configuration.GetSection<ApiJwtAuthorizationOptions>();
-            IEnumerable<ApiJwtAuthorizationScheme> schemeList = (from scheme in configuredOptionsList.Schemes
-                                                                 where schemeNames.Contains(scheme.SchemeName)
-                                                                 select scheme);
+            builder = services.AddAuthentication(schemeList.First().SchemeName);
+        }
+        else
+        {
+            builder = services.AddAuthentication();
+        }
 
-            if (!schemeList.Any())
+        foreach (var scheme in schemeList)
+        {
+            builder = builder.AddJwtBearer(scheme.SchemeName, x =>
             {
-                throw new ArgumentException("No valid schemes for Api JWT authentication", nameof(schemeNames));
-            }
-
-            AuthenticationBuilder builder;
-
-            if (schemeList.Count() == 1)
-            {
-                builder = services.AddAuthentication(schemeList.First().SchemeName);
-            }
-            else
-            {
-                builder = services.AddAuthentication();
-            }
-
-            foreach (var scheme in schemeList)
-            {
-                builder = builder.AddJwtBearer(scheme.SchemeName, x =>
+                x.RequireHttpsMetadata = scheme.RequireHttpsMetadata;
+                x.SaveToken = false;
+                x.TokenValidationParameters = new TokenValidationParameters
                 {
-                    x.RequireHttpsMetadata = scheme.RequireHttpsMetadata;
-                    x.SaveToken = false;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(scheme.JwtSecret)),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(scheme.JwtSecret)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
 
-                    configureOptions?.Invoke(x);
-                });
-            }
-
-            return builder;
+                configureOptions?.Invoke(x);
+            });
         }
 
-        /// <summary>
-        /// Configure API key Basic authentication.
-        /// </summary>
-        /// <param name="builder">Authentication builder.</param>
-        /// <param name="configuration">Configuration.</param>
-        public static AuthenticationBuilder AddApiKeyBasicAuthentication(
-            this AuthenticationBuilder builder,
-            IConfiguration configuration)
+        return builder;
+    }
+
+    /// <summary>
+    /// Configure API key Basic authentication.
+    /// </summary>
+    /// <param name="builder">Authentication builder.</param>
+    /// <param name="configuration">Configuration.</param>
+    public static AuthenticationBuilder AddApiKeyBasicAuthentication(
+        this AuthenticationBuilder builder,
+        IConfiguration configuration)
+    {
+        ApiKeyBasicAuthenticationOptions configOptions = configuration.GetSection<ApiKeyBasicAuthenticationOptions>()
+            ?? throw new ArgumentNullException(nameof(configuration),
+                $"{nameof(ApiKeyBasicAuthenticationOptions)} not found in configuration");
+
+        foreach (KeyValuePair<string, string> configScheme in configOptions.GetSchemesWithApiKeys())
         {
-            ApiKeyBasicAuthenticationOptions configOptions = configuration.GetSection<ApiKeyBasicAuthenticationOptions>();
-            if (configOptions == null)
-            {
-                throw new ArgumentNullException(nameof(configuration), $"{nameof(ApiKeyBasicAuthenticationOptions)} not found in configuration");
-            }
-            return builder.AddScheme<ApiKeyBasicAuthenticationOptions, ApiKeyBasicAuthenticationHandler>(configOptions.Scheme,
+            builder.AddScheme<ApiKeyBasicAuthenticationOptions, ApiKeyBasicAuthenticationHandler>(configScheme.Key,
                 options =>
                 {
-                    options.ApiKey = configOptions.ApiKey;
-                    options.Scheme = configOptions.Scheme;
+                    options.Scheme = configScheme.Key;
+                    options.ApiKey = configScheme.Value;
                 });
         }
 
-        /// <summary>
-        /// Adds jwt bearer claims middleware dependencies.
-        /// </summary>
-        /// <param name="services">The services.</param>
-        public static IServiceCollection AddJwtBearerClaims(this IServiceCollection services)
-            => services.AddSingleton<JwtSecurityTokenHandler>();
+        return builder;
     }
+
+    /// <summary>
+    /// Adds jwt bearer claims middleware dependencies.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    public static IServiceCollection AddJwtBearerClaims(this IServiceCollection services)
+        => services.AddSingleton<JwtSecurityTokenHandler>();
 }
