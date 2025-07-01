@@ -83,7 +83,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         public async Task AddMultipleApiKeyBasicAuthenticationSchemes()
         {
             ServiceCollection serviceCollection = new();
-            serviceCollection.AddAuthentication().AddApiKeyBasicAuthentication(GetMultipleApiKeyConfiguration());
+            serviceCollection.AddAuthentication().AddApiKeyBasicAuthenticationSchemes(GetMultipleApiKeyConfiguration());
             IAuthenticationSchemeProvider schemeProvider = serviceCollection.BuildServiceProvider()
                 .GetRequiredService<IAuthenticationSchemeProvider>();
 
@@ -102,6 +102,8 @@ namespace Kros.AspNetCore.ServiceDiscovery
             ServiceCollection serviceCollection = new();
             IConfigurationRoot config = new ConfigurationBuilder().Build();
             serviceCollection.AddAuthentication().Invoking(builder => builder.AddApiKeyBasicAuthentication(config))
+                .Should().Throw<ArgumentNullException>();
+            serviceCollection.AddAuthentication().Invoking(builder => builder.AddApiKeyBasicAuthenticationSchemes(config))
                 .Should().Throw<ArgumentNullException>();
         }
 
