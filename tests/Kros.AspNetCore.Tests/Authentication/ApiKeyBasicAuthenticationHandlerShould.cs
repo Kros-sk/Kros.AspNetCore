@@ -14,24 +14,24 @@ namespace Kros.AspNetCore.Tests.Authentication
 {
     public class ApiKeyBasicAuthenticationHandlerShould
     {
-        private readonly ApiKeyBasicAuthenticationOptions _options;
-        private readonly IOptionsMonitor<ApiKeyBasicAuthenticationOptions> _optionsMonitor;
+        private readonly ApiKeyBasicAuthenticationScheme _apiKeyAuthScheme;
+        private readonly IOptionsMonitor<ApiKeyBasicAuthenticationScheme> _apiKeyAuthSchemeMonitor;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ApiKeyBasicAuthenticationHandler _handler;
 
         public ApiKeyBasicAuthenticationHandlerShould()
         {
-            _options = new ApiKeyBasicAuthenticationOptions()
+            _apiKeyAuthScheme = new ApiKeyBasicAuthenticationScheme()
             {
-                Scheme = "Basic.ApiKey",
+                SchemeName = "Basic.ApiKey",
                 ApiKey = "key2"
             };
-            _optionsMonitor = Substitute.For<IOptionsMonitor<ApiKeyBasicAuthenticationOptions>>();
-            _optionsMonitor.Get(_options.Scheme).Returns(_options);
+            _apiKeyAuthSchemeMonitor = Substitute.For<IOptionsMonitor<ApiKeyBasicAuthenticationScheme>>();
+            _apiKeyAuthSchemeMonitor.Get(_apiKeyAuthScheme.SchemeName).Returns(_apiKeyAuthScheme);
             _loggerFactory = Substitute.For<ILoggerFactory>();
             _loggerFactory.CreateLogger(Arg.Any<string>()).Returns(Substitute.For<ILogger>());
             _handler = new ApiKeyBasicAuthenticationHandler(
-                _optionsMonitor,
+                _apiKeyAuthSchemeMonitor,
                 _loggerFactory,
                 Substitute.For<UrlEncoder>());
         }
@@ -41,7 +41,7 @@ namespace Kros.AspNetCore.Tests.Authentication
         {
             DefaultHttpContext context = new();
             await _handler.InitializeAsync(
-                new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
+                new AuthenticationScheme(_apiKeyAuthScheme.SchemeName, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
@@ -55,7 +55,7 @@ namespace Kros.AspNetCore.Tests.Authentication
             DefaultHttpContext context = new();
             context.Request.Headers[HeaderNames.Authorization] = "Bearer key2";
             await _handler.InitializeAsync(
-                new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
+                new AuthenticationScheme(_apiKeyAuthScheme.SchemeName, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
@@ -69,7 +69,7 @@ namespace Kros.AspNetCore.Tests.Authentication
             DefaultHttpContext context = new();
             context.Request.Headers[HeaderNames.Authorization] = "Basic wrong_key";
             await _handler.InitializeAsync(
-                new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
+                new AuthenticationScheme(_apiKeyAuthScheme.SchemeName, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
@@ -83,7 +83,7 @@ namespace Kros.AspNetCore.Tests.Authentication
             DefaultHttpContext context = new();
             context.Request.Headers[HeaderNames.Authorization] = "Basic key2";
             await _handler.InitializeAsync(
-                new AuthenticationScheme(_options.Scheme, null, typeof(ApiKeyBasicAuthenticationHandler)),
+                new AuthenticationScheme(_apiKeyAuthScheme.SchemeName, null, typeof(ApiKeyBasicAuthenticationHandler)),
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
