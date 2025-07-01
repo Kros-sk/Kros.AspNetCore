@@ -112,11 +112,11 @@ public static class ServiceCollectionExtensions
             ?? throw new ArgumentNullException(nameof(configuration),
                 $"{Helpers.GetSectionName<ApiKeyBasicAuthenticationOptions>()} not found in configuration");
 
-        return builder.AddScheme<ApiKeyBasicAuthenticationOptions, ApiKeyBasicAuthenticationHandler>(configOptions.Scheme,
+        return builder.AddScheme<ApiKeyBasicAuthenticationScheme, ApiKeyBasicAuthenticationHandler>(configOptions.Scheme,
             options =>
             {
                 options.ApiKey = configOptions.ApiKey;
-                options.Scheme = configOptions.Scheme;
+                options.SchemeName = configOptions.Scheme;
             });
     }
 
@@ -146,10 +146,10 @@ public static class ServiceCollectionExtensions
 
         foreach (KeyValuePair<string, string> configScheme in configOptions.Schemes)
         {
-            builder.AddScheme<ApiKeyBasicAuthenticationOptions, ApiKeyBasicAuthenticationHandler>(configScheme.Key,
+            builder.AddScheme<ApiKeyBasicAuthenticationScheme, ApiKeyBasicAuthenticationHandler>(configScheme.Key,
                 options =>
                 {
-                    options.Scheme = configScheme.Key;
+                    options.SchemeName = configScheme.Key;
                     options.ApiKey = configScheme.Value;
                 });
         }

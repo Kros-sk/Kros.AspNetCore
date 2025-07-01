@@ -14,9 +14,9 @@ namespace Kros.AspNetCore.Authentication;
 /// Processes API key authentication using the request Basic auth header.
 /// </summary>
 public class ApiKeyBasicAuthenticationHandler(
-    IOptionsMonitor<ApiKeyBasicAuthenticationOptions> options,
+    IOptionsMonitor<ApiKeyBasicAuthenticationScheme> options,
     ILoggerFactory logger,
-    UrlEncoder encoder) : AuthenticationHandler<ApiKeyBasicAuthenticationOptions>(options, logger, encoder)
+    UrlEncoder encoder) : AuthenticationHandler<ApiKeyBasicAuthenticationScheme>(options, logger, encoder)
 {
     private readonly string _apiKeyHeaderName = HeaderNames.Authorization;
     private const string ApiKeyPrefix = "Basic ";
@@ -36,12 +36,12 @@ public class ApiKeyBasicAuthenticationHandler(
         if (headerApiKeyvalues[0] == $"{ApiKeyPrefix}{Options.ApiKey}")
         {
             List<Claim> claims = [new Claim(ClaimTypes.Role, ApiKeyRole)];
-            ClaimsIdentity identity = new(claims, Options.Scheme);
-            AuthenticationTicket ticket = new(new ClaimsPrincipal(identity), Options.Scheme);
+            ClaimsIdentity identity = new(claims, Options.SchemeName);
+            AuthenticationTicket ticket = new(new ClaimsPrincipal(identity), Options.SchemeName);
 
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
 
-        return Task.FromResult(AuthenticateResult.Fail($"Wrong API key for scheme: {Options.Scheme}"));
+        return Task.FromResult(AuthenticateResult.Fail($"Wrong API key for scheme: {Options.SchemeName}"));
     }
 }

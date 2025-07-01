@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Kros.AspNetCore.Authentication;
@@ -7,7 +6,7 @@ namespace Kros.AspNetCore.Authentication;
 /// <summary> 
 /// Options to configure the ApiKeyBasicAuthenticationHandler. 
 /// </summary> 
-public class ApiKeyBasicAuthenticationOptions : AuthenticationSchemeOptions
+public class ApiKeyBasicAuthenticationOptions
 {
     /// <summary> 
     /// The API key, that will be checked during authentication (single scheme mode).
