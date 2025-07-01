@@ -7,12 +7,12 @@ namespace Kros.AspNetCore.Authentication;
 /// </summary>
 public class ApiKeyBasicAuthenticationScheme : AuthenticationSchemeOptions
 {
-    /// <summary> 
+    /// <summary>
     /// The API key, that will be checked during authentication.
     /// </summary>
     public string ApiKey { get; set; }
 
-    /// <summary> 
+    /// <summary>
     /// Auth scheme name (single scheme mode).
     /// </summary>
     public string SchemeName { get; set; }

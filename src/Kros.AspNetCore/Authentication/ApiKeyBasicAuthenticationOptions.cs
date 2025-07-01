@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace Kros.AspNetCore.Authentication;
 
-/// <summary> 
-/// Options to configure the ApiKeyBasicAuthenticationHandler. 
-/// </summary> 
+/// <summary>
+/// Options to configure the ApiKeyBasicAuthenticationHandler.
+/// </summary>
 public class ApiKeyBasicAuthenticationOptions
 {
-    /// <summary> 
+    /// <summary>
     /// The API key, that will be checked during authentication (single scheme mode).
     /// </summary>
     [Obsolete("Use the Schemes property instead. This property will be removed in a future version.")]
     public string ApiKey { get; set; }
 
-    /// <summary> 
+    /// <summary>
     /// Auth scheme name (single scheme mode).
     /// </summary>
     [Obsolete("Use the Schemes property instead. This property will be removed in a future version.")]
