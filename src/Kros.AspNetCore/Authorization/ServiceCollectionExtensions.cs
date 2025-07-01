@@ -103,7 +103,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="builder">Authentication builder.</param>
     /// <param name="configuration">Configuration.</param>
-    [Obsolete($"Use {nameof(AddApiKeyBasicAuthenticationSchemes)} instead, with multiple schemes support.")]
+    [Obsolete($"Use {nameof(AddApiKeyBasicAuthenticationSchemes)} instead. You must also change configuration and DevOps secrets path as well!")]
     public static AuthenticationBuilder AddApiKeyBasicAuthentication(
         this AuthenticationBuilder builder,
         IConfiguration configuration)
