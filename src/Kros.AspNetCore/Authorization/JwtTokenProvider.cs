@@ -14,7 +14,7 @@ namespace Kros.AspNetCore.Authorization;
 /// <summary>
 /// Service for fetching JWT tokens from authorization service.
 /// </summary>
-internal class JwtTokenProvider : IJwtTokenProvider
+internal class ApiJwtTokenProvider : IJwtTokenProvider
 {
     /// <summary>
     /// HttpClient name used for communication between ApiGateway and Authorization service.
@@ -33,7 +33,7 @@ internal class JwtTokenProvider : IJwtTokenProvider
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
     /// <param name="jwtAuthorizationOptions">Authorization options.</param>
     /// <param name="serviceDiscoveryProvider">The service discovery provider.</param>
-    public JwtTokenProvider(
+    public ApiJwtTokenProvider(
         IHttpClientFactory httpClientFactory,
         IHttpContextAccessor httpContextAccessor,
         GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
