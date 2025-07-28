@@ -1,0 +1,202 @@
+﻿using Kros.Utils;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Primitives;
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace Kros.AspNetCore.Authorization;
+
+/// <summary>
+/// Provider for JWT tokens with caching capabilities.
+/// </summary>
+internal class CachedJwtTokenProvider : IJwtTokenProvider
+{
+    private readonly HybridCache _hybridCache;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
+    private readonly IJwtTokenProvider _jwtProvider;
+    private static Regex _cacheRegex = null;
+
+    /// <summary>
+    /// Initializes a new instance of the JwtCachingService class.
+    /// </summary>
+    /// <param name="hybridCache">The hybrid cache instance.</param>
+    /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    /// <param name="jwtAuthorizationOptions">Authorization options.</param>
+    /// <param name="jwtProvider">The JWT provider instance.</param>
+    public CachedJwtTokenProvider(
+        HybridCache hybridCache,
+        IHttpContextAccessor httpContextAccessor,
+        GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
+        IJwtTokenProvider jwtProvider)
+    {
+        _hybridCache = Check.NotNull(hybridCache, nameof(hybridCache));
+        _httpContextAccessor = Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
+        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions, nameof(jwtAuthorizationOptions));
+        _jwtProvider = Check.NotNull(jwtProvider, nameof(jwtProvider));
+
+        if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern))
+        {
+            _cacheRegex = new Regex(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern);
+        }
+    }
+
+    /// <summary>
+    /// Gets a JWT token for the given authorization token.
+    /// </summary>
+    /// <param name="token">The authorization token.</param>
+    /// <returns>The JWT token.</returns>
+    public async Task<string> GetJwtTokenAsync(StringValues token)
+    {
+        async Task<string> jwtTokenFactory() => await _jwtProvider.GetJwtTokenAsync(token);
+        if (!ShouldUseCache(_httpContextAccessor.HttpContext.Request))
+        {
+            return await jwtTokenFactory();
+        }
+
+        string cacheKey = BuildCacheKey(_httpContextAccessor.HttpContext, token);
+
+        return await _hybridCache.GetOrCreateAsync(cacheKey, async (cancellationToken) =>
+        {
+            return await jwtTokenFactory();
+        }, GetCacheEntryOptions(), cancellationToken: default);
+    }
+
+    /// <summary>
+    /// Gets a JWT token for hash-based authorization.
+    /// </summary>
+    /// <param name="hashValue">The hash value.</param>
+    /// <returns>The JWT token.</returns>
+    public async Task<string> GetJwtTokenForHashAsync(StringValues hashValue)
+    {
+        async Task<string> jwtTokenFactory() => await _jwtProvider.GetJwtTokenForHashAsync(hashValue);
+        if (!ShouldUseCache(_httpContextAccessor.HttpContext.Request))
+        {
+            return await jwtTokenFactory();
+        }
+
+        string cacheKey = GetKey(hashValue.ToString()).ToString();
+
+        return await _hybridCache.GetOrCreateAsync(cacheKey, async (cancellationToken) =>
+        {
+            return await jwtTokenFactory();
+        }, GetCacheEntryOptions(), cancellationToken: default);
+    }
+
+    /// <summary>
+    /// Builds a cache key based on the HTTP context and token.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <param name="token">The authorization token.</param>
+    /// <returns>The cache key.</returns>
+    private string BuildCacheKey(HttpContext httpContext, StringValues token)
+    {
+        CacheHttpHeadersHelper.TryGetValue(
+            httpContext.Request.Headers,
+            _jwtAuthorizationOptions.CacheKeyHttpHeaders,
+            out string cacheKeyPart);
+
+        string urlPathForCache = GetUrlPathForCacheKey(httpContext);
+        if (urlPathForCache != null)
+        {
+            cacheKeyPart += urlPathForCache;
+        }
+
+        int key = GetKey(token, cacheKeyPart);
+        return key.ToString();
+    }
+
+    /// <summary>
+    /// Determines whether caching should be used for the given request.
+    /// </summary>
+    /// <param name="request">The HTTP request.</param>
+    /// <returns>True if caching should be used; otherwise, false.</returns>
+    private bool ShouldUseCache(HttpRequest request)
+    {
+        return IsCacheAllowed() && !IsRequestPathAllowedForCache(request);
+    }
+
+    /// <summary>
+    /// Gets the URL path for cache key based on regex pattern.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <returns>The URL path for cache key or null if not found.</returns>
+    private string GetUrlPathForCacheKey(HttpContext httpContext)
+    {
+        if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern)
+            && !string.IsNullOrWhiteSpace(httpContext.Request.Path))
+        {
+            Match match = _cacheRegex.Match(httpContext.Request.Path);
+            if (match.Success)
+            {
+                return match.Groups.Values.Last().Value;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Generates a hash key from the given values.
+    /// </summary>
+    /// <param name="value">The primary value.</param>
+    /// <param name="additionalKeyPart">Additional key part (optional).</param>
+    /// <returns>The hash code.</returns>
+    private static int GetKey(StringValues value, string additionalKeyPart = null)
+        => (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
+
+    /// <summary>
+    /// Gets the cache entry options based on configuration.
+    /// </summary>
+    /// <returns>The hybrid cache entry options.</returns>
+    private HybridCacheEntryOptions GetCacheEntryOptions()
+    {
+        if (!IsCacheAllowed())
+        {
+            return new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.Zero // Don't cache if not allowed
+            };
+        }
+
+        // HybridCache doesn't support sliding expiration directly
+        // Use absolute expiration as the primary cache option
+        if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
+        {
+            return new HybridCacheEntryOptions
+            {
+                Expiration = _jwtAuthorizationOptions.CacheAbsoluteExpiration
+            };
+        }
+
+        // If only sliding expiration is configured, use it as absolute expiration
+        if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
+        {
+            return new HybridCacheEntryOptions
+            {
+                Expiration = _jwtAuthorizationOptions.CacheSlidingExpirationOffset
+            };
+        }
+
+        return new HybridCacheEntryOptions();
+    }
+
+    /// <summary>
+    /// Checks if the request path is allowed for caching.
+    /// </summary>
+    /// <param name="request">The HTTP request.</param>
+    /// <returns>True if the path is in the ignored list; otherwise, false.</returns>
+    private bool IsRequestPathAllowedForCache(HttpRequest request)
+        => _jwtAuthorizationOptions.IgnoredPathForCache
+        .Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Checks if caching is allowed based on configuration.
+    /// </summary>
+    /// <returns>True if caching is allowed; otherwise, false.</returns>
+    private bool IsCacheAllowed()
+        => _jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero
+            || _jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero;
+}
