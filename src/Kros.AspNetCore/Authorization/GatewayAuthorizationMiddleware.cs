@@ -2,7 +2,6 @@
 using Kros.AspNetCore.ServiceDiscovery;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -44,16 +43,14 @@ namespace Kros.AspNetCore.Authorization
         /// </summary>
         /// <param name="httpContext">Http context.</param>
         /// <param name="httpClientFactory">Http client factory.</param>
-        /// <param name="hybridCache">Cache for caching authorization token.</param>
+        /// <param name="jwtCachingService">JWT caching service.</param>
         /// <param name="serviceDiscoveryProvider">The service discovery provider.</param>
         public async Task Invoke(
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
-            HybridCache hybridCache,
+            IJwtCachingService jwtCachingService,
             IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
-            var jwtCachingService = new JwtCachingService(hybridCache, _jwtAuthorizationOptions);
-            
             string userJwt = await GetUserAuthorizationJwtAsync(
                 httpContext,
                 httpClientFactory,
@@ -71,7 +68,7 @@ namespace Kros.AspNetCore.Authorization
         private async Task<string> GetUserAuthorizationJwtAsync(
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
-            JwtCachingService jwtCachingService,
+            IJwtCachingService jwtCachingService,
             IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
             if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string token))

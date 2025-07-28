@@ -12,7 +12,7 @@ namespace Kros.AspNetCore.Authorization
     /// <summary>
     /// Service for caching JWT tokens.
     /// </summary>
-    internal class JwtCachingService
+    internal class JwtCachingService : IJwtCachingService
     {
         private readonly HybridCache _hybridCache;
         private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
