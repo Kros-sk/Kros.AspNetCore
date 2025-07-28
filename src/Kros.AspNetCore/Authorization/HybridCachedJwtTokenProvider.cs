@@ -11,7 +11,7 @@ namespace Kros.AspNetCore.Authorization;
 /// <summary>
 /// Provider for JWT tokens with caching capabilities.
 /// </summary>
-internal class CachedJwtTokenProvider : IJwtTokenProvider
+internal class HybridCachedJwtTokenProvider : IJwtTokenProvider
 {
     private readonly HybridCache _hybridCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -26,7 +26,7 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
     /// <param name="jwtAuthorizationOptions">Authorization options.</param>
     /// <param name="jwtProvider">The JWT provider instance.</param>
-    public CachedJwtTokenProvider(
+    public HybridCachedJwtTokenProvider(
         HybridCache hybridCache,
         IHttpContextAccessor httpContextAccessor,
         GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
@@ -95,28 +95,19 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
     /// <returns>The hybrid cache entry options.</returns>
     private HybridCacheEntryOptions GetCacheEntryOptions()
     {
-        if (!JwtCacheHelper.IsCacheAllowed(_jwtAuthorizationOptions))
-        {
-            return new HybridCacheEntryOptions
-            {
-                Expiration = TimeSpan.Zero // Don't cache if not allowed
-            };
-        }
-
-        // HybridCache doesn't support sliding expiration directly
-        // Use absolute expiration as the primary cache option
         if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
         {
-            return new HybridCacheEntryOptions
+            return new()
             {
                 Expiration = _jwtAuthorizationOptions.CacheAbsoluteExpiration
             };
         }
 
+        // HybridCache doesn't support sliding expiration directly
         // If only sliding expiration is configured, use it as absolute expiration
         if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
         {
-            return new HybridCacheEntryOptions
+            return new()
             {
                 Expiration = _jwtAuthorizationOptions.CacheSlidingExpirationOffset
             };
