@@ -24,6 +24,7 @@
     <PackageReference Include="IdentityServer4.AccessTokenValidation" />
     <PackageReference Include="Kros.Utils" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" />
   </ItemGroup>
 

@@ -2,7 +2,7 @@
 using Kros.AspNetCore.ServiceDiscovery;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -50,18 +50,18 @@ namespace Kros.AspNetCore.Authorization
         /// </summary>
         /// <param name="httpContext">Http context.</param>
         /// <param name="httpClientFactory">Http client factory.</param>
-        /// <param name="memoryCache">Cache for caching authorization token.</param>
+        /// <param name="hybridCache">Cache for caching authorization token.</param>
         /// <param name="serviceDiscoveryProvider">The service discovery provider.</param>
         public async Task Invoke(
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
-            IMemoryCache memoryCache,
+            HybridCache hybridCache,
             IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
             string userJwt = await GetUserAuthorizationJwtAsync(
                 httpContext,
                 httpClientFactory,
-                memoryCache,
+                hybridCache,
                 serviceDiscoveryProvider);
 
             if (!string.IsNullOrEmpty(userJwt))
@@ -75,7 +75,7 @@ namespace Kros.AspNetCore.Authorization
         private async Task<string> GetUserAuthorizationJwtAsync(
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
-            IMemoryCache memoryCache,
+            HybridCache hybridCache,
             IServiceDiscoveryProvider serviceDiscoveryProvider)
         {
             if (JwtAuthorizationHelper.TryGetTokenValue(httpContext.Request.Headers, out string token))
@@ -91,16 +91,28 @@ namespace Kros.AspNetCore.Authorization
                 }
                 int key = GetKey(token, cacheKeyPart);
 
-                if (!memoryCache.TryGetValue(key, out string jwtToken))
+                string jwtToken;
+                if (IsCacheAllowed() && !IsRequestPathAllowedForCache(httpContext.Request))
+                {
+                    jwtToken = await hybridCache.GetOrCreateAsync(key.ToString(), async (cancellationToken) =>
+                    {
+                        string authUrl =
+                            _jwtAuthorizationOptions.GetAuthorizationUrl(serviceDiscoveryProvider) + httpContext.Request.Path.Value;
+                        return await GetUserAuthorizationJwtAsync(
+                            httpContext,
+                            httpClientFactory,
+                            token,
+                            authUrl);
+                    }, GetCacheEntryOptions(), cancellationToken: default);
+                }
+                else
                 {
                     string authUrl =
                         _jwtAuthorizationOptions.GetAuthorizationUrl(serviceDiscoveryProvider) + httpContext.Request.Path.Value;
                     jwtToken = await GetUserAuthorizationJwtAsync(
                         httpContext,
                         httpClientFactory,
-                        memoryCache,
                         token,
-                        key,
                         authUrl);
                 }
 
@@ -110,7 +122,23 @@ namespace Kros.AspNetCore.Authorization
                 && httpContext.Request.Query.TryGetValue(_jwtAuthorizationOptions.HashParameterName, out StringValues hashValue))
             {
                 int key = GetKey(hashValue.ToString());
-                if (!memoryCache.TryGetValue(key, out string jwtToken))
+                string jwtToken;
+                if (IsCacheAllowed() && !IsRequestPathAllowedForCache(httpContext.Request))
+                {
+                    jwtToken = await hybridCache.GetOrCreateAsync(key.ToString(), async (cancellationToken) =>
+                    {
+                        UriBuilder uriBuilder = new(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
+                        uriBuilder.Query = QueryString.Create(
+                            _jwtAuthorizationOptions.HashParameterName,
+                            hashValue.ToString()).ToUriComponent();
+                        return await GetUserAuthorizationJwtAsync(
+                            httpContext,
+                            httpClientFactory,
+                            StringValues.Empty,
+                            uriBuilder.Uri.ToString());
+                    }, GetCacheEntryOptions(), cancellationToken: default);
+                }
+                else
                 {
                     UriBuilder uriBuilder = new(_jwtAuthorizationOptions.GetHashAuthorization(serviceDiscoveryProvider));
                     uriBuilder.Query = QueryString.Create(
@@ -119,9 +147,7 @@ namespace Kros.AspNetCore.Authorization
                     jwtToken = await GetUserAuthorizationJwtAsync(
                         httpContext,
                         httpClientFactory,
-                        memoryCache,
                         StringValues.Empty,
-                        key,
                         uriBuilder.Uri.ToString());
                 }
 
@@ -134,9 +160,7 @@ namespace Kros.AspNetCore.Authorization
         private async Task<string> GetUserAuthorizationJwtAsync(
             HttpContext httpContext,
             IHttpClientFactory httpClientFactory,
-            IMemoryCache memoryCache,
             StringValues authHeader,
-            int cacheKey,
             string authorizationUrl)
         {
             using (HttpClient client = httpClientFactory.CreateClient(AuthorizationHttpClientName))
@@ -152,7 +176,6 @@ namespace Kros.AspNetCore.Authorization
 
                 string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
                     new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
-                SetTokenToCache(memoryCache, cacheKey, jwtToken, httpContext.Request);
 
                 return jwtToken;
             }
@@ -169,23 +192,36 @@ namespace Kros.AspNetCore.Authorization
             }
         }
 
-        private void SetTokenToCache(IMemoryCache memoryCache, int key, string jwtToken, HttpRequest request)
+        private HybridCacheEntryOptions GetCacheEntryOptions()
         {
-            if (IsCacheAllowed() && !IsRequestPathAllowedForCache(request))
+            if (!IsCacheAllowed())
             {
-                MemoryCacheEntryOptions cacheEntryOptions = new();
-
-                if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
+                return new HybridCacheEntryOptions
                 {
-                    cacheEntryOptions.SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
-                }
-                if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
-                {
-                    cacheEntryOptions.SetAbsoluteExpiration(_jwtAuthorizationOptions.CacheAbsoluteExpiration);
-                }
-
-                memoryCache.Set(key, jwtToken, cacheEntryOptions);
+                    Expiration = TimeSpan.Zero // Don't cache if not allowed
+                };
             }
+
+            // HybridCache doesn't support sliding expiration directly
+            // Use absolute expiration as the primary cache option
+            if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
+            {
+                return new HybridCacheEntryOptions
+                {
+                    Expiration = _jwtAuthorizationOptions.CacheAbsoluteExpiration
+                };
+            }
+            
+            // If only sliding expiration is configured, use it as absolute expiration
+            if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
+            {
+                return new HybridCacheEntryOptions
+                {
+                    Expiration = _jwtAuthorizationOptions.CacheSlidingExpirationOffset
+                };
+            }
+
+            return new HybridCacheEntryOptions();
         }
 
         private bool IsRequestPathAllowedForCache(HttpRequest request)
