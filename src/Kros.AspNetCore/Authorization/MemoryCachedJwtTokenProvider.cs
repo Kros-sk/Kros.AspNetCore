@@ -1,6 +1,6 @@
-﻿using Kros.Utils;
+using Kros.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Text.RegularExpressions;
@@ -9,30 +9,30 @@ using System.Threading.Tasks;
 namespace Kros.AspNetCore.Authorization;
 
 /// <summary>
-/// Provider for JWT tokens with caching capabilities.
+/// Provider for JWT tokens using memory caching.
 /// </summary>
-internal class CachedJwtTokenProvider : IJwtTokenProvider
+internal class MemoryCachedJwtTokenProvider : IJwtTokenProvider
 {
-    private readonly HybridCache _hybridCache;
+    private readonly IMemoryCache _memoryCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
     private readonly IJwtTokenProvider _jwtProvider;
     private static Regex _cacheRegex = null;
 
     /// <summary>
-    /// Initializes a new instance of the JwtCachingService class.
+    /// Initializes a new instance of the MemoryCachedJwtTokenProvider class.
     /// </summary>
-    /// <param name="hybridCache">The hybrid cache instance.</param>
+    /// <param name="memoryCache">The memory cache instance.</param>
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
     /// <param name="jwtAuthorizationOptions">Authorization options.</param>
     /// <param name="jwtProvider">The JWT provider instance.</param>
-    public CachedJwtTokenProvider(
-        HybridCache hybridCache,
+    public MemoryCachedJwtTokenProvider(
+        IMemoryCache memoryCache,
         IHttpContextAccessor httpContextAccessor,
         GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
         IJwtTokenProvider jwtProvider)
     {
-        _hybridCache = Check.NotNull(hybridCache, nameof(hybridCache));
+        _memoryCache = Check.NotNull(memoryCache, nameof(memoryCache));
         _httpContextAccessor = Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
         _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions, nameof(jwtAuthorizationOptions));
         _jwtProvider = Check.NotNull(jwtProvider, nameof(jwtProvider));
@@ -50,7 +50,9 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
     /// <returns>The JWT token.</returns>
     public async Task<string> GetJwtTokenAsync(StringValues token)
     {
-        if (!JwtCacheHelper.ShouldUseCache(_httpContextAccessor.HttpContext.Request, _jwtAuthorizationOptions))
+        HttpRequest request = _httpContextAccessor.HttpContext.Request;
+        
+        if (!JwtCacheHelper.ShouldUseCache(request, _jwtAuthorizationOptions))
         {
             return await _jwtProvider.GetJwtTokenAsync(token);
         }
@@ -61,11 +63,15 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
             _jwtAuthorizationOptions,
             _cacheRegex);
 
-        return await _hybridCache.GetOrCreateAsync(
-            cacheKey,
-            async (cancellationToken) =>await _jwtProvider.GetJwtTokenAsync(token),
-            GetCacheEntryOptions(),
-            cancellationToken: default);
+        if (_memoryCache.TryGetValue(cacheKey, out string cachedToken))
+        {
+            return cachedToken;
+        }
+
+        string jwtToken = await _jwtProvider.GetJwtTokenAsync(token);
+        SetTokenToCache(cacheKey, jwtToken, request);
+
+        return jwtToken;
     }
 
     /// <summary>
@@ -75,53 +81,49 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
     /// <returns>The JWT token.</returns>
     public async Task<string> GetJwtTokenForHashAsync(StringValues hashValue)
     {
-        if (!JwtCacheHelper.ShouldUseCache(_httpContextAccessor.HttpContext.Request, _jwtAuthorizationOptions))
+        HttpRequest request = _httpContextAccessor.HttpContext.Request;
+        
+        if (!JwtCacheHelper.ShouldUseCache(request, _jwtAuthorizationOptions))
         {
             return await _jwtProvider.GetJwtTokenForHashAsync(hashValue);
         }
 
         string cacheKey = JwtCacheHelper.BuildHashCacheKey(hashValue);
 
-        return await _hybridCache.GetOrCreateAsync(
-            cacheKey,
-            async (cancellationToken) => await _jwtProvider.GetJwtTokenForHashAsync(hashValue),
-            GetCacheEntryOptions(),
-            cancellationToken: default);
+        if (_memoryCache.TryGetValue(cacheKey, out string cachedToken))
+        {
+            return cachedToken;
+        }
+
+        string jwtToken = await _jwtProvider.GetJwtTokenForHashAsync(hashValue);
+        SetTokenToCache(cacheKey, jwtToken, request);
+
+        return jwtToken;
     }
 
     /// <summary>
-    /// Gets the cache entry options based on configuration.
+    /// Sets the JWT token to cache with appropriate expiration options.
     /// </summary>
-    /// <returns>The hybrid cache entry options.</returns>
-    private HybridCacheEntryOptions GetCacheEntryOptions()
+    /// <param name="cacheKey">The cache key.</param>
+    /// <param name="jwtToken">The JWT token to cache.</param>
+    /// <param name="request">The HTTP request.</param>
+    private void SetTokenToCache(string cacheKey, string jwtToken, HttpRequest request)
     {
-        if (!JwtCacheHelper.IsCacheAllowed(_jwtAuthorizationOptions))
+        if (JwtCacheHelper.IsCacheAllowed(_jwtAuthorizationOptions) && 
+            !JwtCacheHelper.IsRequestPathIgnoredForCache(request, _jwtAuthorizationOptions))
         {
-            return new HybridCacheEntryOptions
-            {
-                Expiration = TimeSpan.Zero // Don't cache if not allowed
-            };
-        }
+            var cacheEntryOptions = new MemoryCacheEntryOptions();
 
-        // HybridCache doesn't support sliding expiration directly
-        // Use absolute expiration as the primary cache option
-        if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
-        {
-            return new HybridCacheEntryOptions
+            if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
             {
-                Expiration = _jwtAuthorizationOptions.CacheAbsoluteExpiration
-            };
-        }
-
-        // If only sliding expiration is configured, use it as absolute expiration
-        if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
-        {
-            return new HybridCacheEntryOptions
+                cacheEntryOptions.SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
+            }
+            if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
             {
-                Expiration = _jwtAuthorizationOptions.CacheSlidingExpirationOffset
-            };
-        }
+                cacheEntryOptions.SetAbsoluteExpiration(_jwtAuthorizationOptions.CacheAbsoluteExpiration);
+            }
 
-        return new HybridCacheEntryOptions();
+            _memoryCache.Set(cacheKey, jwtToken, cacheEntryOptions);
+        }
     }
 }
