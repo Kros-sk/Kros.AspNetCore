@@ -28,17 +28,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGatewayJwtAuthorization(
         this IServiceCollection services,
         IConfiguration configuration)
-        => services
-        .AddMemoryCache()
-        .AddScoped<ApiJwtTokenProvider>()
-        .AddScoped<IJwtTokenProvider>(services => new MemoryCachedJwtTokenProvider(
-            services.GetRequiredService<IMemoryCache>(),
-            services.GetRequiredService<IHttpContextAccessor>(),
-            services.GetRequiredService<IOptions<GatewayJwtAuthorizationOptions>>(),
-            services.GetRequiredService<ApiJwtTokenProvider>()))
-        .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
-        .AddHttpClient(ApiJwtTokenProvider.AuthorizationHttpClientName)
-        .Services;
+    {
+        services.ConfigureGatewayJwtAuthorization(configuration)
+            .WithMemoryCache();
+            
+        return services
+            .AddMemoryCache();
+    }
 
     /// <summary>
     /// Configure gateway authorization.
