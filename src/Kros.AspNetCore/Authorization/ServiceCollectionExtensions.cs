@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
             services.GetRequiredService<IOptions<GatewayJwtAuthorizationOptions>>(),
             services.GetRequiredService<ApiJwtTokenProvider>()))
         .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
-        .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
+        .AddHttpClient(ApiJwtTokenProvider.AuthorizationHttpClientName)
         .Services;
 
     /// <summary>
@@ -52,7 +52,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ApiJwtTokenProvider>()
             .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
-            .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName);
+            .AddHttpClient(ApiJwtTokenProvider.AuthorizationHttpClientName);
         return new GatewayJwtAuthorizationRegistrator(services);
     }
     /// <summary>

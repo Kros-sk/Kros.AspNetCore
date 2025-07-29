@@ -11,11 +11,6 @@ namespace Kros.AspNetCore.Authorization;
 /// </summary>
 internal class GatewayAuthorizationMiddleware
 {
-    /// <summary>
-    /// HttpClient name used for communication between ApiGateway and Authorization service.
-    /// </summary>
-    public const string AuthorizationHttpClientName = "JwtAuthorizationClientName";
-
     private readonly RequestDelegate _next;
     private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
 
