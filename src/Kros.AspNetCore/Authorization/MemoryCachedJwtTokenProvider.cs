@@ -1,6 +1,7 @@
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Text.RegularExpressions;
@@ -29,12 +30,12 @@ internal class MemoryCachedJwtTokenProvider : IJwtTokenProvider
     public MemoryCachedJwtTokenProvider(
         IMemoryCache memoryCache,
         IHttpContextAccessor httpContextAccessor,
-        GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
+        IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions,
         IJwtTokenProvider jwtProvider)
     {
         _memoryCache = Check.NotNull(memoryCache, nameof(memoryCache));
         _httpContextAccessor = Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions, nameof(jwtAuthorizationOptions));
+        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions.Value, nameof(jwtAuthorizationOptions));
         _jwtProvider = Check.NotNull(jwtProvider, nameof(jwtProvider));
 
         if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern))

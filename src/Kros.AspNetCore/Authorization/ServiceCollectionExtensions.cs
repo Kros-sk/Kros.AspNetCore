@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -30,11 +31,21 @@ namespace Kros.AspNetCore.Authorization
             .AddScoped<IJwtTokenProvider>(services => new MemoryCachedJwtTokenProvider(
                 services.GetRequiredService<IMemoryCache>(),
                 services.GetRequiredService<IHttpContextAccessor>(),
-                services.GetRequiredService<GatewayJwtAuthorizationOptions>(),
+                services.GetRequiredService<IOptions<GatewayJwtAuthorizationOptions>>(),
                 services.GetRequiredService<ApiJwtTokenProvider>()))
             .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
             .Services;
 
+        /// <summary>
+        /// Configure gateway authorization.
+        /// </summary>
+        public static GatewayJwtAuthorizationRegistrator ConfigureGatewayJwtAuthorization(
+            this IServiceCollection services)
+        {
+            services.AddScoped<ApiJwtTokenProvider>()
+                .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName);
+            return new GatewayJwtAuthorizationRegistrator(services);
+        }
         /// <summary>
         /// Configure downstream api authentication.
         /// </summary>
