@@ -74,22 +74,20 @@ internal class ApiJwtTokenProvider : IJwtTokenProvider
         StringValues authHeader,
         string authorizationUrl)
     {
-        using (HttpClient client = _httpClientFactory.CreateClient(AuthorizationHttpClientName))
+        using HttpClient client = _httpClientFactory.CreateClient(AuthorizationHttpClientName);
+        if (authHeader.Count != 0)
         {
-            if (authHeader.Count != 0)
-            {
-                client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
-            }
-            if (_jwtAuthorizationOptions.ForwardedHeaders.Count != 0)
-            {
-                AddForwardedHeaders(client, httpContext.Request.Headers);
-            }
-
-            string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
-                new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
-
-            return jwtToken;
+            client.DefaultRequestHeaders.Add(HeaderNames.Authorization, authHeader.ToString());
         }
+        if (_jwtAuthorizationOptions.ForwardedHeaders.Count != 0)
+        {
+            AddForwardedHeaders(client, httpContext.Request.Headers);
+        }
+
+        string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
+            new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
+
+        return jwtToken;
     }
 
     private void AddForwardedHeaders(HttpClient client, IHeaderDictionary headers)
