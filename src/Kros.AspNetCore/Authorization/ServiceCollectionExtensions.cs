@@ -24,7 +24,10 @@ public static class ServiceCollectionExtensions
     /// Configure gateway authorization.
     /// </summary>
     /// <param name="services">Collection of app services.</param>
-    public static IServiceCollection AddGatewayJwtAuthorization(this IServiceCollection services)
+    /// <param name="configuration">Configuration.</param>
+    public static IServiceCollection AddGatewayJwtAuthorization(
+        this IServiceCollection services,
+        IConfiguration configuration)
         => services
         .AddMemoryCache()
         .AddScoped<ApiJwtTokenProvider>()
@@ -33,16 +36,22 @@ public static class ServiceCollectionExtensions
             services.GetRequiredService<IHttpContextAccessor>(),
             services.GetRequiredService<IOptions<GatewayJwtAuthorizationOptions>>(),
             services.GetRequiredService<ApiJwtTokenProvider>()))
+        .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
         .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
         .Services;
 
     /// <summary>
     /// Configure gateway authorization.
     /// </summary>
+    /// <param name="services">Collection of app services.</param>
+    /// <param name="configuration">Configuration.</param>
+    /// <returns>Gateway JWT authorization registrator.</returns>
     public static GatewayJwtAuthorizationRegistrator ConfigureGatewayJwtAuthorization(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddScoped<ApiJwtTokenProvider>()
+            .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
             .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName);
         return new GatewayJwtAuthorizationRegistrator(services);
     }
