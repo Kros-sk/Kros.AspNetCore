@@ -122,21 +122,58 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="builder">Authentication builder.</param>
     /// <param name="configuration">Configuration.</param>
+    [Obsolete($"Use {nameof(AddApiKeyBasicAuthenticationSchemes)} instead. You must also change configuration and DevOps secrets path as well!")]
     public static AuthenticationBuilder AddApiKeyBasicAuthentication(
         this AuthenticationBuilder builder,
         IConfiguration configuration)
     {
-        ApiKeyBasicAuthenticationOptions configOptions = configuration.GetSection<ApiKeyBasicAuthenticationOptions>();
-        if (configOptions == null)
-        {
-            throw new ArgumentNullException(nameof(configuration), $"{nameof(ApiKeyBasicAuthenticationOptions)} not found in configuration");
-        }
-        return builder.AddScheme<ApiKeyBasicAuthenticationOptions, ApiKeyBasicAuthenticationHandler>(configOptions.Scheme,
+        ApiKeyBasicAuthenticationOptions configOptions = configuration.GetSection<ApiKeyBasicAuthenticationOptions>()
+            ?? throw new ArgumentNullException(nameof(configuration),
+                $"{Helpers.GetSectionName<ApiKeyBasicAuthenticationOptions>()} not found in configuration");
+
+        return builder.AddScheme<ApiKeyBasicAuthenticationScheme, ApiKeyBasicAuthenticationHandler>(configOptions.Scheme,
             options =>
             {
                 options.ApiKey = configOptions.ApiKey;
-                options.Scheme = configOptions.Scheme;
+                options.SchemeName = configOptions.Scheme;
             });
+    }
+
+    /// <summary>
+    /// Configure API key Basic authentication with multiple schemes support.
+    /// </summary>
+    /// <param name="builder">Authentication builder.</param>
+    /// <param name="configuration">Configuration.</param>
+    /// <remarks>
+    /// Example configuration:
+    /// {
+    ///   "ApiKeyBasicAuthentication": {
+    ///     "Schemes": {
+    ///       "Basic.ApiKey": "key1",
+    ///       "Another.ApiKey": "key2"
+    ///     }
+    ///   }
+    /// }
+    /// </remarks>
+    public static AuthenticationBuilder AddApiKeyBasicAuthenticationSchemes(
+        this AuthenticationBuilder builder,
+        IConfiguration configuration)
+    {
+        ApiKeyBasicAuthenticationOptions configOptions = configuration.GetSection<ApiKeyBasicAuthenticationOptions>()
+            ?? throw new ArgumentNullException(nameof(configuration),
+                $"{Helpers.GetSectionName<ApiKeyBasicAuthenticationOptions>()} not found in configuration");
+
+        foreach (KeyValuePair<string, string> configScheme in configOptions.Schemes)
+        {
+            builder.AddScheme<ApiKeyBasicAuthenticationScheme, ApiKeyBasicAuthenticationHandler>(configScheme.Key,
+                options =>
+                {
+                    options.SchemeName = configScheme.Key;
+                    options.ApiKey = configScheme.Value;
+                });
+        }
+
+        return builder;
     }
 
     /// <summary>

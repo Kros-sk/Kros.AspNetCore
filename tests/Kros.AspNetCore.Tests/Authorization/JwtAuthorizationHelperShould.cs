@@ -18,7 +18,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             IEnumerable<Claim> claims = CreateClaims(11, "bob@bob.com");
             string jwt = JwtAuthorizationHelper
-                .CreateJwtTokenFromClaims(claims, "top_secreat_password", new DateTime(2200, 1, 1));
+                .CreateJwtTokenFromClaims(claims, "top_secreat_password_long_version", new DateTime(2200, 1, 1));
 
             JwtSecurityTokenHandler handler = new();
             JwtSecurityToken tokenS = handler.ReadToken(jwt) as JwtSecurityToken;
@@ -34,11 +34,11 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             IEnumerable<Claim> claims1 = CreateClaims(11, "bob@bob.com");
             string jwt1 = JwtAuthorizationHelper
-                .CreateJwtTokenFromClaims(claims1, "top_secreat_password", new DateTime(2200, 1, 1));
+                .CreateJwtTokenFromClaims(claims1, "top_secreat_password_long_version", new DateTime(2200, 1, 1));
 
             IEnumerable<Claim> claims2 = CreateClaims(22, "alice@gmail.com");
             string jwt2 = JwtAuthorizationHelper
-                .CreateJwtTokenFromClaims(claims2, "top_secreat_password", new DateTime(2200, 1, 1));
+                .CreateJwtTokenFromClaims(claims2, "top_secreat_password_long_version", new DateTime(2200, 1, 1));
 
             jwt1.Should().NotBe(jwt2);
         }

@@ -98,7 +98,7 @@ namespace Kros.AspNetCore.Extensions
                 foreach (string prefix in prefixes)
                 {
                     options
-                        .Select($"{prefix}:*", LabelFilter.Null)
+                        .Select($"{prefix}:*")
                         .Select($"{prefix}:*", environmentName)
                         .TrimKeyPrefix($"{prefix}:");
                 }
@@ -106,7 +106,7 @@ namespace Kros.AspNetCore.Extensions
                 if (appConfig.UseFeatureFlags)
                 {
                     options
-                        .Select("_", LabelFilter.Null)
+                        .Select("_")
                         .Select("_", environmentName)
                         .UseFeatureFlags();
                 }
