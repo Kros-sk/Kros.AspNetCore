@@ -11,6 +11,8 @@ namespace Kros.AspNetCore.Authorization;
 /// </summary>
 internal static class JwtCacheHelper
 {
+    private const string CacheKeyPrefix = "JwtToken:";
+
     /// <summary>
     /// Builds a cache key based on the HTTP context and token.
     /// </summary>
@@ -36,8 +38,7 @@ internal static class JwtCacheHelper
             cacheKeyPart += urlPathForCache;
         }
 
-        int key = GetKey(token, cacheKeyPart);
-        return key.ToString();
+        return GetKey(token, cacheKeyPart);
     }
 
     /// <summary>
@@ -45,36 +46,7 @@ internal static class JwtCacheHelper
     /// </summary>
     /// <param name="hashValue">The hash value.</param>
     /// <returns>The cache key.</returns>
-    public static string BuildHashCacheKey(StringValues hashValue)
-    {
-        int key = GetKey(hashValue.ToString());
-        return key.ToString();
-    }
-
-    /// <summary>
-    /// Gets the URL path for cache key based on regex pattern.
-    /// </summary>
-    /// <param name="httpContext">The HTTP context.</param>
-    /// <param name="jwtAuthorizationOptions">Authorization options.</param>
-    /// <param name="cacheRegex">Compiled regex for URL path pattern.</param>
-    /// <returns>The URL path for cache key or null if not found.</returns>
-    public static string GetUrlPathForCacheKey(
-        HttpContext httpContext,
-        GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
-        Regex cacheRegex)
-    {
-        if (!string.IsNullOrWhiteSpace(jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern)
-            && !string.IsNullOrWhiteSpace(httpContext.Request.Path)
-            && cacheRegex != null)
-        {
-            var match = cacheRegex.Match(httpContext.Request.Path);
-            if (match.Success)
-            {
-                return match.Groups.Values.Last().Value;
-            }
-        }
-        return null;
-    }
+    public static string BuildHashCacheKey(StringValues hashValue) => GetKey(hashValue.ToString());
 
     /// <summary>
     /// Determines whether caching should be used for the given request.
@@ -107,11 +79,39 @@ internal static class JwtCacheHelper
         .Contains(request.Path.Value.TrimEnd('/'), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    /// Gets the URL path for cache key based on regex pattern.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <param name="jwtAuthorizationOptions">Authorization options.</param>
+    /// <param name="cacheRegex">Compiled regex for URL path pattern.</param>
+    /// <returns>The URL path for cache key or null if not found.</returns>
+    private static string GetUrlPathForCacheKey(
+        HttpContext httpContext,
+        GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
+        Regex cacheRegex)
+    {
+        if (!string.IsNullOrWhiteSpace(jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern)
+            && !string.IsNullOrWhiteSpace(httpContext.Request.Path)
+            && cacheRegex != null)
+        {
+            var match = cacheRegex.Match(httpContext.Request.Path);
+            if (match.Success)
+            {
+                return match.Groups.Values.Last().Value;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Generates a hash key from the given values.
     /// </summary>
     /// <param name="value">The primary value.</param>
     /// <param name="additionalKeyPart">Additional key part (optional).</param>
     /// <returns>The hash code.</returns>
-    public static int GetKey(StringValues value, string additionalKeyPart = null)
-        => (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
+    private static string GetKey(StringValues value, string additionalKeyPart = null)
+    {
+        int key = (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
+        return CacheKeyPrefix + key.ToString();
+    }
 }
