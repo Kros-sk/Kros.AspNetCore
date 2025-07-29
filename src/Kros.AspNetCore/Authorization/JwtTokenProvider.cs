@@ -2,6 +2,7 @@
 using Kros.AspNetCore.ServiceDiscovery;
 using Kros.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -36,12 +37,12 @@ internal class ApiJwtTokenProvider : IJwtTokenProvider
     public ApiJwtTokenProvider(
         IHttpClientFactory httpClientFactory,
         IHttpContextAccessor httpContextAccessor,
-        GatewayJwtAuthorizationOptions jwtAuthorizationOptions,
+        IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions,
         IServiceDiscoveryProvider serviceDiscoveryProvider)
     {
         _httpClientFactory = Check.NotNull(httpClientFactory, nameof(httpClientFactory));
         _httpContextAccessor = Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions, nameof(jwtAuthorizationOptions));
+        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions.Value, nameof(jwtAuthorizationOptions));
         _serviceDiscoveryProvider = Check.NotNull(serviceDiscoveryProvider, nameof(serviceDiscoveryProvider));
     }
 

@@ -1,9 +1,8 @@
-using Kros.Utils;
+﻿using Kros.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System;
 
 namespace Kros.AspNetCore.Authorization;
 
@@ -26,22 +25,8 @@ public sealed class GatewayJwtAuthorizationRegistrator
     /// <summary>
     /// Adds hybrid cache to the service collection and configures JWT token provider.
     /// </summary>
-    /// <param name="setupAction">The setup action for the hybrid cache options.</param>
-    /// <returns>The current instance of the <see cref="GatewayJwtAuthorizationRegistrator"/>.</returns>
-    public GatewayJwtAuthorizationRegistrator WithHybridCache(
-        Action<HybridCacheOptions> setupAction)
-    {
-        _services.AddHybridCache(setupAction);
-        AddHybridCachedJwtTokenProvider();
-        return this;
-    }
-
-    /// <summary>
-    /// Adds hybrid cache to the service collection and configures JWT token provider.
-    /// </summary>
     public GatewayJwtAuthorizationRegistrator WithHybridCache()
     {
-        _services.AddHybridCache();
         AddHybridCachedJwtTokenProvider();
         return this;
     }
