@@ -4,6 +4,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Kros.AspNetCore.Authorization;
@@ -13,7 +15,7 @@ namespace Kros.AspNetCore.Authorization;
 /// </summary>
 internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
 {
-    private const string CacheKeyPrefix = "JwtToken:";
+    private const string CacheKeyPrefix = "jwtToken:v1:";
 
     private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -80,14 +82,16 @@ internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
     }
 
     /// <summary>
-    /// Generates a hash key from the given values.
+    /// Generates a SHA256 hash key from the given values.
     /// </summary>
     /// <param name="value">The primary value.</param>
     /// <param name="additionalKeyPart">Additional key part (optional).</param>
-    /// <returns>The hash code.</returns>
+    /// <returns>The SHA256 hash as a Base64 URL-safe string.</returns>
     private static string GetKey(StringValues value, string additionalKeyPart = null)
     {
-        int key = (additionalKeyPart is null) ? HashCode.Combine(value) : HashCode.Combine(value, additionalKeyPart);
-        return CacheKeyPrefix + key.ToString();
+        string input = additionalKeyPart is null ? value.ToString() : $"{value}:{additionalKeyPart}";
+        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        string hash = Convert.ToBase64String(hashBytes);
+        return CacheKeyPrefix + hash;
     }
 }
