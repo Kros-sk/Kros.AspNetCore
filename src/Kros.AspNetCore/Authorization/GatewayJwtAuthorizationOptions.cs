@@ -82,9 +82,6 @@ namespace Kros.AspNetCore.Authorization
         /// <summary>
         /// Cache key prefix for authorization token caching.
         /// </summary>
-        /// <remarks>
-        /// Default is "jwtToken".
-        /// </remarks>
         public string CacheKeyPrefix { get; set; } = "jwtToken";
     }
 }
