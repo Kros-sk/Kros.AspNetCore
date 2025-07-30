@@ -12,7 +12,6 @@ namespace Kros.AspNetCore.Tests.Authorization;
 public class CachedJwtTokenProviderShould
 {
     private const string JwtToken = "MyJwtToken";
-    private const string HashJwtToken = "HashJwtToken";
     private const string CachedToken = "CachedToken";
 
     [Fact]
