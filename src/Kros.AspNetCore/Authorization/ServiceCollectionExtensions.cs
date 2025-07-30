@@ -46,12 +46,12 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<ApiJwtTokenProvider>()
+        services.AddSingleton<ApiJwtTokenProvider>()
             .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
             .AddHttpClient(ApiJwtTokenProvider.AuthorizationHttpClientName);
 
-        services.AddScoped<ICacheKeyBuilder, DefaultCacheKeyBuilder>();
-        services.AddScoped<IJwtTokenProvider>(services => new CachedJwtTokenProvider(
+        services.AddSingleton<ICacheKeyBuilder, DefaultCacheKeyBuilder>();
+        services.AddSingleton<IJwtTokenProvider>(services => new CachedJwtTokenProvider(
             services.GetRequiredService<ICacheService>(),
             services.GetRequiredService<IHttpContextAccessor>(),
             services.GetRequiredService<IOptions<GatewayJwtAuthorizationOptions>>(),
