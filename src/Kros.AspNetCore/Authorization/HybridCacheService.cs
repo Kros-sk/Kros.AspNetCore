@@ -30,7 +30,7 @@ internal class HybridCacheService : ICacheService
         string key,
         Func<Task<string>> factory)
     {
-        var cacheEntryOptions = GetCacheEntryOptions();
+        HybridCacheEntryOptions cacheEntryOptions = GetCacheEntryOptions();
 
         return await _hybridCache.GetOrCreateAsync(
             key,
