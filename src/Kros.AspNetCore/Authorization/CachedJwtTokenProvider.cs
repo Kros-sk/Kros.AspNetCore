@@ -60,9 +60,7 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
 
         return await _cacheService.GetOrCreateAsync(
             cacheKey,
-            () => _jwtProvider.GetJwtTokenAsync(token),
-            _jwtAuthorizationOptions.CacheAbsoluteExpiration,
-            _jwtAuthorizationOptions.CacheSlidingExpirationOffset);
+            () => _jwtProvider.GetJwtTokenAsync(token));
     }
 
     /// <inheritdoc/>
@@ -79,9 +77,7 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
 
         return await _cacheService.GetOrCreateAsync(
             cacheKey,
-            () => _jwtProvider.GetJwtTokenForHashAsync(hashValue),
-            _jwtAuthorizationOptions.CacheAbsoluteExpiration,
-            _jwtAuthorizationOptions.CacheSlidingExpirationOffset);
+            () => _jwtProvider.GetJwtTokenForHashAsync(hashValue));
     }
 
     /// <summary>

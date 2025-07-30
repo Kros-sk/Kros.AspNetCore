@@ -1,5 +1,6 @@
 using Kros.Utils;
 using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
@@ -11,24 +12,25 @@ namespace Kros.AspNetCore.Authorization;
 internal class HybridCacheService : ICacheService
 {
     private readonly HybridCache _hybridCache;
+    private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
 
     /// <summary>
     /// Initializes a new instance of the HybridCacheService class.
     /// </summary>
     /// <param name="hybridCache">The hybrid cache instance.</param>
-    public HybridCacheService(HybridCache hybridCache)
+    /// <param name="jwtAuthorizationOptions">Authorization options.</param>
+    public HybridCacheService(HybridCache hybridCache, IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions)
     {
         _hybridCache = Check.NotNull(hybridCache, nameof(hybridCache));
+        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions.Value, nameof(jwtAuthorizationOptions));
     }
 
     /// <inheritdoc/>
     public async Task<string> GetOrCreateAsync(
         string key,
-        Func<Task<string>> factory,
-        TimeSpan absoluteExpiration,
-        TimeSpan slidingExpiration)
+        Func<Task<string>> factory)
     {
-        HybridCacheEntryOptions cacheEntryOptions = GetCacheEntryOptions(absoluteExpiration, slidingExpiration);
+        var cacheEntryOptions = GetCacheEntryOptions();
 
         return await _hybridCache.GetOrCreateAsync(
             key,
@@ -38,28 +40,26 @@ internal class HybridCacheService : ICacheService
     }
 
     /// <summary>
-    /// Gets the cache entry options based on expiration settings.
+    /// Gets the cache entry options based on configuration.
     /// </summary>
-    /// <param name="absoluteExpiration">Absolute expiration time.</param>
-    /// <param name="slidingExpiration">Sliding expiration time.</param>
     /// <returns>The hybrid cache entry options.</returns>
-    private static HybridCacheEntryOptions GetCacheEntryOptions(TimeSpan absoluteExpiration, TimeSpan slidingExpiration)
+    private HybridCacheEntryOptions GetCacheEntryOptions()
     {
-        if (absoluteExpiration != TimeSpan.Zero)
+        if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
         {
             return new HybridCacheEntryOptions
             {
-                Expiration = absoluteExpiration
+                Expiration = _jwtAuthorizationOptions.CacheAbsoluteExpiration
             };
         }
 
         // HybridCache doesn't support sliding expiration directly
         // If only sliding expiration is configured, use it as absolute expiration
-        if (slidingExpiration != TimeSpan.Zero)
+        if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
         {
             return new HybridCacheEntryOptions
             {
-                Expiration = slidingExpiration
+                Expiration = _jwtAuthorizationOptions.CacheSlidingExpirationOffset
             };
         }
 

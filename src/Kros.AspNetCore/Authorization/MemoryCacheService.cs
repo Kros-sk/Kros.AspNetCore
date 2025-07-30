@@ -1,5 +1,6 @@
 using Kros.Utils;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
@@ -11,22 +12,23 @@ namespace Kros.AspNetCore.Authorization;
 internal class MemoryCacheService : ICacheService
 {
     private readonly IMemoryCache _memoryCache;
+    private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
 
     /// <summary>
     /// Initializes a new instance of the MemoryCacheService class.
     /// </summary>
     /// <param name="memoryCache">The memory cache instance.</param>
-    public MemoryCacheService(IMemoryCache memoryCache)
+    /// <param name="jwtAuthorizationOptions">Authorization options.</param>
+    public MemoryCacheService(IMemoryCache memoryCache, IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions)
     {
         _memoryCache = Check.NotNull(memoryCache, nameof(memoryCache));
+        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions.Value, nameof(jwtAuthorizationOptions));
     }
 
     /// <inheritdoc/>
     public async Task<string> GetOrCreateAsync(
         string key,
-        Func<Task<string>> factory,
-        TimeSpan absoluteExpiration,
-        TimeSpan slidingExpiration)
+        Func<Task<string>> factory)
     {
         if (_memoryCache.TryGetValue(key, out string cachedValue))
         {
@@ -37,13 +39,13 @@ internal class MemoryCacheService : ICacheService
 
         var cacheEntryOptions = new MemoryCacheEntryOptions();
 
-        if (slidingExpiration != TimeSpan.Zero)
+        if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
         {
-            cacheEntryOptions.SetSlidingExpiration(slidingExpiration);
+            cacheEntryOptions.SetSlidingExpiration(_jwtAuthorizationOptions.CacheSlidingExpirationOffset);
         }
-        if (absoluteExpiration != TimeSpan.Zero)
+        if (_jwtAuthorizationOptions.CacheAbsoluteExpiration != TimeSpan.Zero)
         {
-            cacheEntryOptions.SetAbsoluteExpiration(absoluteExpiration);
+            cacheEntryOptions.SetAbsoluteExpiration(_jwtAuthorizationOptions.CacheAbsoluteExpiration);
         }
 
         _memoryCache.Set(key, value, cacheEntryOptions);
