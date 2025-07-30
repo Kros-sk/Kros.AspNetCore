@@ -15,7 +15,8 @@ namespace Kros.AspNetCore.Authorization;
 /// </summary>
 internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
 {
-    private const string CacheKeyPrefix = "jwtToken:v1:";
+    private const string CacheKeyPrefix = "jwtToken";
+    private const string HashGeneratorVersion = "v1";
 
     private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -92,6 +93,6 @@ internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
         string input = additionalKeyPart is null ? value.ToString() : $"{value}:{additionalKeyPart}";
         byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         string hash = Convert.ToBase64String(hashBytes);
-        return CacheKeyPrefix + hash;
+        return $"{CacheKeyPrefix}:{HashGeneratorVersion}:{hash}";
     }
 }
