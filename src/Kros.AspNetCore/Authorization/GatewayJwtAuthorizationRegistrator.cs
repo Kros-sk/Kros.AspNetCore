@@ -24,7 +24,7 @@ public sealed class GatewayJwtAuthorizationRegistrator
     /// </summary>
     public GatewayJwtAuthorizationRegistrator WithHybridCache()
     {
-        _services.AddSingleton<ICacheService, HybridCacheService>();
+        _services.AddScoped<ICacheService, HybridCacheService>();
         return this;
     }
 
@@ -34,7 +34,7 @@ public sealed class GatewayJwtAuthorizationRegistrator
     /// <returns>Gateway JWT authorization registrator.</returns>
     public GatewayJwtAuthorizationRegistrator WithMemoryCache()
     {
-        _services.AddSingleton<ICacheService, MemoryCacheService>();
+        _services.AddScoped<ICacheService, MemoryCacheService>();
         return this;
     }
 }
