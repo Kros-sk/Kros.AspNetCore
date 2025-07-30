@@ -9,12 +9,11 @@ namespace Kros.AspNetCore.Authorization;
 public interface ICacheKeyBuilder
 {
     /// <summary>
-    /// Builds a cache key based on the HTTP context and token.
+    /// Builds a cache key.
     /// </summary>
-    /// <param name="httpContext">The HTTP context.</param>
     /// <param name="token">The authorization token.</param>
     /// <returns>The cache key.</returns>
-    string BuildCacheKey(HttpContext httpContext, StringValues token);
+    string BuildCacheKey(StringValues token);
 
     /// <summary>
     /// Builds a cache key for hash-based authorization.

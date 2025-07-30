@@ -51,7 +51,7 @@ internal class CachedJwtTokenProvider : IJwtTokenProvider
             return await _jwtProvider.GetJwtTokenAsync(token);
         }
 
-        string cacheKey = _cacheKeyBuilder.BuildCacheKey(_httpContextAccessor.HttpContext, token);
+        string cacheKey = _cacheKeyBuilder.BuildCacheKey(token);
 
         return await _cacheService.GetOrCreateAsync(
             cacheKey,

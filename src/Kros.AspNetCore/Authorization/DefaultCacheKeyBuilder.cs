@@ -16,15 +16,20 @@ internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
     private const string CacheKeyPrefix = "JwtToken:";
 
     private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private static Regex _cacheRegex = null;
 
     /// <summary>
     /// Initializes a new instance of the DefaultCacheKeyBuilder class.
     /// </summary>
     /// <param name="jwtAuthorizationOptions">Authorization options.</param>
-    public DefaultCacheKeyBuilder(IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions)
+    /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    public DefaultCacheKeyBuilder(
+        IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions,
+        IHttpContextAccessor httpContextAccessor)
     {
         _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions.Value, nameof(jwtAuthorizationOptions));
+        _httpContextAccessor = Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
         if (!string.IsNullOrWhiteSpace(_jwtAuthorizationOptions.CacheKeyUrlPathRegexPattern))
         {
@@ -33,8 +38,10 @@ internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
     }
 
     /// <inheritdoc/>
-    public string BuildCacheKey(HttpContext httpContext, StringValues token)
+    public string BuildCacheKey(StringValues token)
     {
+        HttpContext httpContext = _httpContextAccessor.HttpContext;
+        
         CacheHttpHeadersHelper.TryGetValue(
             httpContext.Request.Headers,
             _jwtAuthorizationOptions.CacheKeyHttpHeaders,
