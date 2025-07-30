@@ -15,9 +15,6 @@ namespace Kros.AspNetCore.Authorization;
 /// </summary>
 internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
 {
-    private const string CacheKeyPrefix = "jwtToken";
-    private const string HashGeneratorVersion = "v1";
-
     private readonly GatewayJwtAuthorizationOptions _jwtAuthorizationOptions;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private static Regex _cacheRegex = null;
@@ -73,7 +70,7 @@ internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
             && !string.IsNullOrWhiteSpace(httpContext.Request.Path)
             && _cacheRegex != null)
         {
-            var match = _cacheRegex.Match(httpContext.Request.Path);
+            Match match = _cacheRegex.Match(httpContext.Request.Path);
             if (match.Success)
             {
                 return match.Groups.Values.Last().Value;
@@ -88,11 +85,11 @@ internal class DefaultCacheKeyBuilder : ICacheKeyBuilder
     /// <param name="value">The primary value.</param>
     /// <param name="additionalKeyPart">Additional key part (optional).</param>
     /// <returns>The SHA256 hash as a Base64 URL-safe string.</returns>
-    private static string GetKey(StringValues value, string additionalKeyPart = null)
+    private string GetKey(StringValues value, string additionalKeyPart = null)
     {
         string input = additionalKeyPart is null ? value.ToString() : $"{value}:{additionalKeyPart}";
         byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         string hash = Convert.ToBase64String(hashBytes);
-        return $"{CacheKeyPrefix}:{HashGeneratorVersion}:{hash}";
+        return $"{_jwtAuthorizationOptions.CacheKeyPrefix}:v1:{hash}";
     }
 }

@@ -78,5 +78,13 @@ namespace Kros.AspNetCore.Authorization
         /// Part of url path which will be used as cache key for authorization token.
         /// </summary>
         public string CacheKeyUrlPathRegexPattern { get; set; }
+
+        /// <summary>
+        /// Cache key prefix for authorization token caching.
+        /// </summary>
+        /// <remarks>
+        /// Default is "jwtToken".
+        /// </remarks>
+        public string CacheKeyPrefix { get; set; } = "jwtToken";
     }
 }
