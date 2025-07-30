@@ -19,10 +19,14 @@ internal class MemoryCacheService : ICacheService
     /// </summary>
     /// <param name="memoryCache">The memory cache instance.</param>
     /// <param name="jwtAuthorizationOptions">Authorization options.</param>
-    public MemoryCacheService(IMemoryCache memoryCache, IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions)
+    public MemoryCacheService(
+        IMemoryCache memoryCache,
+        IOptions<GatewayJwtAuthorizationOptions> jwtAuthorizationOptions)
     {
         _memoryCache = Check.NotNull(memoryCache, nameof(memoryCache));
-        _jwtAuthorizationOptions = Check.NotNull(jwtAuthorizationOptions.Value, nameof(jwtAuthorizationOptions));
+        _jwtAuthorizationOptions = Check.NotNull(
+            jwtAuthorizationOptions.Value,
+            nameof(jwtAuthorizationOptions));
     }
 
     /// <inheritdoc/>
@@ -37,7 +41,7 @@ internal class MemoryCacheService : ICacheService
 
         string value = await factory();
 
-        var cacheEntryOptions = new MemoryCacheEntryOptions();
+        MemoryCacheEntryOptions cacheEntryOptions = new();
 
         if (_jwtAuthorizationOptions.CacheSlidingExpirationOffset != TimeSpan.Zero)
         {
