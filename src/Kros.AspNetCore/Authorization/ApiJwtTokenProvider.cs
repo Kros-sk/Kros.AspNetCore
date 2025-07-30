@@ -84,7 +84,8 @@ internal class ApiJwtTokenProvider : IJwtTokenProvider
             AddForwardedHeaders(client, httpContext.Request.Headers);
         }
 
-        string jwtToken = await client.GetStringAndCheckResponseAsync(authorizationUrl,
+        string jwtToken = await client.GetStringAndCheckResponseAsync(
+            authorizationUrl,
             new UnauthorizedAccessException(Properties.Resources.AuthorizationServiceForbiddenRequest));
 
         return jwtToken;
