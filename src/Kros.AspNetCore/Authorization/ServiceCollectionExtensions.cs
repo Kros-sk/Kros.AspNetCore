@@ -49,6 +49,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ApiJwtTokenProvider>()
             .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
             .AddHttpClient(ApiJwtTokenProvider.AuthorizationHttpClientName);
+
+        services.AddScoped<IJwtTokenProvider>(services => new CachedJwtTokenProvider(
+            services.GetRequiredService<ICacheService>(),
+            services.GetRequiredService<IHttpContextAccessor>(),
+            services.GetRequiredService<IOptions<GatewayJwtAuthorizationOptions>>(),
+            services.GetRequiredService<ApiJwtTokenProvider>()));
+            
         return new GatewayJwtAuthorizationRegistrator(services);
     }
     /// <summary>
