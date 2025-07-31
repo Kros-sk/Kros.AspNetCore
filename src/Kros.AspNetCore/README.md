@@ -153,12 +153,48 @@ Základná `Startup` trieda obsahujúca nastavenie `appsettings.json` a konfigur
 
 The Api gateway will use `GatewayAuthorizationMiddleware` middleware to contact the authorization service to forward the `Authorization Header` from the original request. Your authorization service will validate this token and create new credential token to be routed to internal services.
 
-To add middleware, you must first register the related services `services.AddGatewayJwtAuthorization()`
-and then register `app.UseGatewayJwtAuthorization()` to the pipeline.
+### Basic Setup
+
+To add middleware, you must first register the related services and then register the middleware to the pipeline:
+
+```csharp
+// Basic setup with memory cache (default)
+services.AddGatewayJwtAuthorization(configuration);
+app.UseGatewayJwtAuthorization();
+```
+
+You can also explicitly configure memory cache:
+
+```csharp
+services.ConfigureGatewayJwtAuthorization(configuration)
+    .WithMemoryCache();
+```
+
+### Caching Options
+
+The authorization middleware supports two caching strategies:
+
+#### Memory Cache (Default)
+Uses in-memory caching. Cache is cleared on application restart.
+
+```csharp
+services.AddGatewayJwtAuthorization(configuration);
+```
+
+#### Hybrid Cache
+Uses distributed caching with in-memory L1 cache. Tokens persist across application restarts.
+
+```csharp
+services.ConfigureGatewayJwtAuthorization(configuration)
+    .WithHybridCache();
+// register hybrid cache implementation, e.g. FusionCache
+```
+
+### Additional Features
 
 You can use `JwtAuthorizationHelper` to generate a Jwt token.
 
-If you need to use claims from credential token right away, adding `JwtBearerClaimsMiddleware` after `GatewayAuthorizationMiddleware` will add claims from cretential token to httpContext claims.
+If you need to use claims from credential token right away, adding `JwtBearerClaimsMiddleware` after `GatewayAuthorizationMiddleware` will add claims from credential token to httpContext claims.
 To add `JwtBearerClaimsMiddleware` register it's dependencies with `services.AddJwtBearerClaims` and register `app.UseJwtBearerClaims` to the pipeline. 
 
 ## JsonPatchDocumentExtensions
