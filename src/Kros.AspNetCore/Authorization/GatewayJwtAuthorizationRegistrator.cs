@@ -1,5 +1,6 @@
 ﻿using Kros.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Kros.AspNetCore.Authorization;
 
@@ -24,17 +25,7 @@ public sealed class GatewayJwtAuthorizationRegistrator
     /// </summary>
     public GatewayJwtAuthorizationRegistrator WithHybridCache()
     {
-        _services.AddScoped<ICacheService, HybridCacheService>();
-        return this;
-    }
-
-    /// <summary>
-    /// Configures gateway authorization to use memory cache.
-    /// </summary>
-    /// <returns>Gateway JWT authorization registrator.</returns>
-    public GatewayJwtAuthorizationRegistrator WithMemoryCache()
-    {
-        _services.AddScoped<ICacheService, MemoryCacheService>();
+        _services.Replace(ServiceDescriptor.Scoped<ICacheService, HybridCacheService>());
         return this;
     }
 }

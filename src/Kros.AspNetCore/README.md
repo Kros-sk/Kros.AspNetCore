@@ -163,13 +163,6 @@ services.AddGatewayJwtAuthorization(configuration);
 app.UseGatewayJwtAuthorization();
 ```
 
-You can also explicitly configure memory cache:
-
-```csharp
-services.ConfigureGatewayJwtAuthorization(configuration)
-    .WithMemoryCache();
-```
-
 ### Caching Options
 
 The authorization middleware supports two caching strategies:
@@ -185,7 +178,7 @@ services.AddGatewayJwtAuthorization(configuration);
 Uses distributed caching with in-memory L1 cache. Tokens persist across application restarts.
 
 ```csharp
-services.ConfigureGatewayJwtAuthorization(configuration)
+services.AddGatewayJwtAuthorization(configuration)
     .WithHybridCache();
 // register hybrid cache implementation, e.g. FusionCache
 ```
