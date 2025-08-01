@@ -23,6 +23,11 @@ public sealed class GatewayJwtAuthorizationRegistrator
     /// <summary>
     /// Configures gateway authorization to use hybrid cache.
     /// </summary>
+    /// <remarks>
+    /// Hybrid cache does not support sliding expiration. If only sliding expiration
+    /// (<see cref="GatewayJwtAuthorizationOptions.CacheSlidingExpirationOffset"/>) is set
+    /// it will be used as absolute expiration.
+    /// </remarks>
     public GatewayJwtAuthorizationRegistrator WithHybridCache()
     {
         _services.Replace(ServiceDescriptor.Scoped<ICacheService, HybridCacheService>());
