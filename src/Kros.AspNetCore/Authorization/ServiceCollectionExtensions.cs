@@ -1,8 +1,10 @@
 ﻿using Kros.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -21,11 +23,29 @@ public static class ServiceCollectionExtensions
     /// Configure gateway authorization.
     /// </summary>
     /// <param name="services">Collection of app services.</param>
-    public static IServiceCollection AddGatewayJwtAuthorization(this IServiceCollection services)
-        => services
-        .AddMemoryCache()
-        .AddHttpClient(GatewayAuthorizationMiddleware.AuthorizationHttpClientName)
-        .Services;
+    /// <param name="configuration">Configuration.</param>
+    public static GatewayJwtAuthorizationRegistrator AddGatewayJwtAuthorization(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services
+            .AddMemoryCache()
+            .AddScoped<ICacheService, MemoryCacheService>();
+
+        services
+            .AddScoped<ApiJwtTokenProvider>()
+            .AddScoped<ICacheKeyBuilder, DefaultCacheKeyBuilder>()
+            .AddScoped<IJwtTokenProvider>(services => new CachedJwtTokenProvider(
+                services.GetRequiredService<ICacheService>(),
+                services.GetRequiredService<IHttpContextAccessor>(),
+                services.GetRequiredService<IOptions<GatewayJwtAuthorizationOptions>>(),
+                services.GetRequiredService<ApiJwtTokenProvider>(),
+                services.GetRequiredService<ICacheKeyBuilder>()))
+            .ConfigureOptions<GatewayJwtAuthorizationOptions>(configuration)
+            .AddHttpClient(ApiJwtTokenProvider.AuthorizationHttpClientName);
+            
+        return new GatewayJwtAuthorizationRegistrator(services);
+    }
 
     /// <summary>
     /// Configure downstream api authentication.
