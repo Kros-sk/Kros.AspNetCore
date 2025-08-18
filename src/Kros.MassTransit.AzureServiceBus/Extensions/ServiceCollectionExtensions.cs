@@ -57,7 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
             IServiceCollection services,
             IConfiguration configuration,
             Type consumerNamespaceAnchor,
-            Action<IMassTransitForAzureBuilder, IBusRegistrationContext> busCfg)
+            Action<IMassTransitForAzureBuilder, IBusRegistrationContext> busCfgAction)
         {
             const string sectionName = "AzureServiceBus";
             services.Configure<AzureServiceBusOptions>(options => configuration.GetSection(sectionName).Bind(options));
@@ -70,15 +70,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     cfg.AddConsumersFromNamespaceContaining(consumerNamespaceAnchor);
                 }
-                cfg.AddBus(provider =>
-                {
-                    MassTransitForAzureBuilder builder = new((IServiceProvider)provider);
-                    busCfg?.Invoke(builder, provider);
 
-                    return builder.Build();
+                cfg.UsingAzureServiceBus((context, sbCfg) =>
+                {
+                    MassTransitForAzureBuilder builder = new((IServiceProvider)context);
+                    busCfgAction?.Invoke(builder, context);
+                    builder.Apply(sbCfg);
                 });
             });
-            services.AddMassTransitHostedService();
 
             return services;
         }
@@ -89,7 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services.Scan(scan =>
                     scan.FromAssembliesOf(namespaceAnchor)
-                    .AddClasses(c => c.AssignableTo(typeof(IConsumer))));
+                    .AddClasses(c => c.AssignableTo(typeof(IConsumer)), publicOnly: false));
             }
         }
     }
