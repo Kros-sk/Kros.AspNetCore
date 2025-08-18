@@ -1,6 +1,4 @@
-﻿using Azure;
-using Azure.Messaging.ServiceBus;
-using Kros.MassTransit.AzureServiceBus.Endpoints;
+﻿using Kros.MassTransit.AzureServiceBus.Endpoints;
 using Kros.Utils;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,7 +76,7 @@ namespace Kros.MassTransit.AzureServiceBus
         /// Ctor.
         /// </summary>
         /// <param name="registrationContext">MassTransit registration context.</param>
-        [Obsolete("'registrationContext' is not used anymore. Use constructor with IServiceProvider paramter.")]
+        [Obsolete("'registrationContext' is not used anymore. Use constructor with IServiceProvider parameter.")]
         public MassTransitForAzureBuilder(IBusRegistrationContext registrationContext)
             : this((IServiceProvider)registrationContext)
         {
@@ -134,11 +132,11 @@ namespace Kros.MassTransit.AzureServiceBus
 
         /// <inheritdoc />
         public IBusConsumerBuilder ConfigureQueue(string queueName)
-            => ConfigureQueue(queueName, config => { });
+            => ConfigureQueue(queueName, _ => { });
 
         /// <inheritdoc />
         public IBusConsumerBuilder ConfigureSubscription<T>(string subscriptionName) where T : class
-            => ConfigureSubscription<T>(subscriptionName, config => { });
+            => ConfigureSubscription<T>(subscriptionName, _ => { });
 
         #endregion
 
@@ -186,8 +184,8 @@ namespace Kros.MassTransit.AzureServiceBus
                 int limit = options.IntervalRetry.Limit;
                 int interval = options.IntervalRetry.Interval;
 
-                return new Action<IRetryConfigurator>(retry =>
-                    retry.Interval(limit, interval));
+                return retry =>
+                    retry.Interval(limit, interval);
             }
             return null;
         }
@@ -198,22 +196,23 @@ namespace Kros.MassTransit.AzureServiceBus
 
         /// <inheritdoc />
         public IBusControl Build()
+            => Bus.Factory.CreateUsingAzureServiceBus(Apply);
+
+        /// <summary>
+        /// Apply configuration to Azure Service Bus configurator (for UsingAzureServiceBus and Build()).
+        /// </summary>
+        /// <param name="busCfg">Service bus configuration.</param>
+        internal void Apply(IServiceBusBusFactoryConfigurator busCfg)
         {
-            IBusControl bus = Bus.Factory.CreateUsingAzureServiceBus(busCfg =>
+            CreateServiceHost(busCfg);
+            ConfigureServiceBus(busCfg);
+            AddMessageTypePrefix(busCfg);
+            AddEndpoints(busCfg);
+
+            if (_retryConfigurator != null)
             {
-                CreateServiceHost(busCfg);
-
-                ConfigureServiceBus(busCfg);
-                AddMessageTypePrefix(busCfg);
-                AddEndpoints(busCfg);
-
-                if (_retryConfigurator != null)
-                {
-                    busCfg.UseMessageRetry(_retryConfigurator);
-                }
-            });
-
-            return bus;
+                busCfg.UseMessageRetry(_retryConfigurator);
+            }
         }
 
         /// <summary>
