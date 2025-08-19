@@ -229,7 +229,8 @@ namespace Kros.MassTransit.AzureServiceBus
         /// <param name="busCfg">Service bus configuration.</param>
         private void ConfigureServiceBus(IServiceBusBusFactoryConfigurator busCfg)
         {
-            busCfg.UseJsonSerializer();
+            busCfg.UseNewtonsoftJsonSerializer();
+            busCfg.UseNewtonsoftJsonDeserializer();
             busCfg.DefaultMessageTimeToLive = ConfigDefaults.MessageTimeToLive;
             busCfg.EnableDeadLetteringOnMessageExpiration = ConfigDefaults.EnableDeadLetteringOnMessageExpiration;
             busCfg.LockDuration = ConfigDefaults.LockDuration;
