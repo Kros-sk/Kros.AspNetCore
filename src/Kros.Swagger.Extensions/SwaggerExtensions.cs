@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -127,8 +127,7 @@ namespace Kros.Swagger.Extensions
         }
 
         internal static IList<OpenApiSecurityRequirement> CreateSecurityRequirements(this SwaggerSettings settings)
-        {
-            return settings.Authorizations.Select(item =>
+            => [.. settings.Authorizations.Select(item =>
             {
                 OpenApiSecurityScheme scheme = item.Value;
                 string schemeName = item.Key;
@@ -142,27 +141,16 @@ namespace Kros.Swagger.Extensions
                     && (scheme.Flows is not null))
                 {
                     scheme.GetScopes(scopes);
-                    scopes = scopes.Distinct(StringComparer.Ordinal).ToList();
+                    scopes = [.. scopes.Distinct(StringComparer.Ordinal)];
                 }
 
                 OpenApiSecurityRequirement req = new()
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = schemeName
-                            }
-                        },
-                        scopes
-                    }
+                    { new OpenApiSecuritySchemeReference(schemeName), scopes }
                 };
 
                 return req;
-            }).ToList();
-        }
+            })];
 
         private static string[] GetAllOAuthScopes(IEnumerable<OpenApiSecurityScheme> schemes)
         {

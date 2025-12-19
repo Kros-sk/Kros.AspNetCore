@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 
@@ -6,13 +6,14 @@ namespace Kros.Swagger.Extensions.Filters
 {
     internal sealed class ClassNameAsTitleSchemaFilter : ISchemaFilter
     {
-        void ISchemaFilter.Apply(OpenApiSchema schema, SchemaFilterContext context)
+        void ISchemaFilter.Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
-            if (string.IsNullOrEmpty(schema.Title)
+            if (schema is OpenApiSchema openApiSchema
+                && string.IsNullOrEmpty(schema.Title)
                 && context.Type != null
                 && !IsPrimitive(context.Type))
             {
-                schema.Title = context.Type.Name;
+                openApiSchema.Title = context.Type.Name;
             }
         }
 

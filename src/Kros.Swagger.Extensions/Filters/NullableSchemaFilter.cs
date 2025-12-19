@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Reflection;
@@ -7,20 +7,20 @@ namespace Kros.Swagger.Extensions.Filters
 {
     internal sealed class NullableSchemaFilter : ISchemaFilter
     {
-        void ISchemaFilter.Apply(OpenApiSchema schema, SchemaFilterContext context)
+        void ISchemaFilter.Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
-            if (context.MemberInfo != null)
+            if (schema is OpenApiSchema openApiSchema && context.MemberInfo != null)
             {
                 Type? memberType = GetMemberType(context.MemberInfo);
                 if (memberType != null)
                 {
-                    if (memberType.IsValueType)
+                    bool isNullable = memberType.IsValueType
+                        ? Nullable.GetUnderlyingType(memberType) != null
+                        : !context.MemberInfo.IsNonNullableReferenceType();
+
+                    if (isNullable && openApiSchema.Type.HasValue)
                     {
-                        schema.Nullable = Nullable.GetUnderlyingType(memberType) != null;
-                    }
-                    else
-                    {
-                        schema.Nullable = !context.MemberInfo.IsNonNullableReferenceType();
+                        openApiSchema.Type |= JsonSchemaType.Null;
                     }
                 }
             }
