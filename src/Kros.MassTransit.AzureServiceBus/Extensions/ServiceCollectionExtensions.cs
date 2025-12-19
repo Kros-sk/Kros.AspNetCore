@@ -88,7 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services.Scan(scan =>
                     scan.FromAssembliesOf(namespaceAnchor)
-                    .AddClasses(c => c.AssignableTo(typeof(IConsumer)), publicOnly: false));
+                    .AddClasses(c => c.AssignableTo<IConsumer>(), publicOnly: false));
             }
         }
     }
