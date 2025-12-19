@@ -1,11 +1,11 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Xml.Linq;
 
 namespace Kros.Swagger.Extensions.Filters
@@ -121,10 +121,7 @@ namespace Kros.Swagger.Extensions.Filters
             Action<OpenApiSchema, SchemaFilterContext>? schemaAction = null,
             Action<OpenApiParameter, ParameterFilterContext>? parameterAction = null)
         {
-            if (enumTypeFilter is null)
-            {
-                throw new ArgumentNullException(nameof(enumTypeFilter));
-            }
+            ArgumentNullException.ThrowIfNull(enumTypeFilter);
             _customEnumTypeFilter = enumTypeFilter;
             _enumTypeFilter = FilterCustomEnums;
             _xmlDocs = LoadXmlDocs(xmlDocPaths);
@@ -168,36 +165,36 @@ namespace Kros.Swagger.Extensions.Filters
         }
 
         /// <inheritdoc/>
-        void ISchemaFilter.Apply(OpenApiSchema schema, SchemaFilterContext context)
+        void ISchemaFilter.Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
             Type? enumType = _enumTypeFilter(context.Type);
-            if (enumType != null)
+            if (schema is OpenApiSchema openApiSchema && enumType != null)
             {
-                schema.Type = "string | integer";
-                schema.Format = Enum.GetUnderlyingType(enumType).Name;
-                schema.Description = CreateEnumMembersDescription(enumType, schema.Description);
-                schema.Enum = CreateStringEnumMembers(enumType);
-                _schemaAction?.Invoke(schema, context);
+                openApiSchema.Type = JsonSchemaType.String | JsonSchemaType.Integer;
+                openApiSchema.Format = Enum.GetUnderlyingType(enumType).Name;
+                openApiSchema.Description = CreateEnumMembersDescription(enumType, openApiSchema.Description ?? string.Empty);
+                openApiSchema.Enum = CreateStringEnumMembers(enumType);
+                _schemaAction?.Invoke(openApiSchema, context);
             }
         }
 
         /// <inheritdoc/>
-        void IParameterFilter.Apply(OpenApiParameter parameter, ParameterFilterContext context)
+        void IParameterFilter.Apply(IOpenApiParameter parameter, ParameterFilterContext context)
         {
             Type? paramType = _enumTypeFilter(context.ParameterInfo?.ParameterType);
-            if (paramType != null)
+            if (parameter is OpenApiParameter openApiParameter && paramType != null)
             {
-                parameter.Description = CreateEnumMembersDescription(paramType, parameter.Description);
-                _parameterAction?.Invoke(parameter, context);
+                parameter.Description = CreateEnumMembersDescription(paramType, openApiParameter.Description ?? string.Empty);
+                _parameterAction?.Invoke(openApiParameter, context);
             }
         }
 
-        private static List<IOpenApiAny> CreateStringEnumMembers(Type enumType)
-            => new(Enum.GetNames(enumType).Select(enumMemberName => new OpenApiString(enumMemberName)));
+        private static List<JsonNode> CreateStringEnumMembers(Type enumType)
+            => [.. Enum.GetNames(enumType).Select(enumMemberName => JsonValue.Create(enumMemberName))];
 
         private static List<Type> CheckTypes(IEnumerable<Type> sourceTypes, string paramName)
         {
-            List<Type> result = new();
+            List<Type> result = [];
             foreach (Type enumType in sourceTypes)
             {
                 if (!enumType.IsEnum)
@@ -219,7 +216,7 @@ namespace Kros.Swagger.Extensions.Filters
 
         private static List<XDocument> LoadXmlDocs(IEnumerable<string> xmlDocPaths)
         {
-            List<XDocument> result = new();
+            List<XDocument> result = [];
             if (xmlDocPaths != null)
             {
                 foreach (string xmlDocPath in xmlDocPaths)
