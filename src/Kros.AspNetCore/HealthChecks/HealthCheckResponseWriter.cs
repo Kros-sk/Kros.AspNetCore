@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Kros.AspNetCore.HealthChecks
@@ -13,6 +12,20 @@ namespace Kros.AspNetCore.HealthChecks
     public static class HealthCheckResponseWriter
     {
         private const string DefaultContentType = "application/json";
+
+        internal static readonly JsonSerializerOptions _serializeOptions = CreateSerializerOptions();
+
+        private static JsonSerializerOptions CreateSerializerOptions()
+        {
+            JsonSerializerOptions options = new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            return options;
+        }
 
         /// <summary>
         /// Add health report as json to HttpContext response.
@@ -25,19 +38,9 @@ namespace Kros.AspNetCore.HealthChecks
 
             if (report != null)
             {
-                JsonSerializerSettings settings = new()
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    NullValueHandling = NullValueHandling.Ignore,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                };
-
-                settings.Converters.Add(new StringEnumConverter());
-
                 httpContext.Response.ContentType = DefaultContentType;
-
                 UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(report);
-                response = JsonConvert.SerializeObject(uiReport, settings);
+                response = JsonSerializer.Serialize(uiReport, _serializeOptions);
             }
 
             return httpContext.Response.WriteAsync(response);
