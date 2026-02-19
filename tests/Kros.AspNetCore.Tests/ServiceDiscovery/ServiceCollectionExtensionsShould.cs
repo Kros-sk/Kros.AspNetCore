@@ -68,6 +68,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
         }
 
         [Fact]
+        [Obsolete("AddApiKeyBasicAuthentication is obsolete.")]
         public async Task AddSingleApiKeyBasicAuthentication()
         {
             ServiceCollection serviceCollection = new();
@@ -97,12 +98,21 @@ namespace Kros.AspNetCore.ServiceDiscovery
         }
 
         [Fact]
+        [Obsolete("AddApiKeyBasicAuthentication is obsolete.")]
         public void ThrowOnAddApiKeyBasicAuthenticationWithoutConfig()
         {
             ServiceCollection serviceCollection = new();
             IConfigurationRoot config = new ConfigurationBuilder().Build();
             serviceCollection.AddAuthentication().Invoking(builder => builder.AddApiKeyBasicAuthentication(config))
                 .Should().Throw<ArgumentNullException>();
+        }
+
+
+        [Fact]
+        public void ThrowOnAddApiKeyBasicAuthenticationSchemesWithoutConfig()
+        {
+            ServiceCollection serviceCollection = new();
+            IConfigurationRoot config = new ConfigurationBuilder().Build();
             serviceCollection.AddAuthentication().Invoking(builder => builder.AddApiKeyBasicAuthenticationSchemes(config))
                 .Should().Throw<ArgumentNullException>();
         }

@@ -24,9 +24,9 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
 
-            await cache.SetAsync("2", 2, new DistributedCacheEntryOptions());
+            await cache.SetAsync("2", 2, new DistributedCacheEntryOptions(), TestContext.Current.CancellationToken);
 
-            int value = await cache.GetAsync<int>("2");
+            int value = await cache.GetAsync<int>("2", TestContext.Current.CancellationToken);
 
             value.Should().Be(2);
         }
@@ -36,9 +36,9 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
 
-            await cache.SetAsync("foo", new Foo() { Value = 2 }, new DistributedCacheEntryOptions());
+            await cache.SetAsync("foo", new Foo() { Value = 2 }, new DistributedCacheEntryOptions(), TestContext.Current.CancellationToken);
 
-            Foo value = await cache.GetAsync<Foo>("foo");
+            Foo value = await cache.GetAsync<Foo>("foo", TestContext.Current.CancellationToken);
 
             value.Value.Should().Be(2);
         }
@@ -48,13 +48,13 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
 
-            Foo foo = await cache.GetAsync<Foo>("foo");
+            Foo foo = await cache.GetAsync<Foo>("foo", TestContext.Current.CancellationToken);
             foo.Should().BeNull();
 
-            int? intValue = await cache.GetAsync<int?>("int");
+            int? intValue = await cache.GetAsync<int?>("int", TestContext.Current.CancellationToken);
             intValue.Should().BeNull();
 
-            string stringValue = await cache.GetAsync<string>("string");
+            string stringValue = await cache.GetAsync<string>("string", TestContext.Current.CancellationToken);
             stringValue.Should().BeNull();
         }
 
@@ -70,10 +70,10 @@ namespace Kros.AspNetCore.Tests.Extensions
                 return new Foo() { Value = 2 };
             }
 
-            Foo foo = await cache.GetAndSetAsync<Foo>("foo", func, options);
+            Foo foo = await cache.GetAndSetAsync<Foo>("foo", func, options, TestContext.Current.CancellationToken);
             foo.Value.Should().Be(2);
 
-            Foo foo2 = await cache.GetAndSetAsync<Foo>("foo", func, options);
+            Foo foo2 = await cache.GetAndSetAsync<Foo>("foo", func, options, TestContext.Current.CancellationToken);
             foo2.Should().BeEquivalentTo(foo);
             callCount.Should().Be(1);
         }

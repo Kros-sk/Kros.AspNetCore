@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Kros.AspNetCore.Tests.HealthChecks
@@ -23,7 +24,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         }
 
         [Fact]
-        public async void WriteToHttpResponse()
+        public async Task WriteToHttpResponse()
         {
             HealthReport report = CreateHealthReport(HealthStatus.Healthy);
 
