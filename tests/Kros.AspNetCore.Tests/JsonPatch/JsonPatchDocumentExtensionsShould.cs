@@ -32,17 +32,17 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void GetColumnsNamesForComplexTypeWithFlattening()
         {
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document1> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
-            IEnumerable<string> columns = jsonPatch.GetColumnsNames(new JsonPatchMapperConfig<Document>());
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames(JsonPatchMapperConfig<Document1>.NewConfig());
             Assert.Equivalent(new[] { "SupplierName" }, columns);
         }
 
         [Fact]
         public void GetColumnsNamesForComplexTypeWithDefaultMapping()
         {
-            JsonPatchMapperConfig<Document>
+            JsonPatchMapperConfig<Document5>
                 .NewConfig()
                 .Map(src =>
                 {
@@ -57,7 +57,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document5> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
@@ -68,7 +68,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void NoMapProperties()
         {
-            JsonPatchMapperConfig<Document> config = new JsonPatchMapperConfig<Document>()
+            JsonPatchMapperConfig<Document2> config = JsonPatchMapperConfig<Document2>.NewConfig()
                 .Map(src =>
                 {
                     if (src.Contains("/Address/"))
@@ -79,7 +79,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document2> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
@@ -90,7 +90,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         [Fact]
         public void GetColumnsNamesForComplexTypeWithCustomMapping()
         {
-            JsonPatchMapperConfig<Document> config = new JsonPatchMapperConfig<Document>()
+            JsonPatchMapperConfig<Document3> config = JsonPatchMapperConfig<Document3>.NewConfig()
                 .Map(src =>
                 {
                     const string address = "/Address/";
@@ -104,7 +104,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document3> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames(config);
@@ -118,9 +118,9 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace("/supplier/address/country", "Slovakia");
 
             string serialized = JsonConvert.SerializeObject(jsonPatch);
-            JsonPatchDocument<Document> deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
+            JsonPatchDocument<Document4> deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document4>>(serialized);
 
-            IEnumerable<string> columns = deserialized.GetColumnsNames(new JsonPatchMapperConfig<Document>());
+            IEnumerable<string> columns = deserialized.GetColumnsNames(JsonPatchMapperConfig<Document4>.NewConfig());
             Assert.Equivalent(new[] { "SupplierAddressCountry" }, columns);
         }
 
@@ -149,7 +149,36 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         public class Document
         {
             public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
 
+        public class Document1
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document2
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document3
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document4
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document5
+        {
+            public Partner Supplier { get; set; } = new Partner();
             public IEnumerable<string> Items { get; set; }
         }
 

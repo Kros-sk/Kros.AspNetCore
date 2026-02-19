@@ -206,6 +206,7 @@ For example: path `/Supplier/Name` is maped to `SupplierName`.
 ### Custom mapping
 
 When you need define custom mapping, you can use `JsonPatchDocumentMapperConfig<TModel>` for configuration.
+Note, that only one configuration can be created for one model, and it is global for all `JsonPatchDocument<TModel>` instances.
 
 ```CSharp
 JsonPatchMapperConfig<Document>

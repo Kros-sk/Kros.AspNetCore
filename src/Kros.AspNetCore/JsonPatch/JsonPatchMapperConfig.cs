@@ -6,14 +6,32 @@ using System.Linq;
 namespace Kros.AspNetCore.JsonPatch
 {
     /// <summary>
+    /// Base class for generic <see cref="JsonPatchMapperConfig{TSource}"/>.
+    /// </summary>
+    public class JsonPatchMapperConfig
+    {
+        /// <summary>
+        /// When using <see cref="JsonPatchMapperConfig{TSource}.NewConfig"/> method, only the first configuration for specified
+        /// type is used. Another new config throws <see cref="InvalidOperationException"/>.
+        /// If you do not want this exception to be thrown, set this property to 'false'."/>
+        /// </summary>
+        [Obsolete("This is only temporary for backward compatibility.")]
+        public static bool ThrowExceptionOnDuplicateNewConfig { get; set; } = true;
+    }
+
+    /// <summary>
     ///JSON PATCH mapper configuration. Configuration for mapping <see cref="JsonPatchMapperConfig{TSource}"/>
     ///operation paths to database columns.
     /// </summary>
     /// <typeparam name="TSource">Source model type.</typeparam>
-    public class JsonPatchMapperConfig<TSource> : IJsonPatchMapper where TSource : class
+    public class JsonPatchMapperConfig<TSource> : JsonPatchMapperConfig, IJsonPatchMapper where TSource : class
     {
         private Func<string, string> _pathMapping;
         private readonly ConcurrentDictionary<string, string> _mapping = new(StringComparer.InvariantCulture);
+
+        private JsonPatchMapperConfig()
+        {
+        }
 
         /// <summary>
         /// Creates new config for <typeparamref name="TSource"/> and store it for non parametric  extension
