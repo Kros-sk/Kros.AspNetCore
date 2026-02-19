@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -30,11 +29,8 @@ public class GatewayAuthorizationMiddlewareShould
 
         await middleware.Invoke(context, jwtProvider);
 
-        context.Request.Headers[HeaderNames.Authorization]
-            .Should()
-            .HaveCount(1)
-            .And
-            .Contain($"Bearer {DownstreamJwtToken}");
+        Assert.Single(context.Request.Headers[HeaderNames.Authorization]);
+        Assert.Contains($"Bearer {DownstreamJwtToken}", context.Request.Headers[HeaderNames.Authorization].ToString());
     }
 
     [Fact]
@@ -53,11 +49,8 @@ public class GatewayAuthorizationMiddlewareShould
 
         await middleware.Invoke(context, jwtProvider);
 
-        context.Request.Headers[HeaderNames.Authorization]
-            .Should()
-            .HaveCount(1)
-            .And
-            .Contain($"Bearer {DownstreamHashJwtToken}");
+        Assert.Single(context.Request.Headers[HeaderNames.Authorization]);
+        Assert.Contains($"Bearer {DownstreamHashJwtToken}", context.Request.Headers[HeaderNames.Authorization].ToString());
     }
 
     [Fact]
@@ -78,11 +71,8 @@ public class GatewayAuthorizationMiddlewareShould
 
         await middleware.Invoke(context, jwtProvider);
 
-        context.Request.Headers[HeaderNames.Authorization]
-            .Should()
-            .HaveCount(1)
-            .And
-            .Contain($"Bearer {DownstreamJwtToken}");
+        Assert.Single(context.Request.Headers[HeaderNames.Authorization]);
+        Assert.Contains($"Bearer {DownstreamJwtToken}", context.Request.Headers[HeaderNames.Authorization].ToString());
     }
 
     [Fact]
@@ -94,8 +84,7 @@ public class GatewayAuthorizationMiddlewareShould
 
         await middleware.Invoke(context, jwtProvider);
 
-        context.Request.Headers[HeaderNames.Authorization]
-            .Should().BeEmpty();
+        Assert.Equal(0, context.Request.Headers[HeaderNames.Authorization].Count);
     }
 
     [Fact]
@@ -117,7 +106,7 @@ public class GatewayAuthorizationMiddlewareShould
 
         await middleware.Invoke(context, jwtProvider);
 
-        nextCalled.Should().BeTrue();
+        Assert.True(nextCalled);
     }
 
     private static GatewayAuthorizationMiddleware CreateMiddleware(GatewayJwtAuthorizationOptions options = null)

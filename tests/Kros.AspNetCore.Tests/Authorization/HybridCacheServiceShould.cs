@@ -1,5 +1,4 @@
-using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Hybrid;
 using NSubstitute;
 using System;
@@ -30,7 +29,7 @@ public class HybridCacheServiceShould
 
         string result = await service.GetOrCreateAsync(key, () => Task.FromResult("factory_value"));
 
-        result.Should().Be(expectedValue);
+        Assert.Equal(expectedValue, result);
     }
 
     [Fact]
@@ -55,8 +54,8 @@ public class HybridCacheServiceShould
 
         await service.GetOrCreateAsync("test_key", () => Task.FromResult("test_value"));
 
-        capturedOptions.Should().NotBeNull();
-        capturedOptions.Expiration.Should().Be(TimeSpan.FromHours(1));
+        Assert.NotNull(capturedOptions);
+        Assert.Equal(TimeSpan.FromHours(1), capturedOptions.Expiration);
     }
 
     [Fact]
@@ -81,8 +80,8 @@ public class HybridCacheServiceShould
 
         await service.GetOrCreateAsync("test_key", () => Task.FromResult("test_value"));
 
-        capturedOptions.Should().NotBeNull();
-        capturedOptions.Expiration.Should().Be(TimeSpan.FromMinutes(30));
+        Assert.NotNull(capturedOptions);
+        Assert.Equal(TimeSpan.FromMinutes(30), capturedOptions.Expiration);
     }
 
     private static HybridCacheService CreateService(

@@ -1,5 +1,4 @@
-using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using System;
@@ -29,8 +28,8 @@ public class MemoryCacheServiceShould
 
         string result = await service.GetOrCreateAsync(key, factory);
 
-        result.Should().Be(existingValue);
-        factoryCalled.Should().BeFalse();
+        Assert.Equal(existingValue, result);
+        Assert.False(factoryCalled);
     }
 
     [Fact]
@@ -46,8 +45,8 @@ public class MemoryCacheServiceShould
 
         string result = await service.GetOrCreateAsync(key, factory);
 
-        result.Should().Be(newValue);
-        memoryCache.Get(key).Should().Be(newValue);
+        Assert.Equal(newValue, result);
+        Assert.Equal(newValue, memoryCache.Get(key));
     }
 
     [Fact]

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Exceptions;
+﻿using Kros.AspNetCore.Exceptions;
 using Kros.AspNetCore.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch.Exceptions;
@@ -42,8 +41,9 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
 
             Func<Task> action = async () => await middleware.Invoke(context);
 
-            await action.Should().ThrowAsync<Exception>().WithMessage("Exception");
-            context.Response.StatusCode.Should().Be(responseStatusCode);
+            Exception exception = await Assert.ThrowsAsync<Exception>(action);
+            Assert.Equal("Exception", exception.Message);
+            Assert.Equal(responseStatusCode, context.Response.StatusCode);
         }
 
         [Theory]
@@ -66,9 +66,9 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
             }, Substitute.For<ILogger<ErrorHandlingMiddleware>>());
 
             Func<Task> action = async () => await middleware.Invoke(context);
-            await action.Should().ThrowAsync<Exception>();
+            await Assert.ThrowsAsync<Exception>(action);
 
-            context.Response.StatusCode.Should().Be(responseStatusCode);
+            Assert.Equal(responseStatusCode, context.Response.StatusCode);
         }
 
         [Theory]
@@ -85,7 +85,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
 
             await middleware.Invoke(context);
 
-            context.Response.StatusCode.Should().Be(expectedStatusCode);
+            Assert.Equal(expectedStatusCode, context.Response.StatusCode);
         }
 
         public static TheoryData<Exception, int> ReturnCorectStatusCodeForExceptionData()
@@ -113,7 +113,7 @@ namespace Kros.AspNetCore.Tests.ErrorHandling
 
             await middleware.Invoke(context);
 
-            context.Response.StatusCode.Should().Be(StatusCodes.Status100Continue);
+            Assert.Equal(StatusCodes.Status100Continue, context.Response.StatusCode);
         }
 
         public static TheoryData<Exception> NotChangeStatusCodeIfResponseHasStartedData()

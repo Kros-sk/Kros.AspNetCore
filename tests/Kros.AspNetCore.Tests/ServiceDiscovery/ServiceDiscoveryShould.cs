@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.ServiceDiscovery;
+﻿using Kros.AspNetCore.ServiceDiscovery;
 using Microsoft.Extensions.Configuration;
 using System;
 using Xunit;
@@ -18,7 +17,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Uri uri = provider.GetService(serviceName);
 
-            uri.AbsoluteUri.Should().Be(expectedUri);
+            Assert.Equal(expectedUri, uri.AbsoluteUri);
         }
 
         [Theory]
@@ -36,7 +35,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Uri uri = provider.GetPath(serviceName, pathName);
 
-            uri.ToString().Should().Be(expectedUri);
+            Assert.Equal(expectedUri, uri.ToString());
         }
 
         [Fact]
@@ -48,7 +47,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Uri uri = provider.GetService("ToDos");
 
-            uri.AbsoluteUri.Should().Be("http://localhost:9004/");
+            Assert.Equal("http://localhost:9004/", uri.AbsoluteUri);
         }
 
         [Fact]
@@ -58,7 +57,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Action action = () => provider.GetService("doesntExist");
 
-            action.Should().Throw<ArgumentException>();
+            Assert.Throws<ArgumentException>(action);
         }
 
         [Theory]
@@ -71,7 +70,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Action action = () => provider.GetPath(serviceName, pathName);
 
-            action.Should().Throw<ArgumentException>();
+            Assert.Throws<ArgumentException>(action);
         }
 
         [Theory]
@@ -84,7 +83,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Uri uri = provider.GetService(serviceType);
 
-            uri.AbsoluteUri.Should().Be(expectedUri);
+            Assert.Equal(expectedUri, uri.AbsoluteUri);
         }
 
         [Theory]
@@ -97,7 +96,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Uri uri = provider.GetPath(serviceType, pathName);
 
-            uri.ToString().Should().Be(expectedUri);
+            Assert.Equal(expectedUri, uri.ToString());
         }
 
         [Fact]
@@ -107,7 +106,7 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Action action = () => provider.GetService(TestServiceType.WithtoutParameter);
 
-            action.Should().Throw<ArgumentException>();
+            Assert.Throws<ArgumentException>(action);
         }
 
         [Theory]
@@ -123,9 +122,9 @@ namespace Kros.AspNetCore.Tests.ServiceDiscovery
 
             Uri uri = provider.GetService(serviceName);
 
-            uri.Scheme.Should().Be("http");
-            uri.Host.Should().Be(serviceName);
-            uri.Port.Should().Be(80);
+            Assert.Equal("http", uri.Scheme);
+            Assert.Equal(serviceName, uri.Host);
+            Assert.Equal(80, uri.Port);
         }
 
         private static IConfiguration GetConfiguration() =>

@@ -1,5 +1,4 @@
-using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -25,7 +24,7 @@ public class DefaultCacheKeyBuilderShould
 
         string result = builder.BuildCacheKey(TestToken);
 
-        result.Should().Be($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, null)}");
+        Assert.Equal($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, null)}", result);
     }
 
     [Fact]
@@ -39,7 +38,7 @@ public class DefaultCacheKeyBuilderShould
         string result = builder.BuildCacheKey(TestToken);
 
         string expectedCacheKeyPart = $"Connection-Id:{TestConnectionId}|";
-        result.Should().Be($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedCacheKeyPart)}");
+        Assert.Equal($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedCacheKeyPart)}", result);
     }
 
     [Fact]
@@ -56,7 +55,7 @@ public class DefaultCacheKeyBuilderShould
         string result = builder.BuildCacheKey(TestToken);
 
         string expectedCacheKeyPart = $"Connection-Id:{TestConnectionId}|789012";
-        result.Should().Be($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedCacheKeyPart)}");
+        Assert.Equal($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedCacheKeyPart)}", result);
     }
 
     [Theory]
@@ -75,7 +74,7 @@ public class DefaultCacheKeyBuilderShould
 
         string result = builder.BuildCacheKey(TestToken);
 
-        result.Should().StartWith($"{TestCacheKeyPrefix}:v1:");
+        Assert.StartsWith($"{TestCacheKeyPrefix}:v1:", result);
     }
 
     [Fact]
@@ -90,7 +89,7 @@ public class DefaultCacheKeyBuilderShould
         string result = builder.BuildCacheKey(TestToken);
 
         string expectedCacheKeyPart = $"Connection-Id:{TestConnectionId}|";
-        result.Should().Be($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedCacheKeyPart)}");
+        Assert.Equal($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedCacheKeyPart)}", result);
     }
 
     [Theory]
@@ -112,7 +111,7 @@ public class DefaultCacheKeyBuilderShould
 
         string result = builder.BuildCacheKey(TestToken);
 
-        result.Should().Be($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedExtractedValue)}");
+        Assert.Equal($"{TestCacheKeyPrefix}:v1:{GetExpectedHashForToken(TestToken, expectedExtractedValue)}", result);
     }
 
     private static DefaultCacheKeyBuilder CreateBuilder(

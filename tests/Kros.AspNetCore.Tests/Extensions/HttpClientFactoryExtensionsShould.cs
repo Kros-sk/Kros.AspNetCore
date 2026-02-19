@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Net;
+﻿using Kros.AspNetCore.Net;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Net.Http;
@@ -23,7 +22,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             using (HttpClient clientAuth = httpClientFactory.CreateClientWithAuthorization(httpContextAccessor))
             {
-                clientAuth.DefaultRequestHeaders.Authorization.ToString().Should().Be(httpContext.Request.Headers["Authorization"].ToString());
+                Assert.Equal(httpContext.Request.Headers["Authorization"].ToString(), clientAuth.DefaultRequestHeaders.Authorization.ToString());
             }
         }
     }

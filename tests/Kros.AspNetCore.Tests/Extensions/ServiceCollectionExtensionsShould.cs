@@ -1,7 +1,7 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System;
 using System.Net;
 using System.Net.Http;
 using Xunit;
@@ -31,7 +31,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             IOptions<TestOptions> options = provider.GetService<IOptions<TestOptions>>();
 
-            options.Value.Value.Should().Be(1);
+            Assert.Equal(1, options.Value.Value);
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             serviceCollection.SetProxy(configuration);
 
-            ((WebProxy)HttpClient.DefaultProxy).Address.Should().Be("http://example.com:1234");
+            Assert.Equal(new Uri("http://example.com:1234"), ((WebProxy)HttpClient.DefaultProxy).Address);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             serviceCollection.SetProxy(configuration);
 
-            ((WebProxy)HttpClient.DefaultProxy).BypassProxyOnLocal.Should().Be(true);
+            Assert.True(((WebProxy)HttpClient.DefaultProxy).BypassProxyOnLocal);
         }
 
         private static IConfiguration GetConfiguration()

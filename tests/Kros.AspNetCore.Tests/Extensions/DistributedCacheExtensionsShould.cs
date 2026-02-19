@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -28,7 +27,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             int value = await cache.GetAsync<int>("2", TestContext.Current.CancellationToken);
 
-            value.Should().Be(2);
+            Assert.Equal(2, value);
         }
 
         [Fact]
@@ -40,7 +39,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             Foo value = await cache.GetAsync<Foo>("foo", TestContext.Current.CancellationToken);
 
-            value.Value.Should().Be(2);
+            Assert.Equal(2, value.Value);
         }
 
         [Fact]
@@ -49,13 +48,13 @@ namespace Kros.AspNetCore.Tests.Extensions
             IDistributedCache cache = new MemoryDistributedCache();
 
             Foo foo = await cache.GetAsync<Foo>("foo", TestContext.Current.CancellationToken);
-            foo.Should().BeNull();
+            Assert.Null(foo);
 
             int? intValue = await cache.GetAsync<int?>("int", TestContext.Current.CancellationToken);
-            intValue.Should().BeNull();
+            Assert.Null(intValue);
 
             string stringValue = await cache.GetAsync<string>("string", TestContext.Current.CancellationToken);
-            stringValue.Should().BeNull();
+            Assert.Null(stringValue);
         }
 
         [Fact]
@@ -71,11 +70,11 @@ namespace Kros.AspNetCore.Tests.Extensions
             }
 
             Foo foo = await cache.GetAndSetAsync<Foo>("foo", func, options, TestContext.Current.CancellationToken);
-            foo.Value.Should().Be(2);
+            Assert.Equal(2, foo.Value);
 
             Foo foo2 = await cache.GetAndSetAsync<Foo>("foo", func, options, TestContext.Current.CancellationToken);
-            foo2.Should().BeEquivalentTo(foo);
-            callCount.Should().Be(1);
+            Assert.Equivalent(foo, foo2);
+            Assert.Equal(1, callCount);
         }
 
         internal class MemoryDistributedCache : IDistributedCache

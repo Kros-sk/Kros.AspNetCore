@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Configuration;
+﻿using Kros.AspNetCore.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
@@ -47,12 +46,12 @@ namespace Kros.AspNetCore.Tests.Configuration
             ServiceProvider provider = services.BuildServiceProvider();
             TestSettings settings = provider.GetRequiredService<TestSettings>();
 
-            settings.Should().NotBeNull();
-            settings.Should().BeEquivalentTo(new TestSettings
+            Assert.NotNull(settings);
+            Assert.Equivalent(new TestSettings
             {
                 StringValue = "Lorem Ipsum",
                 IntValue = 42
-            });
+            }, settings);
         }
 
         [Fact]
@@ -65,8 +64,8 @@ namespace Kros.AspNetCore.Tests.Configuration
 
             IValidatable settings = provider.GetRequiredService<IValidatable>();
 
-            settings.Should().NotBeNull();
-            settings.Should().BeOfType<ValidatableTestSettings>();
+            Assert.NotNull(settings);
+            Assert.IsType<ValidatableTestSettings>(settings);
         }
     }
 }

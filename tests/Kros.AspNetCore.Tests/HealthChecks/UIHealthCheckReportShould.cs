@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.HealthChecks;
+﻿using Kros.AspNetCore.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Collections.Generic;
@@ -51,7 +50,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         {
             UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(healthStatus));
 
-            uiReport.Status.Should().Be(healthStatus);
+            Assert.Equal(healthStatus, uiReport.Status);
         }
 
         [Fact]
@@ -59,7 +58,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         {
             UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(CreateHealthReport(HealthStatus.Healthy));
 
-            uiReport.TotalDuration.Seconds.Should().Be(5);
+            Assert.Equal(5, uiReport.TotalDuration.Seconds);
         }
 
         [Fact]
@@ -68,7 +67,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
             HealthReport healthReport = CreateHealthReport(HealthStatus.Healthy);
             UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(healthReport);
 
-            uiReport.Entries.Count.Should().Be(healthReport.Entries.Count);
+            Assert.Equal(healthReport.Entries.Count, uiReport.Entries.Count);
         }
 
         [Fact]
@@ -80,7 +79,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
             });
             UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(healthReport);
 
-            uiReport.Status.Should().Be(HealthStatus.Unhealthy);
+            Assert.Equal(HealthStatus.Unhealthy, uiReport.Status);
         }
 
         [Fact]
@@ -92,7 +91,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
             });
             UIHealthCheckReport uiReport = UIHealthCheckReport.CreateFrom(healthReport);
 
-            uiReport.Status.Should().Be(HealthStatus.Unhealthy);
+            Assert.Equal(HealthStatus.Unhealthy, uiReport.Status);
         }
     }
 }

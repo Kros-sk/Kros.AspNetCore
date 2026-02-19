@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.JsonPatch;
+﻿using Kros.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -16,8 +15,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Property1, "Value");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames();
-            columns.Should()
-                .BeEquivalentTo("Property1");
+            Assert.Equivalent(new[] { "Property1" }, columns);
         }
 
         [Fact]
@@ -28,8 +26,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Property2, "Value");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames();
-            columns.Should()
-                .BeEquivalentTo("Property1", "Property2");
+            Assert.Equivalent(new[] { "Property1", "Property2" }, columns);
         }
 
         [Fact]
@@ -39,8 +36,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames(new JsonPatchMapperConfig<Document>());
-            columns.Should()
-                .BeEquivalentTo("SupplierName");
+            Assert.Equivalent(new[] { "SupplierName" }, columns);
         }
 
         [Fact]
@@ -66,8 +62,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames();
-            columns.Should()
-                .BeEquivalentTo("SupplierCountry", "SupplierName");
+            Assert.Equivalent(new[] { "SupplierCountry", "SupplierName" }, columns);
         }
 
         [Fact]
@@ -89,8 +84,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames(config);
-            columns.Should()
-                .BeEquivalentTo("SupplierName");
+            Assert.Equivalent(new[] { "SupplierName" }, columns);
         }
 
         [Fact]
@@ -114,8 +108,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames(config);
-            columns.Should()
-                .BeEquivalentTo("SupplierCountry");
+            Assert.Equivalent(new[] { "SupplierCountry" }, columns);
         }
 
         [Fact]
@@ -128,8 +121,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             JsonPatchDocument<Document> deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
 
             IEnumerable<string> columns = deserialized.GetColumnsNames(new JsonPatchMapperConfig<Document>());
-            columns.Should()
-                .BeEquivalentTo("SupplierAddressCountry");
+            Assert.Equivalent(new[] { "SupplierAddressCountry" }, columns);
         }
 
         [Fact]
@@ -148,10 +140,8 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             IEnumerable<string> columns = deserialized.GetColumnsNames();
             IEnumerable<string> columns2 = deserialized2.GetColumnsNames();
 
-            columns.Should()
-                .BeEquivalentTo("PRoperty1");
-            columns2.Should()
-                .BeEquivalentTo("Property1");
+            Assert.Equivalent(new[] { "PRoperty1" }, columns);
+            Assert.Equivalent(new[] { "Property1" }, columns2);
         }
 
         #region Nested classes

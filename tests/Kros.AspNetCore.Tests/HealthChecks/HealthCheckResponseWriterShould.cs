@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.HealthChecks;
+﻿using Kros.AspNetCore.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Newtonsoft.Json;
@@ -38,9 +37,9 @@ namespace Kros.AspNetCore.Tests.HealthChecks
 
             UIHealthCheckReport uiHealthReport = JsonConvert.DeserializeObject<UIHealthCheckReport>(responseBody);
 
-            uiHealthReport.Status.Should().Be(HealthStatus.Healthy);
-            uiHealthReport.TotalDuration.Seconds.Should().Be(5);
-            uiHealthReport.Entries.Count.Should().Be(report.Entries.Count);
+            Assert.Equal(HealthStatus.Healthy, uiHealthReport.Status);
+            Assert.Equal(5, uiHealthReport.TotalDuration.Seconds);
+            Assert.Equal(report.Entries.Count, uiHealthReport.Entries.Count);
         }
     }
 }

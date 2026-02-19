@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace Kros.AspNetCore.Tests.Extensions
@@ -21,7 +20,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             IConfiguration configuration = GetConfiguration();
             TestOptions options = configuration.GetSection<TestOptions>();
 
-            options.Value.Should().Be(1);
+            Assert.Equal(1, options.Value);
         }
 
         [Fact]
@@ -30,7 +29,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             IConfiguration configuration = GetConfiguration();
             string[] allowedOrigins = configuration.GetAllowedOrigins();
 
-            allowedOrigins.Should().BeEquivalentTo("*");
+            Assert.Equivalent(new[] { "*" }, allowedOrigins);
         }
 
         private static IConfiguration GetConfiguration()
