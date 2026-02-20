@@ -101,9 +101,11 @@ public class SmtpEmailSender
 }
 ```
 ### ConfigurationBuilderExtensions
+
 Na pridanie Azure App Configuration slúži metóda `AddAzureAppConfiguration(HostBuilderContext)`.
 
 #### Príklad
+
 Konfigurácia obsahuje hodhoty:
 ```json
 {
@@ -168,6 +170,7 @@ app.UseGatewayJwtAuthorization();
 The authorization middleware supports two caching strategies:
 
 #### Memory Cache (Default)
+
 Uses in-memory caching. Cache is cleared on application restart.
 
 ```csharp
@@ -175,6 +178,7 @@ services.AddGatewayJwtAuthorization(configuration);
 ```
 
 #### Hybrid Cache
+
 Uses distributed caching with in-memory L1 cache. Tokens persist across application restarts.
 
 ```csharp
