@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.ApplicationInsights.Channel;
+﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -17,10 +16,9 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             initializer.Initialize(telemetry);
 
-            (telemetry as RequestTelemetry)
-                .Properties
-                .Should()
-                .ContainKeys("Header-Accept", "Header-Accept-Language", "Header-x-my-custom");
+            Assert.Contains("Header-Accept", (telemetry as RequestTelemetry).Properties.Keys);
+            Assert.Contains("Header-Accept-Language", (telemetry as RequestTelemetry).Properties.Keys);
+            Assert.Contains("Header-x-my-custom", (telemetry as RequestTelemetry).Properties.Keys);
         }
 
         [Fact]
@@ -31,10 +29,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             initializer.Initialize(telemetry);
 
-            (telemetry as RequestTelemetry)
-                .Properties
-                .Should()
-                .ContainKeys("Header-Accept-Language");
+            Assert.Contains("Header-Accept-Language", (telemetry as RequestTelemetry).Properties.Keys);
         }
 
         [Fact]
@@ -45,10 +40,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             initializer.Initialize(telemetry);
 
-            (telemetry as RequestTelemetry)
-                .Properties
-                .Should()
-                .ContainKeys("myprefix-Accept-Language-mysufix");
+            Assert.Contains("myprefix-Accept-Language-mysufix", (telemetry as RequestTelemetry).Properties.Keys);
         }
 
         private static HeadersTelemetryInitializer CreateInitializer(
@@ -68,15 +60,15 @@ namespace Kros.ApplicationInsights.Extensions.Tests
                 Microsoft.Extensions.Options.Options.Create(option));
         }
 
-        private static ITelemetry FakeTelemetry()
+        private static RequestTelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
         }
 
-        private static IHttpContextAccessor FakeHttpContextAccessor()
+        private static HttpContextAccessor FakeHttpContextAccessor()
         {
             DefaultHttpContext httpContext = new();
-            IHttpContextAccessor context = new HttpContextAccessor()
+            HttpContextAccessor context = new()
             {
                 HttpContext = httpContext
             };

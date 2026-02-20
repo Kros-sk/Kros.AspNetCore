@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.ApplicationInsights.DataContracts;
+﻿using Microsoft.ApplicationInsights.DataContracts;
 using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
@@ -17,7 +16,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         public void ReturnCorrectSequenceForRequestName(string name, string expectedSequence)
         {
             RequestTelemetry requestTelemetry = ProcessItems(name, "NotMatter");
-            requestTelemetry.Sequence.Should().Be(expectedSequence);
+            Assert.Equal(expectedSequence, requestTelemetry.Sequence);
         }
 
         [Theory]
@@ -30,7 +29,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         public void ReturnCorrectSequenceForUserAgent(string agentName, string expectedSequence)
         {
             RequestTelemetry requestTelemetry = ProcessItems("someRequests", agentName);
-            requestTelemetry.Sequence.Should().Be(expectedSequence);
+            Assert.Equal(expectedSequence, requestTelemetry.Sequence);
         }
 
         private static RequestTelemetry ProcessItems(string name, string agentName)

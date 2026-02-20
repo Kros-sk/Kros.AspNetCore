@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.ApplicationInsights.Channel;
+﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             initializer.Initialize(telemetry);
 
-            (telemetry as RequestTelemetry).Properties.Should().ContainKey("route_pattern");
+            Assert.Contains("route_pattern", (telemetry as RequestTelemetry).Properties.Keys);
         }
 
         [Fact]
@@ -29,17 +28,17 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             initializer.Initialize(telemetry);
 
-            (telemetry as RequestTelemetry).Properties.Should().NotContainKey("route_pattern");
+            Assert.DoesNotContain("route_pattern", (telemetry as RequestTelemetry).Properties.Keys);
         }
-        private static ITelemetry FakeTelemetry()
+        private static RequestTelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
         }
 
-        private static IHttpContextAccessor FakeHttpContextAccessor(bool addRoutePattern)
+        private static HttpContextAccessor FakeHttpContextAccessor(bool addRoutePattern)
         {
             DefaultHttpContext httpContext = new();
-            IHttpContextAccessor context = new HttpContextAccessor()
+            HttpContextAccessor context = new()
             {
                 HttpContext = httpContext
             };
