@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -24,11 +23,11 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
 
-            await cache.SetAsync("2", 2, new DistributedCacheEntryOptions());
+            await cache.SetAsync("2", 2, new DistributedCacheEntryOptions(), TestContext.Current.CancellationToken);
 
-            int value = await cache.GetAsync<int>("2");
+            int value = await cache.GetAsync<int>("2", TestContext.Current.CancellationToken);
 
-            value.Should().Be(2);
+            Assert.Equal(2, value);
         }
 
         [Fact]
@@ -36,11 +35,11 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
 
-            await cache.SetAsync("foo", new Foo() { Value = 2 }, new DistributedCacheEntryOptions());
+            await cache.SetAsync("foo", new Foo() { Value = 2 }, new DistributedCacheEntryOptions(), TestContext.Current.CancellationToken);
 
-            Foo value = await cache.GetAsync<Foo>("foo");
+            Foo value = await cache.GetAsync<Foo>("foo", TestContext.Current.CancellationToken);
 
-            value.Value.Should().Be(2);
+            Assert.Equal(2, value.Value);
         }
 
         [Fact]
@@ -48,14 +47,14 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             IDistributedCache cache = new MemoryDistributedCache();
 
-            Foo foo = await cache.GetAsync<Foo>("foo");
-            foo.Should().BeNull();
+            Foo foo = await cache.GetAsync<Foo>("foo", TestContext.Current.CancellationToken);
+            Assert.Null(foo);
 
-            int? intValue = await cache.GetAsync<int?>("int");
-            intValue.Should().BeNull();
+            int? intValue = await cache.GetAsync<int?>("int", TestContext.Current.CancellationToken);
+            Assert.Null(intValue);
 
-            string stringValue = await cache.GetAsync<string>("string");
-            stringValue.Should().BeNull();
+            string stringValue = await cache.GetAsync<string>("string", TestContext.Current.CancellationToken);
+            Assert.Null(stringValue);
         }
 
         [Fact]
@@ -70,12 +69,12 @@ namespace Kros.AspNetCore.Tests.Extensions
                 return new Foo() { Value = 2 };
             }
 
-            Foo foo = await cache.GetAndSetAsync<Foo>("foo", func, options);
-            foo.Value.Should().Be(2);
+            Foo foo = await cache.GetAndSetAsync<Foo>("foo", func, options, TestContext.Current.CancellationToken);
+            Assert.Equal(2, foo.Value);
 
-            Foo foo2 = await cache.GetAndSetAsync<Foo>("foo", func, options);
-            foo2.Should().BeEquivalentTo(foo);
-            callCount.Should().Be(1);
+            Foo foo2 = await cache.GetAndSetAsync<Foo>("foo", func, options, TestContext.Current.CancellationToken);
+            Assert.Equivalent(foo, foo2);
+            Assert.Equal(1, callCount);
         }
 
         internal class MemoryDistributedCache : IDistributedCache

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -23,10 +22,8 @@ namespace Kros.AspNetCore.Tests.Authorization
             JwtSecurityTokenHandler handler = new();
             JwtSecurityToken tokenS = handler.ReadToken(jwt) as JwtSecurityToken;
 
-            tokenS.Claims.First(claim => claim.Type == UserClaimTypes.Email).Value
-                .Should().Be("bob@bob.com");
-            tokenS.Claims.First(claim => claim.Type == UserClaimTypes.UserId).Value
-                .Should().Be("11");
+            Assert.Equal("bob@bob.com", tokenS.Claims.First(claim => claim.Type == UserClaimTypes.Email).Value);
+            Assert.Equal("11", tokenS.Claims.First(claim => claim.Type == UserClaimTypes.UserId).Value);
         }
 
         [Fact]
@@ -40,7 +37,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             string jwt2 = JwtAuthorizationHelper
                 .CreateJwtTokenFromClaims(claims2, "top_secreat_password_long_version", new DateTime(2200, 1, 1));
 
-            jwt1.Should().NotBe(jwt2);
+            Assert.NotEqual(jwt2, jwt1);
         }
 
         [Fact]
@@ -49,8 +46,8 @@ namespace Kros.AspNetCore.Tests.Authorization
             IHeaderDictionary headers = new HeaderDictionary();
             bool contains = JwtAuthorizationHelper.TryGetTokenValue(headers, out string token);
 
-            contains.Should().BeFalse();
-            token.Should().BeNull();
+            Assert.False(contains);
+            Assert.Null(token);
         }
 
         [Theory]
@@ -69,8 +66,8 @@ namespace Kros.AspNetCore.Tests.Authorization
             IHeaderDictionary headers = new HeaderDictionary();
             headers[HeaderNames.Authorization] = token;
             bool contains = JwtAuthorizationHelper.TryGetTokenValue(headers, out token, removePrefix);
-            contains.Should().Be(expectedContains);
-            token.Should().Be(expectedToken);
+            Assert.Equal(expectedContains, contains);
+            Assert.Equal(expectedToken, token);
         }
 
         private static IEnumerable<Claim> CreateClaims(int userId, string userEmail)

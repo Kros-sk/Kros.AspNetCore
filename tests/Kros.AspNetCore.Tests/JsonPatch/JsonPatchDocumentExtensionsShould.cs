@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.JsonPatch;
+﻿using Kros.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -16,8 +15,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Property1, "Value");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames();
-            columns.Should()
-                .BeEquivalentTo("Property1");
+            Assert.Equivalent(new[] { "Property1" }, columns);
         }
 
         [Fact]
@@ -28,25 +26,23 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace(p => p.Property2, "Value");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames();
-            columns.Should()
-                .BeEquivalentTo("Property1", "Property2");
+            Assert.Equivalent(new[] { "Property1", "Property2" }, columns);
         }
 
         [Fact]
         public void GetColumnsNamesForComplexTypeWithFlattening()
         {
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document1> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
-            IEnumerable<string> columns = jsonPatch.GetColumnsNames(new JsonPatchMapperConfig<Document>());
-            columns.Should()
-                .BeEquivalentTo("SupplierName");
+            IEnumerable<string> columns = jsonPatch.GetColumnsNames(JsonPatchMapperConfig<Document1>.NewConfig());
+            Assert.Equivalent(new[] { "SupplierName" }, columns);
         }
 
         [Fact]
         public void GetColumnsNamesForComplexTypeWithDefaultMapping()
         {
-            JsonPatchMapperConfig<Document>
+            JsonPatchMapperConfig<Document5>
                 .NewConfig()
                 .Map(src =>
                 {
@@ -61,19 +57,18 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document5> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames();
-            columns.Should()
-                .BeEquivalentTo("SupplierCountry", "SupplierName");
+            Assert.Equivalent(new[] { "SupplierCountry", "SupplierName" }, columns);
         }
 
         [Fact]
         public void NoMapProperties()
         {
-            JsonPatchMapperConfig<Document> config = new JsonPatchMapperConfig<Document>()
+            JsonPatchMapperConfig<Document2> config = JsonPatchMapperConfig<Document2>.NewConfig()
                 .Map(src =>
                 {
                     if (src.Contains("/Address/"))
@@ -84,19 +79,18 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document2> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
             jsonPatch.Replace(p => p.Supplier.Name, "Bob");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames(config);
-            columns.Should()
-                .BeEquivalentTo("SupplierName");
+            Assert.Equivalent(new[] { "SupplierName" }, columns);
         }
 
         [Fact]
         public void GetColumnsNamesForComplexTypeWithCustomMapping()
         {
-            JsonPatchMapperConfig<Document> config = new JsonPatchMapperConfig<Document>()
+            JsonPatchMapperConfig<Document3> config = JsonPatchMapperConfig<Document3>.NewConfig()
                 .Map(src =>
                 {
                     const string address = "/Address/";
@@ -110,12 +104,11 @@ namespace Kros.AspNetCore.Tests.JsonPatch
                     return src;
                 });
 
-            JsonPatchDocument<Document> jsonPatch = new();
+            JsonPatchDocument<Document3> jsonPatch = new();
             jsonPatch.Replace(p => p.Supplier.Address.Country, "Slovakia");
 
             IEnumerable<string> columns = jsonPatch.GetColumnsNames(config);
-            columns.Should()
-                .BeEquivalentTo("SupplierCountry");
+            Assert.Equivalent(new[] { "SupplierCountry" }, columns);
         }
 
         [Fact]
@@ -125,11 +118,10 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             jsonPatch.Replace("/supplier/address/country", "Slovakia");
 
             string serialized = JsonConvert.SerializeObject(jsonPatch);
-            JsonPatchDocument<Document> deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document>>(serialized);
+            JsonPatchDocument<Document4> deserialized = JsonConvert.DeserializeObject<JsonPatchDocument<Document4>>(serialized);
 
-            IEnumerable<string> columns = deserialized.GetColumnsNames(new JsonPatchMapperConfig<Document>());
-            columns.Should()
-                .BeEquivalentTo("SupplierAddressCountry");
+            IEnumerable<string> columns = deserialized.GetColumnsNames(JsonPatchMapperConfig<Document4>.NewConfig());
+            Assert.Equivalent(new[] { "SupplierAddressCountry" }, columns);
         }
 
         [Fact]
@@ -148,10 +140,8 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             IEnumerable<string> columns = deserialized.GetColumnsNames();
             IEnumerable<string> columns2 = deserialized2.GetColumnsNames();
 
-            columns.Should()
-                .BeEquivalentTo("PRoperty1");
-            columns2.Should()
-                .BeEquivalentTo("Property1");
+            Assert.Equivalent(new[] { "PRoperty1" }, columns);
+            Assert.Equivalent(new[] { "Property1" }, columns2);
         }
 
         #region Nested classes
@@ -159,7 +149,36 @@ namespace Kros.AspNetCore.Tests.JsonPatch
         public class Document
         {
             public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
 
+        public class Document1
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document2
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document3
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document4
+        {
+            public Partner Supplier { get; set; } = new Partner();
+            public IEnumerable<string> Items { get; set; }
+        }
+
+        public class Document5
+        {
+            public Partner Supplier { get; set; } = new Partner();
             public IEnumerable<string> Items { get; set; }
         }
 

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using NSubstitute;
 using Xunit;
@@ -14,7 +13,7 @@ namespace Kros.AspNetCore.Tests.Environments
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
             env.EnvironmentName.Returns(EnvironmentsEx.Test);
 
-            env.IsTest().Should().BeTrue();
+            Assert.True(env.IsTest());
         }
 
         [Fact]
@@ -22,7 +21,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
             env.EnvironmentName.Returns(Microsoft.Extensions.Hosting.Environments.Development);
-            env.IsTest().Should().BeFalse();
+            Assert.False(env.IsTest());
         }
 
         [Fact]
@@ -30,7 +29,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
             env.EnvironmentName.Returns(Microsoft.Extensions.Hosting.Environments.Development);
-            env.IsTestOrDevelopment().Should().BeTrue();
+            Assert.True(env.IsTestOrDevelopment());
         }
 
         [Fact]
@@ -38,7 +37,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
             env.EnvironmentName.Returns(Microsoft.Extensions.Hosting.Environments.Staging);
-            env.IsTestOrDevelopment().Should().BeFalse();
+            Assert.False(env.IsTestOrDevelopment());
         }
 
         [Fact]
@@ -46,7 +45,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
             env.EnvironmentName.Returns(Microsoft.Extensions.Hosting.Environments.Staging);
-            env.IsStagingOrProduction().Should().BeTrue();
+            Assert.True(env.IsStagingOrProduction());
         }
 
         [Fact]
@@ -54,7 +53,7 @@ namespace Kros.AspNetCore.Tests.Environments
         {
             IWebHostEnvironment env = Substitute.For<IWebHostEnvironment>();
             env.EnvironmentName.Returns(EnvironmentsEx.Test);
-            env.IsStagingOrProduction().Should().BeFalse();
+            Assert.False(env.IsStagingOrProduction());
         }
     }
 }

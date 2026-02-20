@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Version>6.0.0</Version>
+    <Version>6.1.0</Version>
     <Description>General utilities and helpers for building ASP.NET Core WEB API</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
@@ -21,8 +21,8 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Uris" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" />
-    <PackageReference Include="IdentityServer4.AccessTokenValidation" />
     <PackageReference Include="Kros.Utils" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" />

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Kros.AspNetCore.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -17,7 +16,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             HttpContext context = CreateHttpContext();
             ClientCredentialsAuthorizationMiddleware middleware = CreateMiddleware();
             Func<Task> funcInvoke = async () => await middleware.Invoke(context);
-            await funcInvoke.Should().ThrowAsync<UnauthorizedAccessException>();
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(funcInvoke);
         }
 
         [Theory]
@@ -28,7 +27,7 @@ namespace Kros.AspNetCore.Tests.Authorization
             HttpContext context = CreateHttpContext(authHeader);
             ClientCredentialsAuthorizationMiddleware middleware = CreateMiddleware();
             Func<Task> funcInvoke = async () => await middleware.Invoke(context);
-            await funcInvoke.Should().ThrowAsync<Exception>();
+            await Assert.ThrowsAnyAsync<Exception>(funcInvoke);
         }
 
         private static ClientCredentialsAuthorizationMiddleware CreateMiddleware()

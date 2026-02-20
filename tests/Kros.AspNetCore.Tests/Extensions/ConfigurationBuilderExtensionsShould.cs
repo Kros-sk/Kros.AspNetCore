@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Extensions;
+﻿using Kros.AspNetCore.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +30,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             };
             expectedAppConfig.Settings.AddRange(new[] { "Example1", "Example2" });
 
-            actualAppConfig.Should().BeEquivalentTo(expectedAppConfig);
+            Assert.Equivalent(expectedAppConfig, actualAppConfig);
         }
 
         [Fact]
@@ -50,7 +49,7 @@ namespace Kros.AspNetCore.Tests.Extensions
                 SentinelKey = ""
             };
 
-            actualAppConfig.Should().BeEquivalentTo(expectedAppConfig);
+            Assert.Equivalent(expectedAppConfig, actualAppConfig);
         }
 
         [Fact]
@@ -65,7 +64,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             config.AddAzureAppConfig(builderContext);
 
-            config.Sources.Count.Should().Be(2);
+            Assert.Equal(2, config.Sources.Count);
         }
 
         [Fact]
@@ -76,7 +75,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             config.AddAzureAppConfig(builderContext);
 
-            config.Sources.Count.Should().Be(0);
+            Assert.Empty(config.Sources);
         }
 
         [Fact]
@@ -90,7 +89,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             config.AddAzureAppConfig("Development");
 
-            config.Sources.Count.Should().Be(2);
+            Assert.Equal(2, config.Sources.Count);
         }
 
         [Fact]
@@ -100,7 +99,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             config.AddAzureAppConfig("Development");
 
-            config.Sources.Count.Should().Be(0);
+            Assert.Empty(config.Sources);
         }
 
         #endregion
@@ -122,7 +121,7 @@ namespace Kros.AspNetCore.Tests.Extensions
             };
             expectedKv.Prefixes.AddRange(new[] { "Example1", "Example2" });
 
-            actualKv.Should().BeEquivalentTo(expectedKv);
+            Assert.Equivalent(expectedKv, actualKv);
         }
 
         [Fact]
@@ -138,7 +137,7 @@ namespace Kros.AspNetCore.Tests.Extensions
                 IdentityClientId = string.Empty
             };
 
-            actualKv.Should().BeEquivalentTo(expectedKv);
+            Assert.Equivalent(expectedKv, actualKv);
         }
 
         [Theory]
@@ -156,7 +155,7 @@ namespace Kros.AspNetCore.Tests.Extensions
                 }
             });
 
-            cfgBuilder.Sources.Should().HaveCount(1);
+            Assert.Single(cfgBuilder.Sources);
         }
 
         [Theory]
@@ -174,7 +173,7 @@ namespace Kros.AspNetCore.Tests.Extensions
                 }
             });
 
-            cfgBuilder.Sources.Should().HaveCount(0);
+            Assert.Empty(cfgBuilder.Sources);
         }
 
         #endregion

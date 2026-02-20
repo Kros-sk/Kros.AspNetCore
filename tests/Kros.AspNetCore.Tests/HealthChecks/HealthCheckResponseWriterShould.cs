@@ -1,11 +1,11 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.HealthChecks;
+﻿using Kros.AspNetCore.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Kros.AspNetCore.Tests.HealthChecks
@@ -23,7 +23,7 @@ namespace Kros.AspNetCore.Tests.HealthChecks
         }
 
         [Fact]
-        public async void WriteToHttpResponse()
+        public async Task WriteToHttpResponse()
         {
             HealthReport report = CreateHealthReport(HealthStatus.Healthy);
 
@@ -35,11 +35,12 @@ namespace Kros.AspNetCore.Tests.HealthChecks
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             string responseBody = new StreamReader(context.Response.Body).ReadToEnd();
 
-            UIHealthCheckReport uiHealthReport = JsonConvert.DeserializeObject<UIHealthCheckReport>(responseBody);
+            UIHealthCheckReport uiHealthReport = JsonSerializer.Deserialize<UIHealthCheckReport>(responseBody,
+                HealthCheckResponseWriter._serializeOptions);
 
-            uiHealthReport.Status.Should().Be(HealthStatus.Healthy);
-            uiHealthReport.TotalDuration.Seconds.Should().Be(5);
-            uiHealthReport.Entries.Count.Should().Be(report.Entries.Count);
+            Assert.Equal(HealthStatus.Healthy, uiHealthReport.Status);
+            Assert.Equal(5, uiHealthReport.TotalDuration.Seconds);
+            Assert.Equal(report.Entries.Count, uiHealthReport.Entries.Count);
         }
     }
 }

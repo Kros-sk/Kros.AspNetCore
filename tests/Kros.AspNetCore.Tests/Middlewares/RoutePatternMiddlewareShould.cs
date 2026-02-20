@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Middlewares;
+﻿using Kros.AspNetCore.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
@@ -31,14 +30,9 @@ namespace Kros.AspNetCore.Tests.Middlewares
 
             Func<Task> action = async () => await middleware.InvokeAsync(context);
 
-            await action.Should().ThrowAsync<NullReferenceException>();
-            context.
-                User.
-                Claims.
-                FirstOrDefault(c => c.Type == "route_pattern").
-                Value.
-                Should().
-                Be("POST weather/{town}");
+            await Assert.ThrowsAsync<NullReferenceException>(action);
+            string routePatternValue = context.User.Claims.FirstOrDefault(c => c.Type == "route_pattern")?.Value;
+            Assert.Equal("POST weather/{town}", routePatternValue);
         }
 
         [Fact]
@@ -53,14 +47,9 @@ namespace Kros.AspNetCore.Tests.Middlewares
 
             Func<Task> action = async () => await middleware.InvokeAsync(context);
 
-            await action.Should().ThrowAsync<NullReferenceException>();
-            context.
-                User.
-                Claims.
-                FirstOrDefault(c => c.Type == "route_pattern").
-                Value.
-                Should().
-                Be("POST");
+            await Assert.ThrowsAsync<NullReferenceException>(action);
+            string routePatternValue = context.User.Claims.FirstOrDefault(c => c.Type == "route_pattern")?.Value;
+            Assert.Equal("POST", routePatternValue);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using System;
+﻿using System;
 using Xunit;
 
 namespace Kros.AspNetCore.Tests
@@ -29,9 +28,7 @@ namespace Kros.AspNetCore.Tests
         [MemberData(nameof(GetSectionName_TestData))]
         public void GetSectionName(Type tOptions, string expectedSectionName)
         {
-            Helpers.GetSectionName(tOptions)
-                .Should()
-                .Be(expectedSectionName);
+            Assert.Equal(expectedSectionName, Helpers.GetSectionName(tOptions));
         }
 
         public static TheoryData<Type, string> GetSectionName_TestData()

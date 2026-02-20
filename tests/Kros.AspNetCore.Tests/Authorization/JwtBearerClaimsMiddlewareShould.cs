@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
@@ -49,8 +48,8 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             await middleware.Invoke(context);
 
-            context.User.HasClaim("test", "testvalue").Should().BeTrue();
-            context.User.HasClaim("test2", "testvalue2").Should().BeTrue();
+            Assert.True(context.User.HasClaim("test", "testvalue"));
+            Assert.True(context.User.HasClaim("test2", "testvalue2"));
         }
 
         private static string CreateJwtToken(params (string Key, string Value)[] claims)

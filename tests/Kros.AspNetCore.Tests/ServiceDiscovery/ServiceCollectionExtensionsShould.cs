@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authentication;
+﻿using Kros.AspNetCore.Authentication;
 using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,7 +27,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
                 .BuildServiceProvider()
                 .GetService<IServiceDiscoveryProvider>();
 
-            provider.Should().NotBeNull();
+            Assert.NotNull(provider);
         }
 
         [Fact]
@@ -37,7 +36,7 @@ namespace Kros.AspNetCore.ServiceDiscovery
             ServiceCollection serviceCollection = new();
             serviceCollection.AddApiJwtAuthentication(new string[] { JwtAuthorizationHelper.JwtSchemeName }, GetConfiguration());
             serviceCollection.AddLogging();
-            serviceCollection.BuildServiceProvider().GetServices<JwtBearerHandler>().Count().Should().Be(1);
+            Assert.Single(serviceCollection.BuildServiceProvider().GetServices<JwtBearerHandler>());
         }
 
         [Fact]
@@ -48,26 +47,25 @@ namespace Kros.AspNetCore.ServiceDiscovery
                 new string[] { JwtAuthorizationHelper.JwtSchemeName, JwtAuthorizationHelper.HashJwtSchemeName },
                 GetConfiguration());
             serviceCollection.AddLogging();
-            serviceCollection.BuildServiceProvider().GetServices<JwtBearerHandler>().Count().Should().Be(2);
+            Assert.Equal(2, serviceCollection.BuildServiceProvider().GetServices<JwtBearerHandler>().Count());
         }
 
         [Fact]
         public void AddApiJwtAuthenticationRequiresAtLeastOneScheme()
         {
             ServiceCollection serviceCollection = new();
-            serviceCollection.Invoking(sc => sc.AddApiJwtAuthentication(Array.Empty<string>(), GetConfiguration()))
-                .Should().Throw<ArgumentException>();
+            Assert.Throws<ArgumentException>(() => serviceCollection.AddApiJwtAuthentication(Array.Empty<string>(), GetConfiguration()));
         }
 
         [Fact]
         public void AddApiJwtAuthenticationIgnoresUnconfiguredSchemes()
         {
             ServiceCollection serviceCollection = new();
-            serviceCollection.Invoking(sc => sc.AddApiJwtAuthentication(new string[] { "unknown" }, GetConfiguration()))
-                .Should().Throw<ArgumentException>();
+            Assert.Throws<ArgumentException>(() => serviceCollection.AddApiJwtAuthentication(new string[] { "unknown" }, GetConfiguration()));
         }
 
         [Fact]
+        [Obsolete("AddApiKeyBasicAuthentication is obsolete.")]
         public async Task AddSingleApiKeyBasicAuthentication()
         {
             ServiceCollection serviceCollection = new();
@@ -75,8 +73,8 @@ namespace Kros.AspNetCore.ServiceDiscovery
             IAuthenticationSchemeProvider schemeProvider = serviceCollection.BuildServiceProvider()
                 .GetRequiredService<IAuthenticationSchemeProvider>();
             AuthenticationScheme scheme = await schemeProvider.GetSchemeAsync("Basic.ApiKey");
-            scheme.Should().NotBeNull();
-            scheme.HandlerType.Name.Should().Be(typeof(ApiKeyBasicAuthenticationHandler).Name);
+            Assert.NotNull(scheme);
+            Assert.Equal(typeof(ApiKeyBasicAuthenticationHandler).Name, scheme.HandlerType.Name);
         }
 
         [Fact]
@@ -88,23 +86,31 @@ namespace Kros.AspNetCore.ServiceDiscovery
                 .GetRequiredService<IAuthenticationSchemeProvider>();
 
             AuthenticationScheme scheme = await schemeProvider.GetSchemeAsync("Basic.ApiKey");
-            scheme.Should().NotBeNull();
-            scheme.HandlerType.Name.Should().Be(typeof(ApiKeyBasicAuthenticationHandler).Name);
+            Assert.NotNull(scheme);
+            Assert.Equal(typeof(ApiKeyBasicAuthenticationHandler).Name, scheme.HandlerType.Name);
 
             AuthenticationScheme anotherScheme = await schemeProvider.GetSchemeAsync("Another.ApiKey");
-            anotherScheme.Should().NotBeNull();
-            anotherScheme.HandlerType.Name.Should().Be(typeof(ApiKeyBasicAuthenticationHandler).Name);
+            Assert.NotNull(anotherScheme);
+            Assert.Equal(typeof(ApiKeyBasicAuthenticationHandler).Name, anotherScheme.HandlerType.Name);
         }
 
         [Fact]
+        [Obsolete("AddApiKeyBasicAuthentication is obsolete.")]
         public void ThrowOnAddApiKeyBasicAuthenticationWithoutConfig()
         {
             ServiceCollection serviceCollection = new();
             IConfigurationRoot config = new ConfigurationBuilder().Build();
-            serviceCollection.AddAuthentication().Invoking(builder => builder.AddApiKeyBasicAuthentication(config))
-                .Should().Throw<ArgumentNullException>();
-            serviceCollection.AddAuthentication().Invoking(builder => builder.AddApiKeyBasicAuthenticationSchemes(config))
-                .Should().Throw<ArgumentNullException>();
+            AuthenticationBuilder builder = serviceCollection.AddAuthentication();
+            Assert.Throws<ArgumentNullException>(() => builder.AddApiKeyBasicAuthentication(config));
+        }
+
+        [Fact]
+        public void ThrowOnAddApiKeyBasicAuthenticationSchemesWithoutConfig()
+        {
+            ServiceCollection serviceCollection = new();
+            IConfigurationRoot config = new ConfigurationBuilder().Build();
+            AuthenticationBuilder builder = serviceCollection.AddAuthentication();
+            Assert.Throws<ArgumentNullException>(() => builder.AddApiKeyBasicAuthenticationSchemes(config));
         }
 
         private static IConfiguration GetConfiguration()

@@ -1,5 +1,4 @@
 ﻿using Azure.Security.KeyVault.Secrets;
-using FluentAssertions;
 using Kros.AspNetCore.Extensions;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         public void ThrowArgumentExceptionIfPrefixNotSet(string prefix)
         {
             Func<PrefixKeyVaultSecretManager> action = () => new PrefixKeyVaultSecretManager(prefix);
-            action.Should().Throw<ArgumentException>();
+            Assert.ThrowsAny<ArgumentException>(action);
         }
 
         [Theory]
@@ -25,7 +24,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         public void ThrowArgumentExceptionIfNoValidPrefix(IEnumerable<string> prefix)
         {
             Func<PrefixKeyVaultSecretManager> action = () => new PrefixKeyVaultSecretManager(prefix);
-            action.Should().Throw<ArgumentException>();
+            Assert.ThrowsAny<ArgumentException>(action);
         }
 
         public static TheoryData<IEnumerable<string>> ThrowArgumentExceptionIfNoValidPrefix_Data()
@@ -51,7 +50,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             PrefixKeyVaultSecretManager manager = CreateManager();
             SecretProperties secret = new(secretName);
-            manager.Load(secret).Should().Be(loadIt);
+            Assert.Equal(loadIt, manager.Load(secret));
         }
 
         [Theory]
@@ -67,15 +66,15 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             PrefixKeyVaultSecretManager manager = CreateManager();
             KeyVaultSecret secret = new(secretName, string.Empty);
-            manager.GetKey(secret).Should().Be(configKey);
+            Assert.Equal(configKey, manager.GetKey(secret));
         }
 
         [Fact]
         public void ThrowWhenPrefixIsInvalid()
         {
             Func<PrefixKeyVaultSecretManager> action = () => new PrefixKeyVaultSecretManager("invalid-prefix");
-            action.Should().Throw<ArgumentException>()
-                .WithMessage("*invalid-prefix*");
+            ArgumentException exception = Assert.Throws<ArgumentException>(action);
+            Assert.Contains("invalid-prefix", exception.Message);
         }
 
         [Fact]
@@ -83,8 +82,8 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             Func<PrefixKeyVaultSecretManager> action = () => new PrefixKeyVaultSecretManager(
                 new[] { "validPrefix1", "validPrefix2", "invalid-prefix", "validPrefix3" });
-            action.Should().Throw<ArgumentException>()
-                .WithMessage("*invalid-prefix*");
+            ArgumentException exception = Assert.Throws<ArgumentException>(action);
+            Assert.Contains("invalid-prefix", exception.Message);
         }
 
         private static PrefixKeyVaultSecretManager CreateManager() => new(new[] { "Lorem", "DOLOR" });

@@ -1,5 +1,4 @@
-using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Kros.AspNetCore.Exceptions;
 using Kros.AspNetCore.ServiceDiscovery;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +28,7 @@ public class ApiJwtTokenProviderShould
 
         string result = await provider.GetJwtTokenAsync(token);
 
-        result.Should().Be(JwtToken);
+        Assert.Equal(JwtToken, result);
     }
 
     [Fact]
@@ -40,7 +39,7 @@ public class ApiJwtTokenProviderShould
 
         string result = await provider.GetJwtTokenForHashAsync(hashValue);
 
-        result.Should().Be(HashJwtToken);
+        Assert.Equal(HashJwtToken, result);
     }
 
     [Theory]
@@ -115,9 +114,9 @@ public class ApiJwtTokenProviderShould
 
         string result = await provider.GetJwtTokenAsync("access_token");
 
-        result.Should().Be(JwtToken);
-        httpClient.DefaultRequestHeaders.Contains("ApplicationType").Should().BeTrue();
-        httpClient.DefaultRequestHeaders.GetValues("ApplicationType").Should().Contain("25");
+        Assert.Equal(JwtToken, result);
+        Assert.True(httpClient.DefaultRequestHeaders.Contains("ApplicationType"));
+        Assert.Contains("25", httpClient.DefaultRequestHeaders.GetValues("ApplicationType"));
     }
 
     private static ApiJwtTokenProvider CreateProvider(

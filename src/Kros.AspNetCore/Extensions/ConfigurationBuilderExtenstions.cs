@@ -149,7 +149,7 @@ namespace Kros.AspNetCore.Extensions
                     }
                     if (appConfig.RefreshInterval > TimeSpan.Zero)
                     {
-                        config.SetCacheExpiration(appConfig.RefreshInterval);
+                        config.SetRefreshInterval(appConfig.RefreshInterval);
                     }
                     refreshConfiguration?.Invoke(config);
                 });
@@ -180,7 +180,6 @@ namespace Kros.AspNetCore.Extensions
                 credentialOptions.ExcludeAzureCliCredential = true;
                 credentialOptions.ExcludeEnvironmentCredential = true;
                 credentialOptions.ExcludeInteractiveBrowserCredential = true;
-                credentialOptions.ExcludeSharedTokenCacheCredential = true;
                 credentialOptions.ExcludeVisualStudioCodeCredential = true;
                 credentialOptions.ExcludeVisualStudioCredential = true;
             }

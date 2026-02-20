@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authentication;
+﻿using Kros.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -45,8 +44,8 @@ namespace Kros.AspNetCore.Tests.Authentication
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
-            result.Succeeded.Should().BeFalse();
-            result.None.Should().BeTrue();
+            Assert.False(result.Succeeded);
+            Assert.True(result.None);
         }
 
         [Fact]
@@ -59,8 +58,8 @@ namespace Kros.AspNetCore.Tests.Authentication
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
-            result.Succeeded.Should().BeFalse();
-            result.None.Should().BeTrue();
+            Assert.False(result.Succeeded);
+            Assert.True(result.None);
         }
 
         [Fact]
@@ -73,8 +72,8 @@ namespace Kros.AspNetCore.Tests.Authentication
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
-            result.Succeeded.Should().BeFalse();
-            result.Failure.Should().NotBeNull();
+            Assert.False(result.Succeeded);
+            Assert.NotNull(result.Failure);
         }
 
         [Fact]
@@ -87,9 +86,9 @@ namespace Kros.AspNetCore.Tests.Authentication
                 context);
             AuthenticateResult result = await _handler.AuthenticateAsync();
 
-            result.Succeeded.Should().BeTrue();
-            result.None.Should().BeFalse();
-            result.Failure.Should().BeNull();
+            Assert.True(result.Succeeded);
+            Assert.False(result.None);
+            Assert.Null(result.Failure);
         }
     }
 }

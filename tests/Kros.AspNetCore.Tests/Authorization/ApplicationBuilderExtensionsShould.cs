@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -46,10 +45,8 @@ namespace Kros.AspNetCore.Tests.Authorization
 
             Action action = () => builder.UseGatewayJwtAuthorization(config);
 
-            action
-                .Should()
-                .Throw<InvalidOperationException>()
-                .WithMessage("*GatewayJwtAuthorization*");
+            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(action);
+            Assert.Contains("GatewayJwtAuthorization", exception.Message);
         }
 
         private static IConfiguration GetConfiguration(Dictionary<string, string> values) =>

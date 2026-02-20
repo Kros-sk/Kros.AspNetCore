@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using System.Security.Claims;
 using Xunit;
 
@@ -14,8 +13,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             ClaimsPrincipal user = CreateUser();
 
-            user.GetUserId()
-                .Should().Be(22);
+            Assert.Equal(22, user.GetUserId());
         }
 
         [Fact]
@@ -23,8 +21,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             ClaimsPrincipal user = CreateUser();
 
-            user.GetUserEmail()
-                .Should().Be("bob@gmail.com");
+            Assert.Equal("bob@gmail.com", user.GetUserEmail());
         }
 
         [Fact]
@@ -32,8 +29,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             ClaimsPrincipal user = new();
 
-            user.GetUserId()
-                .Should().Be(0);
+            Assert.Equal(0, user.GetUserId());
         }
 
         [Fact]
@@ -41,8 +37,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             ClaimsPrincipal user = new();
 
-            user.GetUserEmail()
-                .Should().BeEmpty();
+            Assert.Empty(user.GetUserEmail());
         }
 
         [Fact]
@@ -50,8 +45,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             ClaimsPrincipal user = CreateUser();
 
-            user.GetValueFromUserClaims(CustomClaim)
-                .Should().Be("something");
+            Assert.Equal("something", user.GetValueFromUserClaims(CustomClaim));
         }
 
         [Fact]
@@ -59,8 +53,7 @@ namespace Kros.AspNetCore.Tests.Authorization
         {
             ClaimsPrincipal user = new();
 
-            user.GetValueFromUserClaims(CustomClaim)
-                .Should().Be(string.Empty);
+            Assert.Equal(string.Empty, user.GetValueFromUserClaims(CustomClaim));
         }
 
         private static ClaimsPrincipal CreateUser()

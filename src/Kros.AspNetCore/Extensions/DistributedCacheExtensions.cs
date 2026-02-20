@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.Caching.Distributed
             T value,
             DistributedCacheEntryOptions options,
             CancellationToken token = default)
-           => await distributedCache.SetStringAsync(key, JsonConvert.SerializeObject(value), options, token);
+            => await distributedCache.SetStringAsync(key, JsonSerializer.Serialize(value), options, token);
 
         /// <summary>
         /// Gets value from the specified cache with the specified <paramref name="key"/>.
@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.Caching.Distributed
         {
             string result = await distributedCache.GetStringAsync(key, token);
 
-            return string.IsNullOrWhiteSpace(result) ? default : JsonConvert.DeserializeObject<T>(result);
+            return string.IsNullOrWhiteSpace(result) ? default : JsonSerializer.Deserialize<T>(result);
         }
 
         /// <summary>

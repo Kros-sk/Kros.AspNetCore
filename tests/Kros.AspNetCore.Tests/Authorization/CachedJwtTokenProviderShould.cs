@@ -1,5 +1,4 @@
-using FluentAssertions;
-using Kros.AspNetCore.Authorization;
+﻿using Kros.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using NSubstitute;
@@ -19,7 +18,7 @@ public class CachedJwtTokenProviderShould
     {
         string cacheKey = "cache_key";
         string token = "access_token";
-        
+
         ICacheService cacheService = Substitute.For<ICacheService>();
         IJwtTokenProvider innerProvider = Substitute.For<IJwtTokenProvider>();
         ICacheKeyBuilder cacheKeyBuilder = Substitute.For<ICacheKeyBuilder>();
@@ -32,7 +31,7 @@ public class CachedJwtTokenProviderShould
 
         string result = await provider.GetJwtTokenAsync(token);
 
-        result.Should().Be(CachedToken);
+        Assert.Equal(CachedToken, result);
     }
 
     [Fact]
@@ -50,11 +49,10 @@ public class CachedJwtTokenProviderShould
         cacheKeyBuilder.BuildHashCacheKey(hashValue).Returns(cacheKey);
 
         CachedJwtTokenProvider provider = CreateProvider(cacheService, innerProvider, cacheKeyBuilder);
-    
 
         string result = await provider.GetJwtTokenForHashAsync(hashValue);
 
-        result.Should().Be(CachedToken);
+        Assert.Equal(CachedToken, result);
     }
 
     [Fact]
@@ -64,7 +62,7 @@ public class CachedJwtTokenProviderShould
         ICacheService cacheService = Substitute.For<ICacheService>();
         IJwtTokenProvider innerProvider = Substitute.For<IJwtTokenProvider>();
         ICacheKeyBuilder cacheKeyBuilder = Substitute.For<ICacheKeyBuilder>();
-        
+
         innerProvider.GetJwtTokenAsync(token).Returns(JwtToken);
 
         GatewayJwtAuthorizationOptions options = new()
@@ -77,7 +75,7 @@ public class CachedJwtTokenProviderShould
 
         string result = await provider.GetJwtTokenAsync(token);
 
-        result.Should().Be(JwtToken);
+        Assert.Equal(JwtToken, result);
         await cacheService.DidNotReceive().GetOrCreateAsync(Arg.Any<string>(), Arg.Any<Func<Task<string>>>());
     }
 
@@ -106,7 +104,7 @@ public class CachedJwtTokenProviderShould
 
         string result = await provider.GetJwtTokenAsync(token);
 
-        result.Should().Be(JwtToken);
+        Assert.Equal(JwtToken, result);
         await cacheService.DidNotReceive().GetOrCreateAsync(Arg.Any<string>(), Arg.Any<Func<Task<string>>>());
     }
 

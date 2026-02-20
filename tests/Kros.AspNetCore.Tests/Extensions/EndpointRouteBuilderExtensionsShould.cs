@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Kros.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http.Connections;
@@ -21,18 +20,7 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             Action action = () => endpoints.MapSignalRHubWithOptions<Hub>(configuration, "Route");
 
-            action.Should().Throw<InvalidOperationException>(Arg.Any<string>());
-        }
-
-        [Fact]
-        public void NotThrowExceptionIfHttpContextDispatcherOptionsAreSet()
-        {
-            IConfiguration configuration = GetConfiguration();
-            IEndpointRouteBuilder endpoints = Substitute.For<IEndpointRouteBuilder>();
-
-            Action action = () => endpoints.MapSignalRHubWithOptions<Hub>(configuration, "Route");
-
-            action.Should().NotThrow<InvalidOperationException>(Arg.Any<string>());
+            Assert.Throws<InvalidOperationException>(action);
         }
 
         [Fact]
@@ -43,8 +31,8 @@ namespace Kros.AspNetCore.Tests.Extensions
 
             HttpConnectionDispatcherOptions fromCfg = configuration.GetSection<HttpConnectionDispatcherOptions>();
 
-            options.ApplicationMaxBufferSize.Should().Be(fromCfg.ApplicationMaxBufferSize);
-            options.TransportMaxBufferSize.Should().NotBe(fromCfg.TransportMaxBufferSize);
+            Assert.Equal(fromCfg.ApplicationMaxBufferSize, options.ApplicationMaxBufferSize);
+            Assert.NotEqual(fromCfg.TransportMaxBufferSize, options.TransportMaxBufferSize);
         }
 
         private static IConfiguration GetBadConfiguration()

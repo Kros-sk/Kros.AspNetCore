@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Configuration;
+﻿using Kros.AspNetCore.Configuration;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Xunit;
@@ -30,7 +29,7 @@ namespace Kros.AspNetCore.Tests.Configuration
 
             Action action = () => settings.Validate();
 
-            action.Should().Throw<ValidationException>();
+            Assert.Throws<ValidationException>(action);
         }
 
         [Theory]
@@ -39,7 +38,8 @@ namespace Kros.AspNetCore.Tests.Configuration
         {
             Action action = () => settings.Validate();
 
-            action.Should().NotThrow();
+            Exception exception = Record.Exception(action);
+            Assert.Null(exception);
         }
 
         public static TheoryData<IValidatable> ValidateMustNotThrowIfSettingsAreCorrect_Data()

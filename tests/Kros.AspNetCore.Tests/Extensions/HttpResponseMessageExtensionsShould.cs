@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Exceptions;
+﻿using Kros.AspNetCore.Exceptions;
 using Kros.AspNetCore.Extensions;
 using System;
 using System.Net;
@@ -15,7 +14,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.Forbidden };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<ResourceIsForbiddenException>();
+            Assert.Throws<ResourceIsForbiddenException>(act);
         }
 
         [Fact]
@@ -23,7 +22,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.PaymentRequired };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<PaymentRequiredException>();
+            Assert.Throws<PaymentRequiredException>(act);
         }
 
         [Fact]
@@ -31,7 +30,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.NotFound };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<NotFoundException>();
+            Assert.Throws<NotFoundException>(act);
         }
 
         [Fact]
@@ -39,7 +38,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.Unauthorized };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<UnauthorizedAccessException>();
+            Assert.Throws<UnauthorizedAccessException>(act);
         }
 
         [Fact]
@@ -52,7 +51,8 @@ namespace Kros.AspNetCore.Tests.Extensions
             };
 
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<BadRequestException>().WithMessage("Bad request reason");
+            BadRequestException exception = Assert.Throws<BadRequestException>(act);
+            Assert.Contains("Bad request reason", exception.Message);
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.Conflict };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<RequestConflictException>();
+            Assert.Throws<RequestConflictException>(act);
         }
 
         [Fact]
@@ -68,7 +68,8 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.InsufficientStorage };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().ThrowExactly<UnknownStatusCodeException>().WithMessage($"*{(int)HttpStatusCode.InsufficientStorage}*");
+            UnknownStatusCodeException exception = Assert.Throws<UnknownStatusCodeException>(act);
+            Assert.Contains(((int)HttpStatusCode.InsufficientStorage).ToString(), exception.Message);
         }
 
         [Fact]
@@ -76,7 +77,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.InsufficientStorage };
             Action act = () => response.ThrowIfNotSuccessStatusCode(new WebException());
-            act.Should().ThrowExactly<WebException>();
+            Assert.Throws<WebException>(act);
         }
 
         [Fact]
@@ -84,7 +85,8 @@ namespace Kros.AspNetCore.Tests.Extensions
         {
             HttpResponseMessage response = new() { StatusCode = HttpStatusCode.OK };
             Action act = () => response.ThrowIfNotSuccessStatusCode();
-            act.Should().NotThrow();
+            Exception exception = Record.Exception(act);
+            Assert.Null(exception);
         }
     }
 }
