@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace Kros.MediatR.Extensions.Tests
 
             IEnumerable<Assembly> assemblies = config.GetRequestAssemblies();
 
-            assemblies.Should().HaveCount(2);
+            Assert.Equal(2, assemblies.Count());
         }
     }
 }

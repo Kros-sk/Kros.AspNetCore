@@ -1,8 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.ApplicationInsights.DataContracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.ApplicationInsights.DataContracts;
 using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
@@ -14,7 +10,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         {
             RequestTelemetry requestTelemetry = ProcessItems(false);
 
-            requestTelemetry.Sequence.Should().Be("TestPassed");
+            Assert.Equal("TestPassed", requestTelemetry.Sequence);
         }
 
         [Fact]
@@ -22,7 +18,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
         {
             RequestTelemetry requestTelemetry = ProcessItems(true);
 
-            requestTelemetry.Sequence.Should().NotBe("TestPassed");
+            Assert.NotEqual("TestPassed", requestTelemetry.Sequence);
         }
 
         private static RequestTelemetry ProcessItems(bool isSynthetic)

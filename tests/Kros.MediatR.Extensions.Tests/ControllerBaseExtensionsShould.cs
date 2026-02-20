@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -43,7 +42,7 @@ namespace Kros.MediatR.Extensions.Tests
         {
             TestController controller = CreateController();
 
-            controller.Mediator().Should().NotBeNull();
+            Assert.NotNull(controller.Mediator());
         }
 
         [Fact]
@@ -53,7 +52,7 @@ namespace Kros.MediatR.Extensions.Tests
 
             Request.Response response = await controller.SendRequest(new Request() { Value = 22 });
 
-            response.Value.Should().Be(22);
+            Assert.Equal(22, response.Value);
         }
 
         [Fact]
@@ -63,7 +62,7 @@ namespace Kros.MediatR.Extensions.Tests
 
             CreatedResult response = await controller.SendCreateCommand(new Request() { Value = 22 });
 
-            response.StatusCode.Should().Be(201);
+            Assert.Equal(201, response.StatusCode);
         }
 
         private static TestController CreateController()

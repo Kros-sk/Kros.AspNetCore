@@ -1,14 +1,12 @@
-﻿using MediatR;
+﻿using Kros.MediatR.PostProcessors;
+using MediatR;
+using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using FluentAssertions;
-using MediatR.Pipeline;
-using Kros.MediatR.PostProcessors;
-using Kros.AspNetCore.Exceptions;
-using System;
-using System.Reflection;
 
 namespace Kros.MediatR.Extensions.Tests
 {
@@ -36,7 +34,7 @@ namespace Kros.MediatR.Extensions.Tests
                 RequestHandlerDelegate<TResponse> next,
                 CancellationToken cancellationToken)
             {
-                TResponse result = await next();
+                TResponse result = await next(cancellationToken);
                 return result;
             }
         }
@@ -68,7 +66,7 @@ namespace Kros.MediatR.Extensions.Tests
                 RequestHandlerDelegate<TResponse> next,
                 CancellationToken cancellationToken)
             {
-                TResponse result = await next();
+                TResponse result = await next(cancellationToken);
                 return result;
             }
         }
@@ -93,7 +91,7 @@ namespace Kros.MediatR.Extensions.Tests
                 RequestHandlerDelegate<TResponse> next,
                 CancellationToken cancellationToken)
             {
-                TResponse result = await next();
+                TResponse result = await next(cancellationToken);
                 return result;
             }
         }
@@ -112,7 +110,7 @@ namespace Kros.MediatR.Extensions.Tests
                 RequestHandlerDelegate<Unit> next,
                 CancellationToken cancellationToken)
             {
-                Unit result = await next();
+                Unit result = await next(cancellationToken);
                 return result;
             }
         }
@@ -144,7 +142,7 @@ namespace Kros.MediatR.Extensions.Tests
             IPipelineBehavior<FooRequest, FooRequest.FooResponse> behavior =
                 Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
 
-            behavior.Should().BeAssignableTo<FooPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
+            Assert.IsType<FooPipelineBehavior<FooRequest, FooRequest.FooResponse>>(behavior, exactMatch: true);
         }
 
         [Fact]
@@ -154,11 +152,11 @@ namespace Kros.MediatR.Extensions.Tests
 
             IPipelineBehavior<BarRequest, BarRequest.BarResponse> behavior =
                 Provider.GetRequiredService<IPipelineBehavior<BarRequest, BarRequest.BarResponse>>();
-            behavior.Should().BeAssignableTo<BarPipelineBehavior<BarRequest, BarRequest.BarResponse>>();
+            Assert.IsType<BarPipelineBehavior<BarRequest, BarRequest.BarResponse>>(behavior, exactMatch: true);
 
             IPipelineBehavior<Bar1Request, Bar1Request.BarResponse> behaviorBar1 =
                 Provider.GetRequiredService<IPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>();
-            behaviorBar1.Should().BeAssignableTo<BarPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>();
+            Assert.IsType<BarPipelineBehavior<Bar1Request, Bar1Request.BarResponse>>(behaviorBar1, exactMatch: true);
         }
 
         [Fact]
@@ -169,7 +167,7 @@ namespace Kros.MediatR.Extensions.Tests
             IRequestPostProcessor<BarRequest, BarRequest.BarResponse> behavior =
                 Provider.GetRequiredService<IRequestPostProcessor<BarRequest, BarRequest.BarResponse>>();
 
-            behavior.Should().BeAssignableTo<NullCheckPostProcessor<BarRequest, BarRequest.BarResponse>>();
+            Assert.IsType<NullCheckPostProcessor<BarRequest, BarRequest.BarResponse>>(behavior, exactMatch: true);
         }
 
         [Fact]
@@ -181,7 +179,8 @@ namespace Kros.MediatR.Extensions.Tests
 
             Action action = () => behavior.Process(null, null, CancellationToken.None);
 
-            action.Should().NotThrow<NotFoundException>();
+            Exception exception = Record.Exception(action);
+            Assert.Null(exception);
         }
 
         [Fact]
@@ -190,7 +189,7 @@ namespace Kros.MediatR.Extensions.Tests
             Services.AddPipelineBehaviorsForRequest<ICommandRequest>();
 
             IPipelineBehavior<TestCommand, Unit> behavior = Provider.GetRequiredService<IPipelineBehavior<TestCommand, Unit>>();
-            behavior.Should().BeAssignableTo<CommandPipelineBehavior<TestCommand>>();
+            Assert.IsType<CommandPipelineBehavior<TestCommand>>(behavior, exactMatch: true);
         }
 
         [Fact]
@@ -205,7 +204,7 @@ namespace Kros.MediatR.Extensions.Tests
             IPipelineBehavior<FooRequest, FooRequest.FooResponse> behavior =
                 Provider.GetRequiredService<IPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
 
-            behavior.Should().BeAssignableTo<FooPipelineBehavior<FooRequest, FooRequest.FooResponse>>();
+            Assert.IsType<FooPipelineBehavior<FooRequest, FooRequest.FooResponse>>(behavior, exactMatch: true);
         }
     }
 }

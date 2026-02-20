@@ -1,8 +1,6 @@
-﻿using FluentAssertions;
-using Microsoft.ApplicationInsights.Channel;
+﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
-using System;
 using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
@@ -17,7 +15,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             initializer.Initialize(telemetry);
 
-            (telemetry as RequestTelemetry).Context.User.Id.Should().Be("User-Agent");
+            Assert.Equal("User-Agent", (telemetry as RequestTelemetry).Context.User.Id);
         }
 
         [Fact]
@@ -28,17 +26,17 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             initializer.Initialize(telemetry);
 
-            (telemetry as RequestTelemetry).Context.User.Id.Should().NotBe("User-Agent");
+            Assert.NotEqual("User-Agent", (telemetry as RequestTelemetry).Context.User.Id);
         }
-        private static ITelemetry FakeTelemetry()
+        private static RequestTelemetry FakeTelemetry()
         {
             return new RequestTelemetry();
         }
 
-        private static IHttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)
+        private static HttpContextAccessor FakeHttpContextAccessor(bool addUserAgent)
         {
             DefaultHttpContext httpContext = new();
-            IHttpContextAccessor context = new HttpContextAccessor()
+            HttpContextAccessor context = new()
             {
                 HttpContext = httpContext
             };

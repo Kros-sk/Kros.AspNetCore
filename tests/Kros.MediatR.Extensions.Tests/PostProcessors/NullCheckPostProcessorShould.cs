@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Kros.AspNetCore.Exceptions;
+﻿using Kros.AspNetCore.Exceptions;
 using Kros.MediatR.PostProcessors;
 using MediatR;
 using System;
@@ -17,7 +16,7 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
 
             Action action = () => postProcessor.Process(null, null, CancellationToken.None);
 
-            action.Should().Throw<NotFoundException>();
+            Assert.Throws<NotFoundException>(action);
         }
 
         [Fact]
@@ -27,7 +26,8 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
 
             Action action = () => postProcessor.Process(null, "response", CancellationToken.None);
 
-            action.Should().NotThrow<NotFoundException>();
+            Exception exception = Record.Exception(action);
+            Assert.Null(exception);
         }
 
         [Fact]
@@ -40,7 +40,8 @@ namespace Kros.MediatR.Extensions.Tests.PostProcessors
 
             Action action = () => postProcessor.Process(new Request(), null, CancellationToken.None);
 
-            action.Should().NotThrow<NotFoundException>();
+            Exception exception = Record.Exception(action);
+            Assert.Null(exception);
         }
 
         public class Request : IRequest<string> { }

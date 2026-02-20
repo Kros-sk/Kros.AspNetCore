@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.ApplicationInsights.Channel;
+﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Xunit;
@@ -27,7 +26,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             processor.Process(trace);
 
-            next.ReceivedTelemetry.Should().Be(trace);
+            Assert.Same(trace, next.ReceivedTelemetry);
         }
 
         [Theory]
@@ -41,7 +40,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             processor.Process(trace);
 
-            next.ReceivedTelemetry.Should().BeNull();
+            Assert.Null(next.ReceivedTelemetry);
         }
 
         [Fact]
@@ -53,7 +52,7 @@ namespace Kros.ApplicationInsights.Extensions.Tests
 
             processor.Process(eventTelemetry);
 
-            next.ReceivedTelemetry.Should().Be(eventTelemetry);
+            Assert.Same(eventTelemetry, next.ReceivedTelemetry);
         }
     }
 }
