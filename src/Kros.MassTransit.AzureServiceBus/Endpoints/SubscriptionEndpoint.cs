@@ -32,11 +32,14 @@ namespace Kros.MassTransit.AzureServiceBus.Endpoints
         public override void AddConsumer<TConsumer>(Action<IConsumerConfigurator<TConsumer>> configure = null)
             => _consumers.Add(endpointConfig => endpointConfig.Consumer(() => Activator.CreateInstance<TConsumer>(), configure));
 
+        // We do not want to use Masstransit anymore, so we will not invest in fixing this obsolete warning.
+#pragma warning disable CS0618 // Type or member is obsolete
         /// <inheritdoc />
         public override void AddConsumer<TConsumer>(
             IServiceProvider provider,
             Action<IConsumerConfigurator<TConsumer>> configure = null)
             => _consumers.Add(endpointConfig => endpointConfig.Consumer(provider, configure));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         /// <inheritdoc />
         public override void SetEndpoint(IServiceBusBusFactoryConfigurator busCfg)
