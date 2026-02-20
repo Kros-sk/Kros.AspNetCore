@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Version>4.0.0</Version>
+    <Version>4.1.0</Version>
     <Description>Extensions to facilitate work with Application Insights.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
