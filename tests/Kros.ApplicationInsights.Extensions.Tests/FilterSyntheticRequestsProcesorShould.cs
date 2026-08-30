@@ -1,40 +1,28 @@
-﻿using Microsoft.ApplicationInsights.DataContracts;
-using Xunit;
+﻿using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
 {
     public class FilterSyntheticRequestsProcesorShould
     {
         [Fact]
-        public void PassRequestToNextIfItIsNotSynthetic()
+        public void PassRequestIfItIsNotSynthetic()
         {
-            RequestTelemetry requestTelemetry = ProcessItems(false);
+            using TestActivity activity = new("SomeRequest");
 
-            Assert.Equal("TestPassed", requestTelemetry.Sequence);
+            new FilterSyntheticRequestsProcessor().OnEnd(activity.Activity);
+
+            Assert.False(activity.IsDropped);
         }
 
         [Fact]
-        public void DontPassRequestToNextIfItIsSynthetic()
+        public void FilterOutRequestIfItIsSynthetic()
         {
-            RequestTelemetry requestTelemetry = ProcessItems(true);
+            using TestActivity activity = new("SomeRequest");
+            activity.WithTag(ActivityTags.SyntheticSource, "source");
 
-            Assert.NotEqual("TestPassed", requestTelemetry.Sequence);
-        }
+            new FilterSyntheticRequestsProcessor().OnEnd(activity.Activity);
 
-        private static RequestTelemetry ProcessItems(bool isSynthetic)
-        {
-            RequestTelemetry requestTelemetry = new()
-            {
-                Name = "SomeRequest",
-                Sequence = "",
-            };
-            requestTelemetry.Context.Operation.SyntheticSource = isSynthetic ? "source" : null;
-            PassedToNextTelemetryProcessor next = new();
-            FilterSyntheticRequestsProcessor filterRequestsProcessor = new(next);
-
-            filterRequestsProcessor.Process(requestTelemetry);
-
-            return requestTelemetry;
+            Assert.True(activity.IsDropped);
         }
     }
 }

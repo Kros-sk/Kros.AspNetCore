@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Version>4.1.0</Version>
+    <Version>5.0.0</Version>
     <Description>Extensions to facilitate work with Application Insights.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
@@ -21,6 +21,12 @@
   <ItemGroup>
     <PackageReference Include="Kros.Utils" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
+    <PackageReference Include="OpenTelemetry" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Kros.ApplicationInsights.Extensions.Tests" />
   </ItemGroup>
 
 </Project>

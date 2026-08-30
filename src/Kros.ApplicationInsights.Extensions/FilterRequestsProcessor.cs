@@ -1,67 +1,79 @@
-﻿using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using OpenTelemetry;
 using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
-[assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
 {
     /// <summary>
-    /// Telemetry Processor to filter out requests for specific endpoints (/health).
+    /// Telemetry processor which filters out requests for specific endpoints (/health).
     /// </summary>
-    /// <seealso cref="ITelemetryProcessor" />
-    internal class FilterRequestsProcessor : ITelemetryProcessor
+    /// <seealso cref="BaseProcessor{T}" />
+    internal sealed class FilterRequestsProcessor : BaseProcessor<Activity>
     {
-        private ITelemetryProcessor Next { get; set; }
-
-        private readonly string[] _skippedRequests =
+        private static readonly string[] _skippedRequests =
         {
             "/health",
             "/signalR"
         };
 
-        private readonly string[] _skippedAgents =
+        private static readonly string[] _skippedAgents =
         {
             "postman"
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterRequestsProcessor"/> class.
+        /// Filters out requests containing any of the defined skipped requests.
         /// </summary>
-        /// <param name="next">ITelemetryProcessor instance.</param>
-        public FilterRequestsProcessor(ITelemetryProcessor next)
+        /// <param name="activity">Activity which has just ended.</param>
+        public override void OnEnd(Activity activity)
         {
-            this.Next = next;
+            if (activity.IsRequest() && ShouldSkip(activity))
+            {
+                activity.Drop();
+            }
         }
 
-        /// <summary>
-        /// Filters out requests contaning any of defined skipped requests.
-        /// </summary>
-        /// <param name="item">ITelemetry instance.</param>
-        public void Process(ITelemetry item)
-        {
-            if (item is RequestTelemetry request)
-            {
-                string userAgent = GetUserAgentName(request);
+        private static bool ShouldSkip(Activity activity)
+            => IsHttpOptions(activity) || IsSkippedRequest(activity) || IsSkippedAgent(activity);
 
-                if (IsHttpOptions(request)
-                    || _skippedRequests.Any(x => request.Name.Contains(x, StringComparison.OrdinalIgnoreCase))
-                    || _skippedAgents.Any(a => userAgent.Contains(a, StringComparison.OrdinalIgnoreCase)))
+        private static bool IsHttpOptions(Activity activity)
+        {
+            string method = activity.GetFirstTag(ActivityTags.HttpRequestMethod, ActivityTags.HttpMethod);
+
+            return method is not null
+                ? method.Equals(HttpMethods.Options, StringComparison.OrdinalIgnoreCase)
+                : activity.DisplayName.StartsWith(HttpMethods.Options, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsSkippedRequest(Activity activity)
+        {
+            string path = activity.GetFirstTag(ActivityTags.UrlPath, ActivityTags.HttpTarget, ActivityTags.HttpRoute);
+
+            return Contains(path, _skippedRequests) || Contains(activity.DisplayName, _skippedRequests);
+        }
+
+        private static bool IsSkippedAgent(Activity activity)
+            => Contains(
+                activity.GetFirstTag(ActivityTags.UserAgentOriginal, ActivityTags.HttpUserAgent),
+                _skippedAgents);
+
+        private static bool Contains(string value, string[] items)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (string item in items)
+            {
+                if (value.Contains(item, StringComparison.OrdinalIgnoreCase))
                 {
-                    return;
+                    return true;
                 }
             }
 
-            Next.Process(item);
+            return false;
         }
-
-        private static bool IsHttpOptions(RequestTelemetry request)
-            => request.Name.StartsWith(HttpMethods.Options, StringComparison.OrdinalIgnoreCase);
-
-        private static string GetUserAgentName(RequestTelemetry request)
-         => request.Context?.User?.Id ?? string.Empty;
     }
 }

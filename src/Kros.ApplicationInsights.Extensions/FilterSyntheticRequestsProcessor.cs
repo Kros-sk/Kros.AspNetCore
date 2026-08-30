@@ -1,42 +1,24 @@
-﻿using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using OpenTelemetry;
+using System.Diagnostics;
 
-[assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
 {
     /// <summary>
-    /// Telemetry Processor to filter out synthetic requests(bots, web search...).
+    /// Telemetry processor which filters out synthetic requests (bots, web search...).
     /// </summary>
-    /// <seealso cref="Microsoft.ApplicationInsights.Extensibility.ITelemetryProcessor" />
-    internal class FilterSyntheticRequestsProcessor : ITelemetryProcessor
+    /// <seealso cref="BaseProcessor{T}" />
+    internal sealed class FilterSyntheticRequestsProcessor : BaseProcessor<Activity>
     {
-        private ITelemetryProcessor Next { get; set; }
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterRequestsProcessor"/> class.
+        /// Filters out synthetic requests.
         /// </summary>
-        /// <param name="next">ITelemetryProcessor instance.</param>
-        public FilterSyntheticRequestsProcessor(ITelemetryProcessor next)
+        /// <param name="activity">Activity which has just ended.</param>
+        public override void OnEnd(Activity activity)
         {
-            this.Next = next;
-        }
-
-        /// <summary>
-        /// Filters out synthethic requests.
-        /// </summary>
-        /// <param name="item">ITelemetry instance.</param>
-        public void Process(ITelemetry item)
-        {
-            if (!string.IsNullOrEmpty(item.Context.Operation.SyntheticSource))
+            if (activity.GetFirstTag(ActivityTags.SyntheticSource) is not null)
             {
-                return;
+                activity.Drop();
             }
-
-            Next.Process(item);
         }
     }
 }

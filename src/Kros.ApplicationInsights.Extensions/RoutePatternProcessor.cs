@@ -1,40 +1,41 @@
-﻿using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using OpenTelemetry;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 
 namespace Kros.ApplicationInsights.Extensions
 {
-    internal class RoutePatternInitializer : ITelemetryInitializer
+    /// <summary>
+    /// Adds the route pattern claim of the current user to request telemetry.
+    /// </summary>
+    /// <seealso cref="BaseProcessor{T}" />
+    internal sealed class RoutePatternProcessor : BaseProcessor<Activity>
     {
         private const string RoutePatternClaimType = "route_pattern";
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RoutePatternInitializer"/> class.
+        /// Initializes a new instance of the <see cref="RoutePatternProcessor"/> class.
         /// </summary>
         /// <param name="httpContextAccessor">Instance of IHttpContextAccessor.</param>
-        public RoutePatternInitializer(IHttpContextAccessor httpContextAccessor)
+        public RoutePatternProcessor(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public void Initialize(ITelemetry telemetry)
+        /// <inheritdoc />
+        public override void OnEnd(Activity activity)
         {
-            if (telemetry is RequestTelemetry request)
+            if (!activity.IsRequest())
             {
-                AddProperty(request, RoutePatternClaimType);
+                return;
             }
-        }
 
-        private void AddProperty(RequestTelemetry requestTelemetry, string claimType)
-        {
-            string claimValue = GetClaimValue(claimType);
+            string claimValue = GetClaimValue(RoutePatternClaimType);
             if (!string.IsNullOrEmpty(claimValue))
             {
-                requestTelemetry.Properties.Add(claimType, claimValue);
+                activity.SetTag(RoutePatternClaimType, claimValue);
             }
         }
 
@@ -48,7 +49,7 @@ namespace Kros.ApplicationInsights.Extensions
                 Claims?.
                 FirstOrDefault(c => c.Type == claimType);
 
-            return claim != null ? claim.Value : string.Empty;
+            return claim?.Value;
         }
     }
 }
