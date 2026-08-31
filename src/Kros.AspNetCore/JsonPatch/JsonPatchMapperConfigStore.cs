@@ -25,7 +25,9 @@ namespace Kros.AspNetCore.JsonPatch
         /// <typeparam name="TSource">Type of model.</typeparam>
         /// <returns>Configuration for mapping JSON patch of <typeparamref name="TSource"/> model to database names.</returns>
         public JsonPatchMapperConfig<TSource> GetConfig<TSource>() where TSource : class
-            => _configs.GetOrAdd(typeof(TSource), (t) => JsonPatchMapperConfig<TSource>.NewConfig()) as JsonPatchMapperConfig<TSource>;
+            // The factory must stay free of side effects. ConcurrentDictionary.GetOrAdd may run it on several
+            // threads at once, and registering from within it made the losing threads throw on a duplicate.
+            => _configs.GetOrAdd(typeof(TSource), (t) => new JsonPatchMapperConfig<TSource>()) as JsonPatchMapperConfig<TSource>;
 
         /// <summary>
         /// Store configuration for mapping JSON patch of <typeparamref name="TSource"/> model to database names.

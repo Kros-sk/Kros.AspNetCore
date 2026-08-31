@@ -29,7 +29,7 @@ namespace Kros.AspNetCore.JsonPatch
         private Func<string, string> _pathMapping;
         private readonly ConcurrentDictionary<string, string> _mapping = new(StringComparer.InvariantCulture);
 
-        private JsonPatchMapperConfig()
+        internal JsonPatchMapperConfig()
         {
         }
 
