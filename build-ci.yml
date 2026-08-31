@@ -15,7 +15,7 @@ steps:
     displayName: Build
 
   - pwsh: |
-      dotnet test "$(Build.SourcesDirectory)/Kros.AspNetCore.sln" --configuration Release --logger trx --results-directory "$(Common.TestResultsDirectory)"
+      dotnet test --solution "$(Build.SourcesDirectory)/Kros.AspNetCore.sln" --configuration Release --report-trx --results-directory "$(Common.TestResultsDirectory)"
     displayName: Test
 
   - task: PublishTestResults@2
