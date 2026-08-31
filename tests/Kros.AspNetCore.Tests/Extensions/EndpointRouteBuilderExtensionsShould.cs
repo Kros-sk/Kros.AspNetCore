@@ -15,7 +15,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void ThrowExceptionIfHttpContextDispatcherOptionsAreMissing()
         {
-            IConfiguration configuration = GetBadConfiguration();
+            IConfiguration configuration = TestsHelper.GetSignalRBadConfiguration();
             IEndpointRouteBuilder endpoints = Substitute.For<IEndpointRouteBuilder>();
 
             Action action = () => endpoints.MapSignalRHubWithOptions<Hub>(configuration, "Route");
@@ -26,7 +26,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void HaveOptionsCorrectlySet()
         {
-            IConfiguration configuration = GetConfiguration();
+            IConfiguration configuration = TestsHelper.GetConfiguration();
             HttpConnectionDispatcherOptions options = new HttpConnectionDispatcherOptions();
 
             HttpConnectionDispatcherOptions fromCfg = configuration.GetSection<HttpConnectionDispatcherOptions>();
@@ -34,11 +34,5 @@ namespace Kros.AspNetCore.Tests.Extensions
             Assert.Equal(fromCfg.ApplicationMaxBufferSize, options.ApplicationMaxBufferSize);
             Assert.NotEqual(fromCfg.TransportMaxBufferSize, options.TransportMaxBufferSize);
         }
-
-        private static IConfiguration GetBadConfiguration()
-           => new ConfigurationBuilder().AddJsonFile(Path.Combine("Extensions", "appsettings.configuration-test-signalr-bad.json")).Build();
-
-        private static IConfiguration GetConfiguration()
-            => new ConfigurationBuilder().AddJsonFile(Path.Combine("Extensions", "appsettings.configuration-test.json")).Build();
     }
 }
