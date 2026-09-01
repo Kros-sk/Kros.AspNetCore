@@ -1,22 +1,30 @@
 ﻿using Kros.Utils;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using OpenTelemetry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kros.ApplicationInsights.Extensions
 {
-    internal class HeadersTelemetryInitializer : ITelemetryInitializer
+    /// <summary>
+    /// Adds selected request headers to request telemetry.
+    /// </summary>
+    /// <seealso cref="BaseProcessor{T}" />
+    internal sealed class HeadersTelemetryProcessor : BaseProcessor<Activity>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HeadersToCaptureOptions _headersToCapture;
 
-        public HeadersTelemetryInitializer(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HeadersTelemetryProcessor"/> class.
+        /// </summary>
+        /// <param name="httpContextAccessor">Instance of IHttpContextAccessor.</param>
+        /// <param name="headersToCapture">Headers which are added to the telemetry.</param>
+        public HeadersTelemetryProcessor(
             IHttpContextAccessor httpContextAccessor,
             IOptions<HeadersToCaptureOptions> headersToCapture)
         {
@@ -24,21 +32,25 @@ namespace Kros.ApplicationInsights.Extensions
             _headersToCapture = Check.NotNull(headersToCapture.Value, nameof(headersToCapture));
         }
 
-        public void Initialize(ITelemetry telemetry)
+        /// <inheritdoc />
+        public override void OnEnd(Activity activity)
         {
-            if (telemetry is RequestTelemetry requestTelemetry)
+            if (!activity.IsRequest())
             {
-                HttpContext context = _httpContextAccessor.HttpContext;
-                if (context != null)
+                return;
+            }
+
+            HttpContext context = _httpContextAccessor.HttpContext;
+            if (context is null)
+            {
+                return;
+            }
+
+            foreach (string headerKey in _headersToCapture)
+            {
+                if (context.Request.Headers.TryGetValue(headerKey, out StringValues headerValue))
                 {
-                    foreach (string headerKey in _headersToCapture)
-                    {
-                        if (context.Request.Headers.TryGetValue(headerKey, out StringValues headerValue))
-                        {
-                            requestTelemetry.Properties[_headersToCapture.PropertyNameResolver(headerKey)]
-                                = headerValue.ToString();
-                        }
-                    }
+                    activity.SetTag(_headersToCapture.PropertyNameResolver(headerKey), headerValue.ToString());
                 }
             }
         }

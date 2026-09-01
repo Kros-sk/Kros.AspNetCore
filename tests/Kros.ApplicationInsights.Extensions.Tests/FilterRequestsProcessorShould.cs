@@ -1,4 +1,4 @@
-﻿using Microsoft.ApplicationInsights.DataContracts;
+﻿using System.Diagnostics;
 using Xunit;
 
 namespace Kros.ApplicationInsights.Extensions.Tests
@@ -6,47 +6,80 @@ namespace Kros.ApplicationInsights.Extensions.Tests
     public class FilterRequestsProcessorShould
     {
         [Theory]
-        [InlineData("/health", "")]
-        [InlineData("/signalR", "")]
-        [InlineData("OPTIONS/", "")]
-        [InlineData("OPTIONS/someRequest", "")]
-        [InlineData("GET/someRequest", "TestPassed")]
-        [InlineData("GET/optionsrequest", "TestPassed")]
-        [InlineData("someRequests", "TestPassed")]
-        public void ReturnCorrectSequenceForRequestName(string name, string expectedSequence)
-        {
-            RequestTelemetry requestTelemetry = ProcessItems(name, "NotMatter");
-            Assert.Equal(expectedSequence, requestTelemetry.Sequence);
-        }
+        [InlineData("/health")]
+        [InlineData("/health/ready")]
+        [InlineData("/signalR")]
+        public void FilterOutSkippedRequestPath(string path)
+            => Assert.True(Process(path: path).IsDropped);
 
         [Theory]
-        [InlineData("postman", "")]
-        [InlineData("postman/7.5", "")]
-        [InlineData("Safari", "TestPassed")]
-        [InlineData("Safari/4.23", "TestPassed")]
-        [InlineData("Chrome/4.23", "TestPassed")]
-        [InlineData("Opera/4.23", "TestPassed")]
-        public void ReturnCorrectSequenceForUserAgent(string agentName, string expectedSequence)
+        [InlineData("/weather")]
+        [InlineData("/optionsrequest")]
+        [InlineData("/someRequest")]
+        public void PassOtherRequestPaths(string path)
+            => Assert.False(Process(path: path).IsDropped);
+
+        [Fact]
+        public void FilterOutRequestWhenOnlyDisplayNameContainsSkippedRequest()
+            => Assert.True(Process(displayName: "GET /health").IsDropped);
+
+        [Fact]
+        public void FilterOutHttpOptionsRequest()
+            => Assert.True(Process(path: "/someRequest", method: "OPTIONS").IsDropped);
+
+        [Theory]
+        [InlineData("GET")]
+        [InlineData("POST")]
+        public void PassOtherHttpMethods(string method)
+            => Assert.False(Process(path: "/someRequest", method: method).IsDropped);
+
+        [Theory]
+        [InlineData("postman")]
+        [InlineData("PostmanRuntime/7.5")]
+        public void FilterOutSkippedUserAgent(string userAgent)
+            => Assert.True(Process(path: "/someRequest", userAgent: userAgent).IsDropped);
+
+        [Theory]
+        [InlineData("Safari/4.23")]
+        [InlineData("Chrome/4.23")]
+        [InlineData("Opera/4.23")]
+        public void PassOtherUserAgents(string userAgent)
+            => Assert.False(Process(path: "/someRequest", userAgent: userAgent).IsDropped);
+
+        [Fact]
+        public void PassDependencyTelemetryForSkippedPath()
         {
-            RequestTelemetry requestTelemetry = ProcessItems("someRequests", agentName);
-            Assert.Equal(expectedSequence, requestTelemetry.Sequence);
+            using TestActivity activity = new("dependency", ActivityKind.Client);
+            activity.WithTag(ActivityTags.UrlPath, "/health");
+
+            new FilterRequestsProcessor().OnEnd(activity.Activity);
+
+            Assert.False(activity.IsDropped);
         }
 
-        private static RequestTelemetry ProcessItems(string name, string agentName)
+        private static TestActivity Process(
+            string path = null,
+            string method = null,
+            string userAgent = null,
+            string displayName = "request")
         {
-            RequestTelemetry requestTelemetry = new()
+            TestActivity activity = new(displayName);
+            if (path is not null)
             {
-                Name = name,
-                Sequence = ""
-            };
-            requestTelemetry.Context.User.Id = agentName;
+                activity.WithTag(ActivityTags.UrlPath, path);
+            }
+            if (method is not null)
+            {
+                activity.WithTag(ActivityTags.HttpRequestMethod, method);
+            }
+            if (userAgent is not null)
+            {
+                activity.WithTag(ActivityTags.UserAgentOriginal, userAgent);
+            }
 
-            PassedToNextTelemetryProcessor next = new();
-            FilterRequestsProcessor filterRequestsProcessor = new(next);
+            new FilterRequestsProcessor().OnEnd(activity.Activity);
 
-            filterRequestsProcessor.Process(requestTelemetry);
-
-            return requestTelemetry;
+            return activity;
         }
     }
 }

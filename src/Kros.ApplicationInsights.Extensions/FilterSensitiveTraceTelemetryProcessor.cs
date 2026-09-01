@@ -1,58 +1,77 @@
-﻿using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.ApplicationInsights.DataContracts;
+﻿using OpenTelemetry;
+using OpenTelemetry.Logs;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Kros.ApplicationInsights.Extensions.Tests")]
 namespace Kros.ApplicationInsights.Extensions
 {
     /// <summary>
-    /// Telemetry Processor to filter out sensitive data.
+    /// Log processor which redacts log records containing sensitive data.
     /// </summary>
-    /// <seealso cref="ITelemetryProcessor" />
-    public class FilterSensitiveTraceTelemetryProcessor : ITelemetryProcessor
+    /// <remarks>
+    /// OpenTelemetry log records cannot be dropped from a processor, so a matching record has its message
+    /// and attributes replaced by <see cref="RedactedMessage"/>. The sensitive values therefore never leave
+    /// the process, which is what this processor is for.
+    /// </remarks>
+    /// <seealso cref="BaseProcessor{T}" />
+    public sealed class FilterSensitiveTraceTelemetryProcessor : BaseProcessor<LogRecord>
     {
-        private readonly ITelemetryProcessor _next;
+        /// <summary>
+        /// Message which replaces the original one when sensitive data is detected.
+        /// </summary>
+        public const string RedactedMessage = "[Redacted: log record contained sensitive data.]";
 
-        private static readonly List<string> _sensitivePatterns = new()
-        {
+        private static readonly string[] _sensitivePatterns =
+        [
+            "Request Headers:\nAuthorization:",
             "Request Headers:\r\nAuthorization:",
+            "Request Headers:\nx-functions-key:",
             "Request Headers:\r\nx-functions-key:"
-        };
+        ];
+
+        private static readonly IReadOnlyList<KeyValuePair<string, object>> _emptyAttributes = [];
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterSensitiveTraceTelemetryProcessor"/> class.
+        /// Redacts the log record when it contains sensitive data.
         /// </summary>
-        /// <param name="next">ITelemetryProcessor instance.</param>
-        public FilterSensitiveTraceTelemetryProcessor(ITelemetryProcessor next)
+        /// <param name="data">Log record which has just been emitted.</param>
+        public override void OnEnd(LogRecord data)
         {
-            _next = next;
+            if (HasSensitiveData(data))
+            {
+                Redact(data);
+            }
         }
 
-        /// <summary>
-        /// Filters out sensitive data.
-        /// </summary>
-        /// <param name="item">ITelemetry instance.</param>
-        public void Process(ITelemetry item)
+        private static bool HasSensitiveData(LogRecord data)
+            => IsSensitive(data.FormattedMessage) || IsSensitive(data.Body);
+
+        private static bool IsSensitive(string message)
         {
-            if (!OkToSend(item))
+            if (string.IsNullOrEmpty(message))
             {
-                return;
+                return false;
             }
 
-            _next.Process(item);
+            foreach (string pattern in _sensitivePatterns)
+            {
+                if (message.StartsWith(pattern, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        private bool OkToSend(ITelemetry item)
+        private static void Redact(LogRecord data)
         {
-            if (item is TraceTelemetry trace && !string.IsNullOrEmpty(trace.Message))
-            {
-                return !_sensitivePatterns.Any(p => trace.Message.StartsWith(p, System.StringComparison.OrdinalIgnoreCase));
-            }
+            data.FormattedMessage = RedactedMessage;
+            data.Body = RedactedMessage;
 
-            return true;
+            // The exporter reads the values from the attributes, so the original message has to be
+            // removed from there as well.
+            data.Attributes = _emptyAttributes;
         }
     }
 }

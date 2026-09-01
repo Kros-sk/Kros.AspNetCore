@@ -17,7 +17,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void GetOptionsByType()
         {
-            IConfiguration configuration = GetConfiguration();
+            IConfiguration configuration = TestsHelper.GetConfiguration();
             TestOptions options = configuration.GetSection<TestOptions>();
 
             Assert.Equal(1, options.Value);
@@ -26,13 +26,10 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void GetAllowedOrigins()
         {
-            IConfiguration configuration = GetConfiguration();
+            IConfiguration configuration = TestsHelper.GetConfiguration();
             string[] allowedOrigins = configuration.GetAllowedOrigins();
 
             Assert.Equivalent(new[] { "*" }, allowedOrigins);
         }
-
-        private static IConfiguration GetConfiguration()
-           => new ConfigurationBuilder().AddJsonFile("Extensions\\appsettings.configuration-test.json").Build();
     }
 }

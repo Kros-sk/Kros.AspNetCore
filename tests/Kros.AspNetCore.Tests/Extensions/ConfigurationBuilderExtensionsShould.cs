@@ -16,7 +16,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void LoadAppConfigOptions()
         {
-            IConfiguration cfg = GetConfiguration();
+            IConfiguration cfg = TestsHelper.GetConfiguration();
             AppConfigOptions actualAppConfig = new();
             cfg.Bind("AppConfig", actualAppConfig);
 
@@ -109,7 +109,7 @@ namespace Kros.AspNetCore.Tests.Extensions
         [Fact]
         public void LoadKeyVaultOptions()
         {
-            IConfiguration cfg = GetConfiguration();
+            IConfiguration cfg = TestsHelper.GetConfiguration();
             KeyVaultOptions actualKv = new();
             cfg.Bind("KeyVault", actualKv);
 
@@ -183,14 +183,11 @@ namespace Kros.AspNetCore.Tests.Extensions
         private static HostBuilderContext CreateHostBuilderContext()
         {
             HostBuilderContext context = new(new Dictionary<object, object>());
-            context.Configuration = GetConfiguration();
+            context.Configuration = TestsHelper.GetConfiguration();
             context.HostingEnvironment = Substitute.For<IHostEnvironment>();
             context.HostingEnvironment.EnvironmentName.Returns("Development");
             return context;
         }
-
-        private static IConfiguration GetConfiguration()
-           => new ConfigurationBuilder().AddJsonFile("Extensions\\appsettings.configuration-test.json").Build();
 
         #endregion
     }
