@@ -29,7 +29,7 @@ namespace Kros.AspNetCore.Tests.JsonPatch
             RequestColumnsConcurrently<ConcurrentModel<Guid>>(errors);
             RequestColumnsConcurrently<ConcurrentModel<DateTime>>(errors);
 
-            Assert.Empty(errors);
+            Assert.True(errors.IsEmpty, string.Join(Environment.NewLine, errors));
         }
 
         [Fact]
