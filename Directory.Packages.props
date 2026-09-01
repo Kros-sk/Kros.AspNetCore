@@ -6,7 +6,7 @@
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="Hellang.Middleware.ProblemDetails" Version="6.5.1" />
-    <PackageVersion Include="Kros.AspNetCore" Version="6.1.0" />
+    <PackageVersion Include="Kros.AspNetCore" Version="6.1.1" />
     <PackageVersion Include="Kros.Utils" Version="4.3.0" />
     <PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="[8.5.8]" />
     <PackageVersion Include="MassTransit.Newtonsoft" Version="[8.5.8]" />
@@ -23,8 +23,8 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.400" />
     <PackageVersion Include="NSubstitute" Version="6.2.0" />
-    <PackageVersion Include="OpenTelemetry" Version="1.15.3" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry" Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
     <PackageVersion Include="Scrutor" Version="7.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
