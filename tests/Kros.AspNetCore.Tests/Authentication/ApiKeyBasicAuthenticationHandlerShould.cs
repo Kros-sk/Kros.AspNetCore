@@ -90,5 +90,35 @@ namespace Kros.AspNetCore.Tests.Authentication
             Assert.False(result.None);
             Assert.Null(result.Failure);
         }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task RejectRequestsWhenSchemeHasEmptyApiKey(string apiKey)
+        {
+            ApiKeyBasicAuthenticationScheme emptyKeyScheme = new()
+            {
+                SchemeName = "Basic.EmptyApiKey",
+                ApiKey = apiKey
+            };
+            IOptionsMonitor<ApiKeyBasicAuthenticationScheme> emptyKeySchemeMonitor =
+                Substitute.For<IOptionsMonitor<ApiKeyBasicAuthenticationScheme>>();
+            emptyKeySchemeMonitor.Get(emptyKeyScheme.SchemeName).Returns(emptyKeyScheme);
+            ApiKeyBasicAuthenticationHandler handler = new(
+                emptyKeySchemeMonitor,
+                _loggerFactory,
+                Substitute.For<UrlEncoder>());
+
+            DefaultHttpContext context = new();
+            context.Request.Headers[HeaderNames.Authorization] = $"Basic {apiKey}";
+            await handler.InitializeAsync(
+                new AuthenticationScheme(emptyKeyScheme.SchemeName, null, typeof(ApiKeyBasicAuthenticationHandler)),
+                context);
+            AuthenticateResult result = await handler.AuthenticateAsync();
+
+            Assert.False(result.Succeeded);
+            Assert.NotNull(result.Failure);
+        }
     }
 }
