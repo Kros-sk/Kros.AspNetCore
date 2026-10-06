@@ -33,6 +33,11 @@ public class ApiKeyBasicAuthenticationHandler(
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
+        if (string.IsNullOrWhiteSpace(Options.ApiKey))
+        {
+            return Task.FromResult(AuthenticateResult.Fail($"API key is not configured for scheme: {Options.SchemeName}"));
+        }
+
         if (headerApiKeyvalues[0] == $"{ApiKeyPrefix}{Options.ApiKey}")
         {
             List<Claim> claims = [new Claim(ClaimTypes.Role, ApiKeyRole)];
