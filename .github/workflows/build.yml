@@ -1,0 +1,131 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One run per branch at a time. Runs for pull requests are cancelled when a newer
+# commit is pushed; runs for the publishing branches are queued and never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write # needed by the test reporter to create a check run with the results
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build Kros.AspNetCore.sln --configuration Release
+
+      - name: Test
+        run: dotnet test --solution Kros.AspNetCore.sln --configuration Release --report-trx --results-directory "${{ runner.temp }}/TestResults"
+
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v2
+        continue-on-error: true # the reporter cannot create check runs for pull requests from forks
+        with:
+          name: Test results
+          path: ${{ runner.temp }}/TestResults/*.trx
+          reporter: dotnet-trx
+          fail-on-error: false # the Test step already fails the job on failing tests
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: ${{ runner.temp }}/TestResults/*.trx
+          if-no-files-found: ignore
+
+      - name: Collect packages
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          $staging = Join-Path $env:RUNNER_TEMP 'packages'
+          New-Item -ItemType Directory -Path $staging -Force | Out-Null
+          # Only packages produced by this Release build. Packages anywhere else (e.g. stale local
+          # bin/Debug output or the NuGet cache) are ignored, which replaces the "Clear NuGet packages"
+          # step of the former Azure DevOps pipeline.
+          Get-ChildItem -Path . -Recurse -Include *.nupkg, *.snupkg |
+            Where-Object { $_.FullName -match '[\\/]bin[\\/]Release[\\/]' } |
+            ForEach-Object {
+              Write-Host "Collecting $($_.Name)"
+              Copy-Item $_.FullName -Destination $staging
+            }
+
+      - name: Upload packages
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: ${{ runner.temp }}/packages/*
+          if-no-files-found: error
+
+  publish:
+    name: Push to NuGet.org
+    needs: build
+    # Same rule as the Azure DevOps pipeline: publish only from the release branch(es) listed above,
+    # never from pull requests. Manual runs (workflow_dispatch) publish as well, as long as they run on
+    # one of those branches.
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: nuget-org
+    permissions:
+      contents: read
+      id-token: write # allows GitHub to issue the OIDC token exchanged for a short-lived NuGet.org API key
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Download packages
+        uses: actions/download-artifact@v8
+        with:
+          name: packages
+          path: ${{ runner.temp }}/packages
+
+      # Trusted Publishing: exchanges the GitHub OIDC token for a temporary (1 hour) NuGet.org API key.
+      # Requires a Trusted Publishing policy on nuget.org for this repository and workflow file (build.yml).
+      - name: NuGet.org login
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }} # nuget.org profile name of the account that owns the Trusted Publishing policy
+
+      - name: Push to NuGet.org
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: |
+          Get-ChildItem (Join-Path $env:RUNNER_TEMP 'packages' '*.nupkg') | ForEach-Object {
+            Write-Host "Pushing package $($_.Name)"
+            dotnet nuget push $_.FullName --api-key $env:NUGET_API_KEY --source 'https://api.nuget.org/v3/index.json' --skip-duplicate
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
