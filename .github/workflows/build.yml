@@ -46,7 +46,7 @@ jobs:
 
       - name: Publish test results
         if: always()
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         continue-on-error: true # the reporter cannot create check runs for pull requests from forks
         with:
           name: Test results
