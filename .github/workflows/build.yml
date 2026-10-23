@@ -62,24 +62,144 @@ jobs:
           path: ${{ runner.temp }}/TestResults/*.trx
           if-no-files-found: ignore
 
-      - name: Collect packages
-        if: github.event_name != 'pull_request'
+  sign:
+    name: Sign and pack
+    needs: build
+    # Packages are produced only by runs that publish (see the publish job below), never by pull requests.
+    if: github.event_name != 'pull_request'
+    # Authenticode signing with Azure Artifact Signing (signtool) works only on Windows, so the library is built
+    # once more here. The build is deterministic (ContinuousIntegrationBuild), so the assemblies match the ones
+    # tested above.
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write # allows GitHub to issue the OIDC token that azure/login exchanges for an Azure access token
+    env:
+      # Azure Artifact Signing account (resource group development-rsg, region West Europe).
+      SIGNING_ENDPOINT: https://weu.codesigning.azure.net/
+      SIGNING_ACCOUNT_NAME: KrosArtifactSigner
+      SIGNING_CERTIFICATE_PROFILE_NAME: KrosAzureArtifactSigningCertificate
+    outputs:
+      has-packages: ${{ steps.packages.outputs.has-packages }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build Kros.AspNetCore.sln --configuration Release
+
+      - name: Find packages not yet on NuGet.org
+        id: packages
         shell: pwsh
         run: |
-          $staging = Join-Path $env:RUNNER_TEMP 'packages'
-          New-Item -ItemType Directory -Path $staging -Force | Out-Null
-          # Only packages produced by this Release build. Packages anywhere else (e.g. stale local
-          # bin/Debug output or the NuGet cache) are ignored, which replaces the "Clear NuGet packages"
-          # step of the former Azure DevOps pipeline.
-          Get-ChildItem -Path . -Recurse -Include *.nupkg, *.snupkg |
+          # Every package produced by this Release build is looked up on NuGet.org. A version that is already
+          # published is neither signed nor uploaded: NuGet.org would reject it anyway (the push below uses
+          # --skip-duplicate). For the remaining packages, the assemblies to sign are those shipped in the package
+          # (lib/**/*.dll), located in the project's bin/Release folder. Their paths, relative to the repository
+          # root, are written to sign-catalog.txt for the signing step.
+          $root = (Get-Location).Path
+          $projects = @()
+          $assemblies = @()
+          Get-ChildItem -Path . -Recurse -Filter *.nupkg |
             Where-Object { $_.FullName -match '[\\/]bin[\\/]Release[\\/]' } |
             ForEach-Object {
-              Write-Host "Collecting $($_.Name)"
-              Copy-Item $_.FullName -Destination $staging
+              $zip = [IO.Compression.ZipFile]::OpenRead($_.FullName)
+              try {
+                $entry = $zip.Entries | Where-Object { $_.FullName -notmatch '/' -and $_.Name -like '*.nuspec' } | Select-Object -First 1
+                $reader = New-Object IO.StreamReader($entry.Open())
+                try { [xml]$nuspec = $reader.ReadToEnd() } finally { $reader.Dispose() }
+                $libs = @($zip.Entries | Where-Object { $_.FullName -like 'lib/*.dll' } | ForEach-Object { $_.Name } | Sort-Object -Unique)
+              } finally { $zip.Dispose() }
+              $id = $nuspec.package.metadata.id
+              $version = $nuspec.package.metadata.version
+              try {
+                $published = (Invoke-RestMethod "https://api.nuget.org/v3-flatcontainer/$($id.ToLowerInvariant())/index.json").versions
+              } catch {
+                if ($_.Exception.Response.StatusCode -ne 404) { throw }
+                $published = @() # the package has never been published
+              }
+              if ($published -contains $version.ToLowerInvariant()) {
+                Write-Host "::notice::$id $version is already on NuGet.org. The package is neither signed nor pushed."
+                return
+              }
+              $projects += (Get-ChildItem -Path $_.Directory.Parent.Parent.FullName -Filter *.csproj | Select-Object -First 1).FullName
+              if ($libs.Count -gt 0) {
+                $assemblies += Get-ChildItem -Path $_.Directory.FullName -Recurse -Include $libs |
+                  Where-Object { $_.FullName -notmatch '[\\/](ref|refint)[\\/]' } |
+                  ForEach-Object { $_.FullName.Substring($root.Length + 1) }
+              }
+              Write-Host "$id $version is new and will be signed and pushed."
             }
+          Set-Content -Path sign-catalog.txt -Value ($assemblies | Sort-Object -Unique)
+          "projects=$($projects -join ';')" | Add-Content -Path $env:GITHUB_OUTPUT
+          "has-packages=$(($projects.Count -gt 0).ToString().ToLowerInvariant())" | Add-Content -Path $env:GITHUB_OUTPUT
+
+      # The identity must have the "Artifact Signing Certificate Profile Signer" role on the signing account and a
+      # federated credential for this repository (subject repo:Kros-sk/Kros.AspNetCore:ref:refs/heads/main).
+      - name: Azure login
+        if: steps.packages.outputs.has-packages == 'true'
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Sign assemblies
+        if: steps.packages.outputs.has-packages == 'true'
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: ${{ env.SIGNING_ENDPOINT }}
+          signing-account-name: ${{ env.SIGNING_ACCOUNT_NAME }}
+          certificate-profile-name: ${{ env.SIGNING_CERTIFICATE_PROFILE_NAME }}
+          files-catalog: ${{ github.workspace }}\sign-catalog.txt
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+          cache-dependencies: false # the signing tools contain executable code; GitHub Actions caches are not a security boundary
+
+      - name: Verify signatures
+        if: steps.packages.outputs.has-packages == 'true'
+        shell: pwsh
+        run: |
+          $failed = $false
+          foreach ($path in Get-Content sign-catalog.txt) {
+            $signature = Get-AuthenticodeSignature -FilePath $path
+            if ($signature.Status -ne 'Valid' -or -not $signature.TimeStamperCertificate) {
+              Write-Host "::error::$path is not signed and timestamped: $($signature.Status)"
+              $failed = $true
+            } else {
+              Write-Host "$path signed by '$($signature.SignerCertificate.Subject)', timestamped by '$($signature.TimeStamperCertificate.Subject)'"
+            }
+          }
+          if ($failed) { exit 1 }
+
+      - name: Pack
+        if: steps.packages.outputs.has-packages == 'true'
+        shell: pwsh
+        env:
+          PROJECTS: ${{ steps.packages.outputs.projects }}
+        run: |
+          # Re-creates the packages from the signed assemblies. --no-build keeps the signed files untouched.
+          $staging = Join-Path $env:RUNNER_TEMP 'packages'
+          New-Item -ItemType Directory -Path $staging -Force | Out-Null
+          foreach ($project in $env:PROJECTS -split ';') {
+            dotnet pack $project --configuration Release --no-build
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            Get-ChildItem -Path (Join-Path (Split-Path $project) 'bin' 'Release' '*') -Include *.nupkg, *.snupkg |
+              ForEach-Object {
+                Write-Host "Collecting $($_.Name)"
+                Copy-Item $_.FullName -Destination $staging
+              }
+          }
 
       - name: Upload packages
-        if: github.event_name != 'pull_request'
+        if: steps.packages.outputs.has-packages == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: packages
@@ -88,11 +208,11 @@ jobs:
 
   publish:
     name: Push to NuGet.org
-    needs: build
+    needs: sign
     # Same rule as the Azure DevOps pipeline: publish only from the release branch(es) listed above,
     # never from pull requests. Manual runs (workflow_dispatch) publish as well, as long as they run on
-    # one of those branches.
-    if: github.event_name != 'pull_request'
+    # one of those branches. Nothing is pushed when every package version is already on NuGet.org.
+    if: github.event_name != 'pull_request' && needs.sign.outputs.has-packages == 'true'
     runs-on: ubuntu-latest
     environment: nuget-org
     permissions:
