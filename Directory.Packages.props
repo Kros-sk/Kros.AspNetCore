@@ -6,7 +6,7 @@
     <PackageVersion Include="coverlet.collector" Version="10.1.1" />
     <PackageVersion Include="FluentValidation" Version="12.2.0" />
     <PackageVersion Include="Hellang.Middleware.ProblemDetails" Version="6.5.1" />
-    <PackageVersion Include="Kros.AspNetCore" Version="6.1.2" />
+    <PackageVersion Include="Kros.AspNetCore" Version="6.1.3" />
     <PackageVersion Include="Kros.Utils" Version="4.6.1" />
     <PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="[8.5.8]" />
     <PackageVersion Include="MassTransit.Newtonsoft" Version="[8.5.8]" />
